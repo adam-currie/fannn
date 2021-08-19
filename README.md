@@ -1,1 +1,1 @@
-fannn
+Highly customizable fan profiles.
