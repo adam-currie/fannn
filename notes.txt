@@ -1,0 +1,1 @@
+lm_sensors is not going to be enough, we need an abstraction layer so we can use things like XNVCtrl
