@@ -1,4 +1,13 @@
 todo:
+
 save sensors as: [feature->path]/[labelOfFeature]/[nameOfSubFeature]
+
 governor and UserExpression in 1 class?
+
 cpack?
+
+sensor interface implemented by a different class for each provider (libsensors, XNVCtrl) then implement it in a composite class that just has a list of interfaces.
+keep both libsensors and XNVCtrl in mind when designing the interface
+
+https://github.com/NVIDIA/nvidia-settings/blob/main/samples/nv-control-targets.c
+for XNVCtrl reference 
