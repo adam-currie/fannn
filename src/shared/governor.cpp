@@ -68,40 +68,42 @@ bool tryParseBivariantArithmetic(string s, function<int(int, int)> &func){
 function<int()> parseUserExp(
     string expression, 
     function<function<int()>(string)> getNamedInput,
-    function<function<int(int)>(string)> getNamedFunc){
-        vector<string> tokenStrs = splitOnWhiteSpace(expression);
-        //the optional second parameter takes an input from inputs
-        vector<variant<function<int(int)>, function<int(int,int)>>> ops;
-        vector<function<int()>> inputs;
+    function<function<int(int)>(string)> getNamedFunc)
+    {
+    vector<string> tokenStrs = splitOnWhiteSpace(expression);
 
-        //todo:bedmas
-        for (string s : tokenStrs){
-            function<int(int)> func;
-            function<int(int, int)> bivariantFunc;
-            function<int()> input;
-            if (tryParseNamedFunc(s, getNamedFunc, func)){
-                ops.push_back(func);
-            }else if (tryParseBivariantArithmetic(s, bivariantFunc)){
-                ops.push_back(bivariantFunc);
-            }else if (tryParseInput(s, getNamedInput, input)){
-                inputs.push_back(input);
+    //ops optionally take a second parameter that takes an input from input
+    vector<variant<function<int(int)>, function<int(int,int)>>> ops;
+    vector<function<int()>> inputs;
+
+    //todo:bedmas
+    for (string s : tokenStrs){
+        function<int(int)> func;
+        function<int(int, int)> bivariantFunc;
+        function<int()> input;
+        if (tryParseNamedFunc(s, getNamedFunc, func)){
+            ops.push_back(func);
+        }else if (tryParseBivariantArithmetic(s, bivariantFunc)){
+            ops.push_back(bivariantFunc);
+        }else if (tryParseInput(s, getNamedInput, input)){
+            inputs.push_back(input);
+        }
+    }
+    
+    return [=](){ 
+        auto input = inputs.begin();
+        int r = (*input++)();
+
+        for(auto op : ops){
+            if(auto monovariantFunc = get_if<function<int(int)>>(&op)){
+                r = (*monovariantFunc)(r);
+            }else{
+                auto byvariantFunc = get<function<int(int,int)>>(op);
+                r = byvariantFunc(r, (*input++)());
             }
         }
-        
-        return [=](){ 
-            auto input = inputs.begin();
-            int r = (*input++)();
-
-            for(auto op : ops){
-                if(auto monovariantFunc = get_if<function<int(int)>>(&op)){
-                    r = (*monovariantFunc)(r);
-                }else{
-                    auto byvariantFunc = get<function<int(int,int)>>(op);
-                    r = byvariantFunc(r, (*input++)());
-                }
-            }
-            return r; 
-        };
+        return r; 
+    };
 }
 
 template<typename T>

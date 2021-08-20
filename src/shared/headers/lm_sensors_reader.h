@@ -1,9 +1,9 @@
 #pragma once
 
-class Reader {
+class LmSensorsReader {
     public:
-        Reader();
+        LmSensorsReader();
         int debugListEverything();
         void Reload();
-        ~Reader();
+        ~LmSensorsReader();
 };

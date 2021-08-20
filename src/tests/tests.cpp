@@ -3,7 +3,7 @@
 #include <functional>
 #include <iostream>
 #include "governor.h"
-#include "reader.h"
+#include "lm_sensors_reader.h"
 
 
 using namespace std;
@@ -37,5 +37,5 @@ TEST_CASE("parseUserExp_test"){
 }
 
 TEST_CASE("temp_test"){
-    Reader().debugListEverything();
+    LmSensorsReader().debugListEverything();
 }

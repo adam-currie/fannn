@@ -1,13 +1,13 @@
-#include "reader.h"
+#include "lm_sensors_reader.h"
 #include <sensors/sensors.h>
 #include <sensors/error.h>
 #include <iostream>
 
-Reader::Reader() {
+LmSensorsReader::LmSensorsReader() {
     sensors_init(NULL);
 }
 
-int Reader::debugListEverything() { 
+int LmSensorsReader::debugListEverything() { 
     sensors_chip_name const * cn;
     int c = 0;
     while ((cn = sensors_get_detected_chips(0, &c)) != 0) {
@@ -41,11 +41,11 @@ int Reader::debugListEverything() {
     return 666;
 }
 
-void Reader::Reload() {
+void LmSensorsReader::Reload() {
     sensors_cleanup();
     sensors_init(NULL);
 }
 
-Reader::~Reader() {
+LmSensorsReader::~LmSensorsReader() {
     sensors_cleanup();
 }
