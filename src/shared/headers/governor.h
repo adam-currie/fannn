@@ -12,7 +12,6 @@ std::function<int()> parseUserExp(
     std::function<std::function<int()>(std::string)> getNamedInput,
     std::function<std::function<int(int)>(std::string)> getNamedFunc);
 
-template<typename T>
-std::function<void()> GetGovernor(
-    std::function<T()> getter, 
-    std::vector<std::function<void(T)>> setters);
+std::function<void()> getGovernor(
+    std::function<int()> getter, 
+    std::vector<std::function<void(int)>> setters);

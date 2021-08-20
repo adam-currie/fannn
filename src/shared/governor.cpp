@@ -106,10 +106,9 @@ function<int()> parseUserExp(
     };
 }
 
-template<typename T>
-function<void()> GetGovernor(function<T()> getter, vector<function<void(T)>> setters){
-    return [&]{//todo: mess around with value vs ref for both captured args
-        T value = getter();
+function<void()> getGovernor(function<int()> getter, vector<function<void(int)>> setters){
+    return [=]{
+        int value = getter();
         for (auto setter : setters){
             setter(value);
         };

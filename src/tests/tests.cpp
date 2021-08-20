@@ -36,6 +36,34 @@ TEST_CASE("parseUserExp_test"){
     REQUIRE(f() == 0);
 }
 
+TEST_CASE("governor_test"){
+    int setCounter = 0;
+    int a = 0;
+    int b = 0;
+    int c = 0;
+
+    function<int()> getter = [&](){
+        return ++setCounter;
+    };
+    
+    vector<function<void(int)>> setters = {
+        [&](int v){a=v;},
+        [&](int v){b=v;},
+        [&](int v){c=v;}
+    };
+
+    function<void()> gov = getGovernor(getter, setters);
+
+    gov();
+    REQUIRE(a == 1);
+    REQUIRE(b == 1);
+    REQUIRE(c == 1);
+    gov();
+    REQUIRE(a == 2);
+    REQUIRE(b == 2);
+    REQUIRE(c == 2);
+}
+
 TEST_CASE("temp_test"){
     LmSensorsReader().debugListEverything();
 }
