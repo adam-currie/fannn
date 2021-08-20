@@ -1,7 +1,10 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include <functional>
+#include <iostream>
 #include "governor.h"
+#include "reader.h"
+
 
 using namespace std;
 
@@ -31,4 +34,8 @@ TEST_CASE("parseUserExp_test"){
     REQUIRE(f() == 10);
     REQUIRE(f() == 20);
     REQUIRE(f() == 0);
+}
+
+TEST_CASE("temp_test"){
+    Reader().debugListEverything();
 }
