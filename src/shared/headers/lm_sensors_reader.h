@@ -1,9 +1,11 @@
 #pragma once
 
-class LmSensorsReader {
+#include "i_sensor_reader.h"
+
+class LmSensorsReader : ISensorReader{
     public:
         LmSensorsReader();
         int debugListEverything();
-        void Reload();
+        int getValue(std::string sensorId) override;
         ~LmSensorsReader();
 };

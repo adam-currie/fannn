@@ -41,11 +41,6 @@ int LmSensorsReader::debugListEverything() {
     return 666;
 }
 
-void LmSensorsReader::Reload() {
-    sensors_cleanup();
-    sensors_init(NULL);
-}
-
 LmSensorsReader::~LmSensorsReader() {
     sensors_cleanup();
 }
