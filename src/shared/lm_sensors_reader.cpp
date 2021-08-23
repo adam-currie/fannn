@@ -2,9 +2,25 @@
 #include <sensors/sensors.h>
 #include <sensors/error.h>
 #include <iostream>
+#include <atomic>
+
+static std::atomic<LmSensorsReader*> instance(nullptr);
 
 LmSensorsReader::LmSensorsReader() {
-    sensors_init(NULL);
+    LmSensorsReader* np = nullptr;
+    if(std::atomic_compare_exchange_strong(&instance, &np, this)){
+        sensors_init(nullptr);
+    }else{
+        throw new std::logic_error(
+            "not implemented: I have no idea why libsensors"
+            "doesn't want us calling sensors_init more than once,"
+            "but i don't feel like finding out."
+            "Probably we can just ignore this or work around it.");
+    };
+}
+
+int LmSensorsReader::getValue(std::string sensorId){
+    return 666;
 }
 
 int LmSensorsReader::debugListEverything() { 
@@ -43,4 +59,5 @@ int LmSensorsReader::debugListEverything() {
 
 LmSensorsReader::~LmSensorsReader() {
     sensors_cleanup();
+    instance.store(nullptr);
 }
