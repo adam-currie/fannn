@@ -6,12 +6,11 @@ governor and UserExpression in 1 class?
 
 cpack?
 
-sensor interface implemented by a different class for each provider (libsensors, XNVCtrl) then implement it in a composite class that just has a list of interfaces.
-keep both libsensors and XNVCtrl in mind when designing the interface
-
 both sensors and controllers should eventually be packaged into plugins(.so) 
 so people can quickly write up an interface to for their weird use cases 
 (like setting their system lights to match their fan speed, or modifying fan speed by time of day)
+
+let user rename/alias sensors and controllers(fans)
 
 https://github.com/NVIDIA/nvidia-settings/blob/main/samples/nv-control-targets.c
 for XNVCtrl reference 
