@@ -23,6 +23,10 @@ int LmSensorsReader::getValue(std::string sensorId){
     return 666;
 }
 
+std::vector<std::string> LmSensorsReader::getAll(){
+    throw std::logic_error("not implemented");
+}
+
 int LmSensorsReader::debugListEverything() { 
     sensors_chip_name const * cn;
     int c = 0;
@@ -38,18 +42,26 @@ int LmSensorsReader::debugListEverything() {
             sensors_subfeature const *subf;
             int s = 0;
 
+            //returned subfeature number is NEXT number, not current
             while ((subf = sensors_get_all_subfeatures(cn, feat, &s)) != 0) {
-                std::cout << "  " << f << ":" << s << ": name:" << subf->name
-                        << " number:" << subf->number << " flags:" << subf->flags << " number:" << subf->number << " = ";
+                std::cout << "  " << f << ":" << subf->number << ": name:" << subf->name
+                    << " flags:" << subf->flags << " = ";
                 double val;
                 if (subf->flags & SENSORS_MODE_R) {
                     int rc = sensors_get_value(cn, subf->number, &val);
                     if (rc < 0) {
-                        std::cout << "err: " << rc;
+                        std::cout << "read err: " << rc;
                     } else {
                         std::cout << val;
                     }
+                }else{
+                    std::cout << "not readable?";
                 }
+
+                if (subf->flags & SENSORS_MODE_W) {
+                    std::cout << " writable";
+                }
+
                 std::cout << std::endl;
             }
         }
