@@ -4,6 +4,7 @@
 #include <iostream>
 #include "governor.h"
 #include "lm_sensors_reader.h"
+#include "sysfs_pwm_writer.h"
 
 
 using namespace std;
@@ -66,4 +67,8 @@ TEST_CASE("governor_test"){
 
 TEST_CASE("temp_test"){
     LmSensorsReader().debugListEverything();
+}
+
+TEST_CASE("sysfs_pwm_writer_test"){
+    SysfsPwmWriter().getAll();
 }

@@ -14,3 +14,6 @@ let user rename/alias sensors and controllers(fans)
 
 https://github.com/NVIDIA/nvidia-settings/blob/main/samples/nv-control-targets.c
 for XNVCtrl reference 
+
+add hide option to sensors and output devices in the gui, more hidden option brings up this list of
+hidden devices to be re-enabled
