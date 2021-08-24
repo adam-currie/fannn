@@ -11,7 +11,7 @@ LmSensorsReader::LmSensorsReader() {
     if(std::atomic_compare_exchange_strong(&instance, &np, this)){
         sensors_init(nullptr);
     }else{
-        throw new std::logic_error(
+        throw std::logic_error(
             "not implemented: I have no idea why libsensors"
             "doesn't want us calling sensors_init more than once,"
             "but i don't feel like finding out."
