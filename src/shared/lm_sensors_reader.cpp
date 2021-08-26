@@ -1,72 +1,140 @@
 #include "lm_sensors_reader.h"
+#include <string.h>
 #include <sensors/sensors.h>
 #include <sensors/error.h>
 #include <iostream>
+#include <sstream>
 #include <atomic>
+#include <map>
 
-static std::atomic<LmSensorsReader*> instance(nullptr);
+using namespace std;
 
-LmSensorsReader::LmSensorsReader() {
-    LmSensorsReader* np = nullptr;
-    if(std::atomic_compare_exchange_strong(&instance, &np, this)){
-        sensors_init(nullptr);
-    }else{
-        throw std::logic_error(
+const char IDSTR_DELIM = '/';
+const char IDSTR_ESCAPE = '\\';
+
+static atomic<LmSensorsReader*> instance(nullptr);
+
+struct SensorData {
+    sensors_chip_name chip;
+    int subFeature;
+    SensorData(sensors_chip_name chip, int subFeature) : chip(chip), subFeature(subFeature) {}
+}typedef SensorData;
+
+class LmSensorsReader::Impl {
+    public:
+        map<string, SensorData> sensorMap = map<string, SensorData>();
+};
+
+class deliminatedStrBuilder{
+    ostringstream out;
+    char delim, escape;
+    bool hasData = false;
+    public:
+        deliminatedStrBuilder(char delim, char escape) : delim(delim), escape(escape) {}
+        deliminatedStrBuilder& operator<<(string s){
+            if(s.empty()) 
+                return *this;
+
+            if(hasData) {
+                //add delim between strings
+                out << delim;
+            }else{
+                //no delim needed before first string, next time though
+                hasData = true;
+            }
+
+            for(char c : s){
+                if(c == escape || c == delim)
+                    out << escape;
+                out << c;
+            }
+
+            return *this;
+        }
+        string get(){ return out.str(); }
+};
+
+//debug: old
+// /**
+//  * @brief splits the sensor id into its 2 parts and nullifies the deliminator, nothing is new-ed
+//  * @return int 0 if successful
+//  */
+// int splitSensorIdStr(char *idStr, const char **chipStr, const char **subFeatureNumStr){
+//     *chipStr = idStr;
+//     bool escaping = false;
+
+//debug: old
+//     for(char *c = idStr; *c != '\0'; c++){
+//         if(escaping){
+//             escaping = false;
+//         }else{
+//             if(*c == IDSTR_DELIM){
+//                 *c = '\0';
+//                 *subFeatureNumStr = c+1;
+//                 return 0;
+//             }
+//         }
+//     }
+//     return 1;
+// }
+
+// //negative on failure
+// int cStrToPositiveInt(const char *str){
+//     long l = strtol(str, nullptr, 10);
+//     return (l >= 0 && l <= INT_MAX)? l : -1;
+// }
+
+LmSensorsReader::LmSensorsReader() : pImpl{std::make_unique<Impl>()} {
+    LmSensorsReader *np = nullptr;
+    if(!atomic_compare_exchange_strong(&instance, &np, this)){
+        throw logic_error(
             "not implemented: I have no idea why libsensors"
             "doesn't want us calling sensors_init more than once,"
             "but i don't feel like finding out."
             "Probably we can just ignore this or work around it.");
     };
-}
 
-int LmSensorsReader::getValue(std::string sensorId){
-    return 666;
-}
+    sensors_init(nullptr);
 
-std::vector<std::string> LmSensorsReader::getAll(){
-    throw std::logic_error("not implemented");
-}
-
-int LmSensorsReader::debugListEverything() { 
-    sensors_chip_name const * cn;
-    int c = 0;
-    while ((cn = sensors_get_detected_chips(0, &c)) != 0) {
-        std::cout << "Chip: " << cn->prefix << "/" << cn->path << std::endl;
-
-        sensors_feature const *feat;
-        int f = 0;
-
-        while ((feat = sensors_get_features(cn, &f)) != 0) {
-            std::cout << " feature: " << feat->name << " type: " << feat->type << " label: " << sensors_get_label(cn, feat) << std::endl;
-
-            sensors_subfeature const *subf;
-            int s = 0;
-
-            //returned subfeature number is NEXT number, not current
-            while ((subf = sensors_get_all_subfeatures(cn, feat, &s)) != 0) {
-                std::cout << "  " << f << ":" << subf->number << ": name:" << subf->name
-                    << " flags:" << subf->flags << " = ";
-                double val;
-                if (subf->flags & SENSORS_MODE_R) {
-                    int rc = sensors_get_value(cn, subf->number, &val);
-                    if (rc < 0) {
-                        std::cout << "read err: " << rc;
-                    } else {
-                        std::cout << val;
-                    }
-                }else{
-                    std::cout << "not readable?";
+    sensors_chip_name const *chip;
+    int nextChip = 0;
+    while ((chip = sensors_get_detected_chips(0, &nextChip)) != 0) {
+        sensors_feature const *feature;
+        int nextFeature = 0;
+        while ((feature = sensors_get_features(chip, &nextFeature)) != 0) {
+            sensors_subfeature const *subFeature;
+            int nextSubFeature = 0;
+            string featureLabel = sensors_get_label(chip, feature);
+            while ((subFeature = sensors_get_all_subfeatures(chip, feature, &nextSubFeature)) != 0) {
+                if(subFeature->flags & SENSORS_MODE_R){
+                    SensorData data(*chip, nextSubFeature-1);
+                    deliminatedStrBuilder idBuilder(IDSTR_DELIM, IDSTR_ESCAPE);
+                    idBuilder << chip->prefix << to_string(chip->bus.type) << to_string(chip->bus.nr) << to_string(chip->addr) << featureLabel << subFeature->name;
+                    pImpl->sensorMap.insert({idBuilder.get(), data});//todo: deal with dups
                 }
-
-                if (subf->flags & SENSORS_MODE_W) {
-                    std::cout << " writable";
-                }
-
-                std::cout << std::endl;
             }
         }
     }
-    return 666;
+}
+
+double LmSensorsReader::getValue(string sensorId){
+    SensorData sensor = pImpl->sensorMap.at(sensorId);
+
+    double value;
+    if(sensors_get_value(&sensor.chip, sensor.subFeature, &value)){
+        throw logic_error("failed to read value of sensor: " + sensorId);//todo: better
+    }
+
+    return value;
+}
+
+vector<string> LmSensorsReader::getAll(){
+    vector<string> keys(pImpl->sensorMap.size());
+    int i=0;
+    for(auto pair : pImpl->sensorMap){
+        keys[i++] = pair.first;
+    }
+    return keys;
 }
 
 LmSensorsReader::~LmSensorsReader() {
