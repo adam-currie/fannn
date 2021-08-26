@@ -18,8 +18,14 @@ const regex PWM_REGEX("pwm[0-9]+");
 
 SysfsPwmWriter::SysfsPwmWriter(){}
 
-void SysfsPwmWriter::setValue(string deviceId){
-    throw logic_error("not implemented");
+void SysfsPwmWriter::setValue(string deviceId, int value){
+    /*
+        todo: might need to enable pwm here and then reset to the original value in a destructor, see:
+        https://github.com/lm-sensors/lm-sensors/blob/master/prog/pwm/fancontrol
+    */
+   ofstream out(deviceId, std::ofstream::trunc);
+   out << value;
+   out.close();
 }
 
 vector<string> SysfsPwmWriter::getAll(){
