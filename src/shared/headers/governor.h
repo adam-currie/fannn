@@ -7,11 +7,13 @@
 const std::string NAMED_INPUT_PREFIX = "input:";
 const std::string NAMED_FUNCTION_PREFIX = "func:";
 
-std::function<int()> parseUserExp(
+template <typename T>
+std::function<T()> parseUserExp(
     std::string expression, 
-    std::function<std::function<int()>(std::string)> getNamedInput,
-    std::function<std::function<int(int)>(std::string)> getNamedFunc);
+    std::function<std::function<T()>(std::string)> getNamedInput,
+    std::function<std::function<T(T)>(std::string)> getNamedFunc);
 
+template <typename T>
 std::function<void()> getGovernor(
-    std::function<int()> getter, 
-    std::vector<std::function<void(int)>> setters);
+    std::function<T()> getter, 
+    std::vector<std::function<void(T)>> setters);
