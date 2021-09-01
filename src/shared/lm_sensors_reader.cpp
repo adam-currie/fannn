@@ -54,36 +54,6 @@ class deliminatedStrBuilder{
         string get(){ return out.str(); }
 };
 
-//debug: old
-// /**
-//  * @brief splits the sensor id into its 2 parts and nullifies the deliminator, nothing is new-ed
-//  * @return int 0 if successful
-//  */
-// int splitSensorIdStr(char *idStr, const char **chipStr, const char **subFeatureNumStr){
-//     *chipStr = idStr;
-//     bool escaping = false;
-
-//debug: old
-//     for(char *c = idStr; *c != '\0'; c++){
-//         if(escaping){
-//             escaping = false;
-//         }else{
-//             if(*c == IDSTR_DELIM){
-//                 *c = '\0';
-//                 *subFeatureNumStr = c+1;
-//                 return 0;
-//             }
-//         }
-//     }
-//     return 1;
-// }
-
-// //negative on failure
-// int cStrToPositiveInt(const char *str){
-//     long l = strtol(str, nullptr, 10);
-//     return (l >= 0 && l <= INT_MAX)? l : -1;
-// }
-
 LmSensorsReader::LmSensorsReader() : pImpl{std::make_unique<Impl>()} {
     LmSensorsReader *np = nullptr;
     if(!atomic_compare_exchange_strong(&instance, &np, this)){
