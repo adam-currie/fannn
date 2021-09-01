@@ -2,6 +2,7 @@
 #include "governor.h"
 #include "sysfs_pwm_writer.h"
 #include "lm_sensors_reader.h"
+#include "user_config.h"
 #include <sensors/error.h>
 #include <iostream>
 #include <cmath>
@@ -14,16 +15,18 @@ using namespace std;
 class MinIntervalStepper{
     timespec lastTime = {0,0};
     timespec interval;
-    const long NS_IN_A_SEC = 1000000000;
+    static const long NS_IN_A_SEC = 1000000000;
     void getTime(timespec *out){
         if(clock_gettime(CLOCK_MONOTONIC, out))
             throw runtime_error("clock_gettime() failed:" + errno);
     }
     public: 
-        MinIntervalStepper(int minItervalMs){
-            interval.tv_sec = minItervalMs / 1000;
-            interval.tv_nsec = (minItervalMs % 1000) * (NS_IN_A_SEC/1000);
-        }
+        /**
+         * @brief Construct a new Min Interval Stepper object
+         * @param minItervalMs default is zero, resulting in no waiting between steps.
+         */
+        MinIntervalStepper(int minItervalMs = 0) : 
+            interval{minItervalMs/1000, (minItervalMs % 1000) * (NS_IN_A_SEC/1000)} {}
         void step(){
             timespec current, elapsed, remaining;
             getTime(&current);
@@ -55,28 +58,33 @@ class MinIntervalStepper{
         }
 };
 
-void loadConfig();
+void fakeConfigLoad();
 
 //todo: should be using an abstraction layer with prefixes on the device id str for different underlying writers
 SysfsPwmWriter writer = SysfsPwmWriter();
 //todo: should be using an abstraction layer
 LmSensorsReader reader = LmSensorsReader();
-int updateIntervalMs = 2000;
 vector<function<void()>> governors;
+MinIntervalStepper stepper;
 
 int main(){
-    loadConfig();
+    UserConfig config("debug_filename");
+    config.load();
+
     int i = 0;//debug
-    MinIntervalStepper stepper(updateIntervalMs);
     while(1){
         stepper.step();
         for(auto g : governors) 
             g();
         std::cout << i++ << std::endl;//debug
+        if(config.checkForExternalChanges())
+            config.load();
+        fakeConfigLoad();//debug
     }
 }
 
-void loadConfig(){
+//debug
+void fakeConfigLoad(){
     function<function<double()>(string)> getSensor = [](string s){
         return [s](){ 
             return reader.getValue(s); 
