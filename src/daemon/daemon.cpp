@@ -23,10 +23,10 @@ class MinIntervalStepper{
     public: 
         /**
          * @brief Construct a new Min Interval Stepper object
-         * @param minItervalMs default is zero, resulting in no waiting between steps.
+         * @param minIntervalMs default is zero, resulting in no waiting between steps.
          */
-        MinIntervalStepper(int minItervalMs = 0) : 
-            interval{minItervalMs/1000, (minItervalMs % 1000) * (NS_IN_A_SEC/1000)} {}
+        MinIntervalStepper(int minIntervalMs = 0) : 
+            interval{minIntervalMs/1000, (minIntervalMs % 1000) * (NS_IN_A_SEC/1000)} {}
         void step(){
             timespec current, elapsed, remaining;
             getTime(&current);
