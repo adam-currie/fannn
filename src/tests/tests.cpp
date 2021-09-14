@@ -5,7 +5,7 @@
 #include "governor.h"
 #include "lm_sensors_reader.h"
 #include "sysfs_pwm_writer.h"
-
+#include "curve.h"
 
 using namespace std;
 
@@ -75,4 +75,28 @@ TEST_CASE("sysfs_pwm_writer_test"){
     auto writer = SysfsPwmWriter();
     auto devices = writer.getAll();
     writer.setValue("/sys/devices/platform/nct6687.2592/hwmon/hwmon4/pwm1", 50);
+}
+
+TEST_CASE("curve_gety_test"){
+    Curve c;
+
+    REQUIRE_THROWS_AS( c.setDomain(101, 100), typeof(out_of_range) );
+    REQUIRE_THROWS_AS( c.setRange(101, 100), typeof(out_of_range) );
+
+    c.points = map<int,int>({
+        {1,4},
+        {10,8}
+    });
+    REQUIRE(c.getY(9) == 8);
+
+    c.points = map<int,int>({
+        {1,1},
+        {2,2}
+    });
+
+    c.setDomain(420,420);
+    c.setRange(666,666);
+    REQUIRE_THROWS_AS( c.getY(419), typeof(out_of_range) );
+    REQUIRE_THROWS_AS( c.getY(421), typeof(out_of_range) );
+    REQUIRE(c.getY(420) == 666);
 }
