@@ -1,3 +1,5 @@
+#pragma once
+
 #include <vector>
 #include "i_device_writer.h"
 
