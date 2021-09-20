@@ -6,64 +6,12 @@
 #include "lm_sensors_reader.h"
 #include "sysfs_pwm_writer.h"
 #include "curve.h"
+#include "profile.h"
+#include "profile_engine.h"
+#include "ranges"
+#include "tokenizer.h"
 
 using namespace std;
-
-TEST_CASE("parseUserExp_test"){
-    int counter = 0;
-
-    function<function<int()>(string)> getSensorDebug = [&counter](string s){
-        REQUIRE(s == "debug_temp");
-        return [&counter](){ 
-            return counter++; 
-        };
-    };
-
-    function<function<int(int)>(string)> getCurve = [](string s){
-        REQUIRE(s == "debug_curve");
-        return [](int i){ 
-            return i*i; 
-        };
-    };
-
-    function<int()> f = parseUserExp(
-        "input:debug_temp * 2 func:debug_curve",
-        getSensorDebug,
-        getCurve);
-        
-    REQUIRE(f() == 0);
-    REQUIRE(f() == 4);
-    REQUIRE(f() == 16);
-    REQUIRE(f() == 36);
-}
-
-TEST_CASE("governor_test"){
-    int setCounter = 0;
-    int a = 0;
-    int b = 0;
-    int c = 0;
-
-    function<int()> getter = [&](){
-        return ++setCounter;
-    };
-    
-    vector<function<void(int)>> setters = {
-        [&](int v){a=v;},
-        [&](int v){b=v;},
-        [&](int v){c=v;}
-    };
-
-    function<void()> gov = getGovernor(getter, setters);
-
-    gov();
-    REQUIRE(a == 1);
-    REQUIRE(b == 1);
-    REQUIRE(c == 1);
-    gov();
-    REQUIRE(a == 2);
-    REQUIRE(b == 2);
-    REQUIRE(c == 2);
-}
 
 TEST_CASE("sensors_get_all_test"){
     for(string str : LmSensorsReader().getAll()){
@@ -83,13 +31,13 @@ TEST_CASE("curve_gety_test"){
     REQUIRE_THROWS_AS( c.setDomain(101, 100), typeof(out_of_range) );
     REQUIRE_THROWS_AS( c.setRange(101, 100), typeof(out_of_range) );
 
-    c.points = map<int,int>({
-        {1,4},
-        {10,8}
+    c.points = map<double,double>({
+        {0,0},
+        {10,5}
     });
-    REQUIRE(c.getY(9) == 8);
+    REQUIRE(c.getY(9) == 4.5);
 
-    c.points = map<int,int>({
+    c.points = map<double,double>({
         {1,1},
         {2,2}
     });
@@ -99,4 +47,103 @@ TEST_CASE("curve_gety_test"){
     REQUIRE_THROWS_AS( c.getY(419), typeof(out_of_range) );
     REQUIRE_THROWS_AS( c.getY(421), typeof(out_of_range) );
     REQUIRE(c.getY(420) == 666);
+}
+
+TEST_CASE("tokenizer_test"){
+    Tokenizer tokenizer(" 1+2 -3+value - 420 ", {' '}, {'+','-'});
+    REQUIRE(tokenizer.getTokens() == vector<string>({"1","+","2","-","3","+","value","-","420"}));
+}
+
+TEST_CASE("governor_test"){
+    auto readCurve = [](string name){
+        Curve curve1;
+        curve1.points = {{0,0},{100,50}};
+        if (name == "curve1") {
+            return [=](double x){ return curve1.getY(x); };
+        }else{
+            throw runtime_error("thats not a curve!");
+        }
+    };
+
+    //fake sensor values that increment each time they are read, starting at 10
+    class : public ISensorReader { public:
+        string prefix = "sensor";
+        vector<double> values = vector<double>(8, 10);
+        vector<string> getAll(){
+            vector<string> all(values.size());
+            for(int i=0; i<all.size(); i++) all[i] = i;
+            return all;
+        }
+        double getValue(string id){
+            if (id.rfind(prefix, 0) != 0) throw runtime_error("that aint no sensor");
+            id = id.substr(prefix.size());
+            return values[stoi(id)]++;
+        }
+    } reader;
+
+    Governor gov1(
+        "curve1 sensor1",
+        [](string s){return true;},
+        [](string s){return true;});
+    gov1.readCurve = readCurve;
+    gov1.readSensorOrGovernor = [&](string id){ 
+        return reader.getValue(id); 
+    };
+
+    REQUIRE(gov1.exec() == 5);
+}
+
+TEST_CASE("profile_engine_test"){
+    Profile profile;
+    
+    {
+        Curve curve;
+        curve.points = {{0,0},{100,50}};
+        profile.curves = {{"curve1", curve}};
+    }
+
+    {
+        Governor gov(
+            "curve1 sensor1",
+            [](string s){return true;},
+            [](string s){return true;});
+        profile.governors = {
+            {"governor1", gov}
+        };
+    }
+    
+    class : public IDeviceWriter {
+        vector<int> devices = vector<int>(8);
+        vector<string> getAll(){
+            vector<string> all(devices.size());
+            for(int i=0; i<all.size(); i++) all[i] = i;
+            return all;
+        }
+        void setValue(string id, int value){
+            devices[stoi(id)] = value;
+        }
+    } writer;
+
+    //fake sensor values that increment each time they are read
+    class : public ISensorReader {
+        string prefix = "sensor";
+        vector<double> values = vector<double>(8);
+        vector<string> getAll(){
+            vector<string> all(values.size());
+            for(int i=0; i<all.size(); i++) all[i] = i;
+            return all;
+        }
+        double getValue(string id){
+            if (id.rfind(prefix, 0) != 0) throw runtime_error("that aint no sensor");//todo: idk what to throw yet
+            id = id.substr(prefix.size());
+            return values[stoi(id)]++;
+        }
+    } reader;
+
+    ProfileEngine engine(
+        profile, 
+        shared_ptr<IDeviceWriter>(&writer), 
+        shared_ptr<ISensorReader>(&reader));
+
+    engine.runOnce();
 }

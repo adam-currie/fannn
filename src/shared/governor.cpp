@@ -2,123 +2,205 @@
 #include <sstream>
 #include <variant>
 #include <string.h>
+#include "tokenizer.h"
+#include <math.h>
 
 using namespace std;
 
-vector<string> splitOnWhiteSpace(string str){
-    vector<string> v;
-    istringstream iss(str);
-    string word;
-    while(iss >> word) v.push_back(word);
-    return v;
-}
+const vector<char> DELIMINATORS = {' ', '\f', '\n', '\r', '\t', '\v'};
 
-template <typename T, typename enable_if<is_arithmetic<T>::value>::type* = nullptr>
-bool tryParseNamedFunc(string s, function<function<T(T)>(string)> getNamedFunc, function<T(T)> &func){
-    if (s.rfind(NAMED_FUNCTION_PREFIX, 0) == 0){
-        string name = s.substr(NAMED_FUNCTION_PREFIX.length());
-        func = getNamedFunc(name); //todo: handle not finding it
-        return true;
-    }else{
-        return false;
+typedef struct ArithmeticOp : public function<double(double, double)>{
+    const char symbol;
+    const int priority;
+    ArithmeticOp() : symbol(0), priority(0){}
+    ArithmeticOp(char symbol, int priority, function<double(double,double)> f) : function<double(double, double)>(f), 
+        symbol(symbol), priority(priority) {}
+} ArithmeticOp;
+
+const map<char, ArithmeticOp> ARITHMETIC = {
+    {'-', ArithmeticOp('-', 1, minus<double>())}, 
+    {'+', ArithmeticOp('+', 1, plus<double>())},
+    {'*', ArithmeticOp('*', 2, multiplies<double>())},
+    {'/', ArithmeticOp('/', 2, divides<double>())},
+    {'^', ArithmeticOp('^', 3, [](double a,double b){return pow(a,b);})}
+};
+
+const vector<char> Governor::RESERVED_SYMBOLS = [](){ 
+    vector<char> symbols;
+    for(auto t: ARITHMETIC) symbols.push_back(t.first);
+    symbols.push_back(')');
+    symbols.push_back('(');
+    return symbols;
+}();
+
+struct _TokenParseError: public runtime_error {
+    public:
+        int tokenIndex;
+        string errMsg;
+        _TokenParseError(int tokenIndex, string errMsg) : runtime_error(errMsg),
+            tokenIndex(tokenIndex), errMsg(errMsg) {}
+};
+
+class Parser{
+    Governor *owner;
+    function<bool(string)> validateCurve;
+    function<bool(string)> validateSensorOrGovernor;
+    vector<string> tokens;
+    int n = 0;
+
+    string getToken(int n, string errMsg){
+        if (n >= tokens.size()) 
+            throw _TokenParseError(n, errMsg);
+        return tokens[n];
     }
-}
 
-template <typename T, typename enable_if<is_arithmetic<T>::value>::type* = nullptr>
-bool tryParseInput(string s, function<function<T()>(string)> getNamedInput, function<T()> &inputFunc){
-    try {
-        const T constant = stoi(s);
-        inputFunc = [=](){ return constant; };
-        return true;
-    }catch(invalid_argument){
-        if (s.rfind(NAMED_INPUT_PREFIX, 0) == 0){
-            string name = s.substr(NAMED_INPUT_PREFIX.length());
-            inputFunc = getNamedInput(name); //todo: handle not finding it
-            return true;
-        }else{
-            return false;
+    bool isArithmeticOp(string s){
+        return  s.size() == 1 &&
+                ARITHMETIC.find(s.at(0)) != ARITHMETIC.end();
+    }
+
+    ArithmeticOp parseArithmeticOp() {
+        string token = getToken(n, "expected arithmetic operation");
+        if(token.size() != 1) 
+            throw  _TokenParseError(n, "expected arithmetic operation");
+        
+        auto opIterator = ARITHMETIC.find(token.at(0));
+        if (opIterator == ARITHMETIC.end())
+            throw _TokenParseError(n, "expected arithmetic operation");
+
+        n++;
+        return opIterator->second;
+    }
+
+    /**
+     * @brief parses a single expression without traversing operations
+     *        (unless they are encapsulated within a function call or brackets)
+     */
+    function<double()> parseSelfContainedExp() {
+        string token = getToken(n, "expected an expression");
+
+        if(isArithmeticOp(token))
+            throw _TokenParseError(n, "expected an expression"); 
+
+        //CONSTANTS?
+        try {
+            const double constant = stod(token);
+            n++;
+            return [=](){ return constant; };
+        }catch(invalid_argument){
+            //so its not a constant, fine by me!
+        }catch(out_of_range){
+            throw _TokenParseError(n, "constant value is out of range");
         }
-    }//todo: test how this fails with out_of_range exception
-}
 
-template <typename T, typename enable_if<is_arithmetic<T>::value>::type* = nullptr>
-bool tryParseBivariantArithmetic(string s, function<T(T, T)> &func){
-    if(s.length() != 1){
-        return false;
-    }
+        //BRACKETS?
+        if(token == "("){
+            n++;
+            return parseExp(true);
+        }
 
-    switch(s[0]){
-        case '+':
-            func = plus<T>();
-            return true;
-        case '-':
-            func = minus<T>();
-            return true;
-        case '*':
-            func = multiplies<T>();
-            return true;
-        case '/':   //todo: division by zero
-            func = divides<T>();
-            return true;
-        default:
-            return false;
-    }
-}
+        //SENSORS, GOVERNORS AND CURVES?
+        if (tokens.size() > n+1 && !isArithmeticOp(tokens[n])){
+            //should be a curve because it takes an argument
+            if(!validateCurve(token))
+                throw _TokenParseError(n, "no curve matching: '" + token + "'"); 
 
-//todo: all other arithmetic types except maybe bool
-template function<int()> parseUserExp<int>(string, function<function<int()>(string)>, function<function<int(int)>(string)>);
-template function<double()> parseUserExp<double>(string, function<function<double()>(string)>, function<function<double(double)>(string)>);
-template <typename T>
-function<T()> parseUserExp(
-    string expression, 
-    function<function<T()>(string)> getNamedInput,
-    function<function<T(T)>(string)> getNamedFunc)
-    {
-    vector<string> tokenStrs = splitOnWhiteSpace(expression);//todo: quote strings to allow for spaces in them
-
-    //ops optionally take a second parameter that takes an input from input
-    vector<variant<function<T(T)>, function<T(T,T)>>> ops;
-    vector<function<T()>> inputs;
-
-    //todo:bedmas
-    for (string s : tokenStrs){
-        function<T(T)> func;
-        function<T(T, T)> bivariantFunc;
-        function<T()> input;
-        if (tryParseNamedFunc(s, getNamedFunc, func)){
-            ops.push_back(func);
-        }else if (tryParseBivariantArithmetic(s, bivariantFunc)){
-            ops.push_back(bivariantFunc);
-        }else if (tryParseInput(s, getNamedInput, input)){
-            inputs.push_back(input);
+            n++;
+            auto rightHandExp = parseSelfContainedExp();
+            return [*this, token, rightHandExp](){ 
+                return owner->readCurve(token)(rightHandExp()); }
+            ;
+        } else {
+            if(!validateSensorOrGovernor(token))
+                throw _TokenParseError(n, "no sensor or governor matching: '" + token + "'");
+            n++;
+            return [*this, token](){
+                 return owner->readSensorOrGovernor(token); 
+            };
         }
     }
-    
-    return [=](){ 
-        auto input = inputs.begin();
-        int r = (*input++)();
 
-        for(auto op : ops){
-            if(auto monovariantFunc = get_if<function<T(T)>>(&op)){
-                r = (*monovariantFunc)(r);
-            }else{
-                auto byvariantFunc = get<function<T(T,T)>>(op);
-                r = byvariantFunc(r, (*input++)());
-            }
-        }
-        return r; 
-    };
-}
+    /**
+     * @brief   traverses operations until we can be sure we can encapsulate 
+     *          them in an expression without breaking order of operations, 
+     *          then concatenates that expression with everything after
+     */
+    function<double()> parseExp(bool bracketed = false) {
+        vector<ArithmeticOp> ops;
+        vector<function<double()>> subExpressions;
 
-//todo: all other arithmetic types except maybe bool
-template function<void()> getGovernor<int>(function<int()>, vector<function<void(int)>>);
-template function<void()> getGovernor<double>(function<double()>, vector<function<void(double)>>);
-template <typename T>
-function<void()> getGovernor(function<T()> getter, vector<function<void(T)>> setters){
-    return [=]{
-        T value = getter();
-        for (auto setter : setters){
-            setter(value);
+        auto endReached = [&](){
+            return bracketed ?
+                getToken(n++, "expected closing bracket") == ")" :
+                n >= tokens.size();
         };
-    };
+
+        //loop through expression+op pairs until we are sure we can encapsulate them without breaking order of operations
+        do {
+            subExpressions.push_back(parseSelfContainedExp());
+            if (endReached()) 
+                break;
+            ops.push_back(parseArithmeticOp());
+        } while (
+            ops.size() < 2 || 
+            ops.back().priority >= ops[ops.size()-2].priority
+        );
+
+        if (ops.size() == subExpressions.size()) {
+            //if we end in an op then we need to keep parsing
+            //concatenate the expression we encapsulated with everything after
+            function<double()> everythingAfter = parseExp();
+            return [=](){ 
+                double value = subExpressions.back()();
+                for (int i=ops.size()-2; i>=0; i--)
+                    value = ops[i](subExpressions[i](),value);
+                return ops.back()(value, everythingAfter());
+            };
+        }else{
+            return [=](){ 
+                double value = subExpressions.back()();
+                for (int i=ops.size()-1; i>=0; i--)
+                    value = ops[i](subExpressions[i](),value);
+                return value;
+            };
+        }
+    }
+
+    public:
+        Parser(vector<string> tokens, function<bool(string)> validateCurve, function<bool(string)> validateSensorOrGovernor, Governor *owner) 
+            :   tokens(tokens), validateCurve(validateCurve), validateSensorOrGovernor(validateSensorOrGovernor), owner(owner) {}
+
+        /**
+         * @brief parses the expression
+         * @throws _TokenParseError thrown on failure
+         * @return function<double()> the parsed expression if successful
+         */
+        function<double()> parse(){
+            return parseExp();
+        }
+};
+
+Governor::Governor(string userExpression, function<bool(string)> validateCurve, function<bool(string)> validateSensorOrGovernor)
+    : expStr(userExpression) {
+    Tokenizer tokenizer(userExpression, DELIMINATORS, RESERVED_SYMBOLS);
+
+    try {
+        exp = Parser(tokenizer.getTokens(), validateCurve, validateSensorOrGovernor, this)
+            .parse();
+    } catch(_TokenParseError e) {
+        int start,end;
+        try{
+            tie(start,end) = tokenizer.backtraceToken(e.tokenIndex);
+        } catch(out_of_range) {
+            //probably our original error is that our token index went out of range!
+            //in any case this means that our error applies to the whole dang string
+            start = 0;
+            end = userExpression.size()-1;
+        }
+        throw Governor::ParseError(userExpression, start, end, e.errMsg);
+    }
+}
+
+double Governor::exec(){
+    return exp();
 }

@@ -100,14 +100,5 @@ void fakeConfigLoad(){
         };
     };
 
-    auto junctionTempTimes2 = parseUserExp(
-        "input:amdgpu/2/0/11520/junction/temp2_input * 2",
-        getSensor,
-        getCurve);
-
-    auto pwm1Setter = [](double v){
-        writer.setValue("/sys/devices/platform/nct6687.2592/hwmon/hwmon4/pwm1", v);
-    };
-
-    governors.push_back(getGovernor(junctionTempTimes2, {pwm1Setter}));
+    //todo:
 }
