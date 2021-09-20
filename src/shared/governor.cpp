@@ -100,7 +100,7 @@ class Parser{
         }
 
         //SENSORS, GOVERNORS AND CURVES?
-        if (tokens.size() > n+1 && !isArithmeticOp(tokens[n])){
+        if (tokens.size() > n+1 && !isArithmeticOp(tokens[n+1])){
             //should be a curve because it takes an argument
             if(!validateCurve(token))
                 throw _TokenParseError(n, "no curve matching: '" + token + "'"); 
