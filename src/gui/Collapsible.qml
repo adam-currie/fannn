@@ -27,7 +27,7 @@ Page {
             color: Material.accent
         }
     }
-    ListView {
+    GridView {
         visible: !collapsed
         implicitHeight: childrenRect.height
         height: collapsed? 0 : implicitHeight
@@ -64,8 +64,4 @@ Page {
 //    }
 //}
 
-/*##^##
-Designer {
-    D{i:0;autoSize:true;height:480;width:640}
-}
-##^##*/
+
