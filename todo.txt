@@ -2,8 +2,6 @@ todo:
 
 save sensors as: [feature->path]/[labelOfFeature]/[nameOfSubFeature]
 
-governor and UserExpression in 1 class?
-
 cpack?
 
 both sensors and controllers should eventually be packaged into plugins(.so) 
