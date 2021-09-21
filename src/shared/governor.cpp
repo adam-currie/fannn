@@ -130,15 +130,19 @@ class Parser{
         vector<function<double()>> subExpressions;
 
         auto endReached = [&](){
-            return bracketed ?
-                getToken(n++, "expected closing bracket") == ")" :
-                n >= tokens.size();
+            if(bracketed){
+                bool bracketHit = getToken(n, "expected closing bracket") == ")";
+                if (bracketHit) n++;
+                return bracketHit;
+            }else{
+                return n >= tokens.size();
+            }
         };
 
         //loop through expression+op pairs until we are sure we can encapsulate them without breaking order of operations
         do {
             subExpressions.push_back(parseSelfContainedExp());
-            if (endReached()) 
+            if (endReached())
                 break;
             ops.push_back(parseArithmeticOp());
         } while (

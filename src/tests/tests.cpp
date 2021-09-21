@@ -10,6 +10,7 @@
 #include "profile_engine.h"
 #include "ranges"
 #include "tokenizer.h"
+#include <math.h>
 
 using namespace std;
 
@@ -81,69 +82,36 @@ TEST_CASE("governor_test"){
         }
     } reader;
 
+    map<string,Governor> govMap;
+
+    auto readSensorOrGov = [&](string id){ 
+        try{
+            return govMap.at(id).exec();
+        }catch(out_of_range){
+            return reader.getValue(id); 
+        }
+    };
+
     Governor gov1(
         "curve1 sensor1",
         [](string s){return true;},
         [](string s){return true;});
     gov1.readCurve = readCurve;
-    gov1.readSensorOrGovernor = [&](string id){ 
-        return reader.getValue(id); 
-    };
+    gov1.readSensorOrGovernor = readSensorOrGov;
+    govMap.insert({"gov1", gov1});
+
+    Governor gov2(
+        " curve1(gov1     +sensor2 * 2)^2 ^ 3  -2      ",
+        [](string s){return true;},
+        [](string s){return true;});
+    gov2.readCurve = readCurve;
+    gov2.readSensorOrGovernor = readSensorOrGov;
+    govMap.insert({"gov2", gov2});
 
     REQUIRE(gov1.exec() == 5);
-}
+    REQUIRE(gov1.exec() == 5.5);
+    REQUIRE(gov1.exec() == 6);
+    REQUIRE(gov1.exec() == 6.5);
 
-TEST_CASE("profile_engine_test"){
-    Profile profile;
-    
-    {
-        Curve curve;
-        curve.points = {{0,0},{100,50}};
-        profile.curves = {{"curve1", curve}};
-    }
-
-    {
-        Governor gov(
-            "curve1 sensor1",
-            [](string s){return true;},
-            [](string s){return true;});
-        profile.governors = {
-            {"governor1", gov}
-        };
-    }
-    
-    class : public IDeviceWriter {
-        vector<int> devices = vector<int>(8);
-        vector<string> getAll(){
-            vector<string> all(devices.size());
-            for(int i=0; i<all.size(); i++) all[i] = i;
-            return all;
-        }
-        void setValue(string id, int value){
-            devices[stoi(id)] = value;
-        }
-    } writer;
-
-    //fake sensor values that increment each time they are read
-    class : public ISensorReader {
-        string prefix = "sensor";
-        vector<double> values = vector<double>(8);
-        vector<string> getAll(){
-            vector<string> all(values.size());
-            for(int i=0; i<all.size(); i++) all[i] = i;
-            return all;
-        }
-        double getValue(string id){
-            if (id.rfind(prefix, 0) != 0) throw runtime_error("that aint no sensor");//todo: idk what to throw yet
-            id = id.substr(prefix.size());
-            return values[stoi(id)]++;
-        }
-    } reader;
-
-    ProfileEngine engine(
-        profile, 
-        shared_ptr<IDeviceWriter>(&writer), 
-        shared_ptr<ISensorReader>(&reader));
-
-    engine.runOnce();
+    REQUIRE(fabs(gov2.exec() - 1103240374.88) < .01);
 }
