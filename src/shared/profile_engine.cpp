@@ -1,6 +1,7 @@
 #include "profile_engine.h"
 
 using namespace std;
+using namespace Fannn;
 
 ProfileEngine::ProfileEngine(Profile profile, const shared_ptr<const IDeviceWriter> deviceWriter, const shared_ptr<const ISensorReader> sensorReader) 
   : profile(profile), deviceWriter(deviceWriter), sensorReader(sensorReader){

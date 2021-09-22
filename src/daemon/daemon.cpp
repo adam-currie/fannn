@@ -8,6 +8,7 @@
 #include <cmath>
 
 using namespace std;
+using namespace Fannn;
 
 /**
  * @brief waits just long enough to make a step take as long as it should, taking into account the time already spent on it

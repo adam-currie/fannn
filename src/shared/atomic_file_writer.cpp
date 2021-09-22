@@ -8,6 +8,7 @@
 #include <sys/time.h>
 
 using namespace std;
+using namespace Fannn;
 
 #define TEMP_FILENAME_LENGTH 16
 

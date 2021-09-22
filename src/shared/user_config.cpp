@@ -2,6 +2,7 @@
 #include "atomic_file_writer.h"
 
 using namespace std;
+using namespace Fannn;
 
 #define USER_CONFIG_FILE_DIR "config/"
 

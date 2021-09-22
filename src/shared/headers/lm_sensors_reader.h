@@ -4,13 +4,17 @@
 #include <memory>
 #include <experimental/propagate_const>
 
-class LmSensorsReader : ISensorReader{
-    class Impl;
-    std::experimental::propagate_const<std::unique_ptr<Impl>> pImpl;
-    public:
-        LmSensorsReader();
-        int debugListEverything();
-        std::vector<std::string> getAll() override;
-        double getValue(std::string sensorId) override;
-        ~LmSensorsReader();
-};
+namespace Fannn {
+
+    class LmSensorsReader : ISensorReader{
+        class Impl;
+        std::experimental::propagate_const<std::unique_ptr<Impl>> pImpl;
+        public:
+            LmSensorsReader();
+            int debugListEverything();
+            std::vector<std::string> getAll() override;
+            double getValue(std::string sensorId) override;
+            ~LmSensorsReader();
+    };
+
+}

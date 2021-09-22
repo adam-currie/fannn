@@ -8,6 +8,7 @@
 #define HWMON_ROOT "/sys"
 
 using namespace std;
+using namespace Fannn;
 using recursive_directory_iterator = std::filesystem::recursive_directory_iterator;
 using directory_options = std::filesystem::directory_options;
 using directory_entry = std::filesystem::directory_entry;

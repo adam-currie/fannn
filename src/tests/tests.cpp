@@ -13,6 +13,7 @@
 #include <math.h>
 
 using namespace std;
+using namespace Fannn;
 
 TEST_CASE("sensors_get_all_test"){
     for(string str : LmSensorsReader().getAll()){

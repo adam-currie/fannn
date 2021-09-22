@@ -6,6 +6,7 @@
 #include <math.h>
 
 using namespace std;
+using namespace Fannn;
 
 const vector<char> DELIMINATORS = {' ', '\f', '\n', '\r', '\t', '\v'};
 

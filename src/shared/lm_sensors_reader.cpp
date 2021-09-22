@@ -8,6 +8,7 @@
 #include <map>
 
 using namespace std;
+using namespace Fannn;
 
 const char IDSTR_DELIM = '/';
 const char IDSTR_ESCAPE = '\\';

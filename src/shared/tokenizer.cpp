@@ -2,7 +2,7 @@
 #include <algorithm>
 
 using namespace std;
-
+using namespace Fannn;
 
 template <typename T>
 bool contains(vector<T> v, T t){
