@@ -1,17 +1,15 @@
 todo:
 
-save sensors as: [feature->path]/[labelOfFeature]/[nameOfSubFeature]
-
 cpack?
 
 both sensors and controllers should eventually be packaged into plugins(.so) 
 so people can quickly write up an interface to for their weird use cases 
 (like setting their system lights to match their fan speed, or modifying fan speed by time of day)
 
-let user rename/alias sensors and controllers(fans)
-
 https://github.com/NVIDIA/nvidia-settings/blob/main/samples/nv-control-targets.c
 for XNVCtrl reference 
 
 add hide option to sensors and output devices in the gui, more hidden option brings up this list of
 hidden devices to be re-enabled
+
+find out why 'import fannn' produces an error when viewed in qt creator yet it runs fine

@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
 import Qt.labs.settings
+import fannn 1.0
 
 ApplicationWindow {
     id: window
@@ -94,11 +95,7 @@ ApplicationWindow {
             ComboBox {
                 flat: true
                 Layout.leftMargin: 8
-                model: 3
-                delegate: ItemDelegate {
-                    text: "profile " + (index + 1)
-                    width: listView.width
-                }
+                model: ProfilesModel
             }
 
             ToolButton {

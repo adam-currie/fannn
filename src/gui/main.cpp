@@ -2,7 +2,8 @@
 #include <QQmlApplicationEngine>
 #include <QSettings>
 #include <QQuickStyle>
-
+#include "sensors_model.h"
+#include "profiles_model.h"
 
 int main(int argc, char *argv[]){
     QGuiApplication::setApplicationName("Fannn");
@@ -26,7 +27,7 @@ int main(int argc, char *argv[]){
         QLatin1String("Imagine"), QLatin1String("Material"), QLatin1String("Universal") };
     engine.setInitialProperties({{ "builtInStyles", builtInStyles }});
 
-    const QUrl url(QStringLiteral("qrc:/main.qml"));
+    const QUrl url(u"qrc:/fannn/main.qml"_qs);
     QObject::connect(
         &engine,
         &QQmlApplicationEngine::objectCreated,
