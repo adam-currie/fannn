@@ -20,7 +20,7 @@ class AtomicFileWriter::Impl {
     public:
         char tmpFilePath[sizeof(TEMP_DIR)+TEMP_FILENAME_LENGTH] = TEMP_DIR;
         string targetPath;
-        FILE *tmpFp;
+        FILE *tmpFp;//todo: close?
 };
 
 static void getRandAlphaNum(char *out, const int len) {
@@ -60,7 +60,7 @@ static void cleanupTempDir(){
     }
 }
 
-AtomicFileWriter::AtomicFileWriter(string filename) : pImpl{std::make_unique<Impl>()}{
+AtomicFileWriter::AtomicFileWriter(string filename) : pImpl{std::make_unique<Impl>()} {
     pImpl->targetPath = filename;
 
     cleanupTempDir();
@@ -74,6 +74,11 @@ AtomicFileWriter::AtomicFileWriter(string filename) : pImpl{std::make_unique<Imp
         throw runtime_error("failed to create temporary file for writing");
 }
 
+AtomicFileWriter& AtomicFileWriter::operator<<(const char* s){
+    fputs(s, pImpl->tmpFp);
+    return *this;
+}
+
 void AtomicFileWriter::atomicWrite(){
     //flush to file system
     if(fflush(pImpl->tmpFp))
@@ -83,8 +88,6 @@ void AtomicFileWriter::atomicWrite(){
     //is replaced with our temp file but before our temp file contents are are physically written to disk
     if (fsync(fileno(pImpl->tmpFp)))
         throw runtime_error(string("failed to flush temporary file to disk. errno:") + to_string(errno)); 
-
-    fclose(pImpl->tmpFp);
 
     ensureDirectoryStructure(pImpl->targetPath);
     if(rename(pImpl->tmpFilePath, pImpl->targetPath.c_str()))
