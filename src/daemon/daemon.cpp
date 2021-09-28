@@ -69,19 +69,19 @@ vector<function<void()>> governors;
 MinIntervalStepper stepper;
 
 int main(){
-    UserConfig config("debug_filename");
-    config.load();
+//    UserConfig config("debug_filename");
+//    config.load();
 
-    int i = 0;//debug
-    while(1){
-        stepper.step();
-        for(auto g : governors) 
-            g();
-        std::cout << i++ << std::endl;//debug
-        if(config.checkForExternalChanges())
-            config.load();
-        fakeConfigLoad();//debug
-    }
+//    int i = 0;//debug
+//    while(1){
+//        stepper.step();
+//        for(auto g : governors)
+//            g();
+//        std::cout << i++ << std::endl;//debug
+//        if(config.checkForExternalChanges())
+//            config.load();
+//        fakeConfigLoad();//debug
+//    }
 }
 
 //debug
