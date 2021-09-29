@@ -17,14 +17,24 @@ qt6_add_qml_module(fannn-gui
     VERSION 1.0
     SOURCES
         main.cpp
-        sensors_model.h
-        profiles_model.h
-        sensors_model.cpp
-        profiles_model.cpp
+        sensor_list_model.h
+        governor_list_model.h
+        curve_list_model.h
+        controller_list_model.h
+        profile_list_model.h
+        sensor_list_model.cpp
+        governor_list_model.cpp
+        curve_list_model.cpp
+        controller_list_model.cpp
+        profile_list_model.cpp
     QML_FILES
         main.qml
         Warning.qml
         Collapsible.qml
+        SensorDelegate.qml
+        CurveDelegate.qml
+        GovernorDelegate.qml
+        ControllerDelegate.qml
 )
 
 target_link_libraries(fannn-gui PRIVATE

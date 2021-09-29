@@ -2,8 +2,12 @@
 #include <QQmlApplicationEngine>
 #include <QSettings>
 #include <QQuickStyle>
-#include "sensors_model.h"
-#include "profiles_model.h"
+#include "sensor_list_model.h"
+#include "profile_list_model.h"
+#include "controller_list_model.h"
+#include "governor_list_model.h"
+#include "sensor_list_model.h"
+#include "curve_list_model.h"
 
 int main(int argc, char *argv[]){
     QGuiApplication::setApplicationName("Fannn");
@@ -26,11 +30,19 @@ int main(int argc, char *argv[]){
     QStringList builtInStyles = { QLatin1String("Basic"), QLatin1String("Fusion"),
         QLatin1String("Imagine"), QLatin1String("Material"), QLatin1String("Universal") };
 
-    ProfilesModel profilesModel;
+    ProfileListModel profilesModel;
+    SensorListModel sensorsModel;
+    CurveListModel curvesModel;
+    GovernorListModel governorsModel;
+    ControllerListModel controllersModel;
 
     engine.setInitialProperties({
         { "builtInStyles", builtInStyles },
-        { "profilesModel", QVariant::fromValue(&profilesModel) }
+        { "profilesModel", QVariant::fromValue(&profilesModel) },
+        { "sensorsModel", QVariant::fromValue(&sensorsModel) },
+        { "curvesModel", QVariant::fromValue(&curvesModel) },
+        { "governorsModel", QVariant::fromValue(&governorsModel) },
+        { "controllersModel", QVariant::fromValue(&controllersModel) }
     });
 
     const QUrl url(u"qrc:/fannn/main.qml"_qs);

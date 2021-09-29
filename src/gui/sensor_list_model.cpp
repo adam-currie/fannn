@@ -1,10 +1,10 @@
-#include "sensors_model.h"
+#include "sensor_list_model.h"
 
-SensorsModel::SensorsModel(QObject *parent) : QAbstractListModel(parent) {
+SensorListModel::SensorListModel(QObject *parent) : QAbstractListModel(parent) {
     //todo
 }
 
-QVariant SensorsModel::data(const QModelIndex &index, int role) const {
+QVariant SensorListModel::data(const QModelIndex &index, int role) const {
     if (!index.isValid())
         return QVariant();
 
@@ -21,13 +21,11 @@ QVariant SensorsModel::data(const QModelIndex &index, int role) const {
     return 666;//todo
 }
 
-Qt::ItemFlags SensorsModel::flags(const QModelIndex &index) const {
-    if (index.isValid())
-        return (QAbstractListModel::flags(index)|Qt::ItemIsDragEnabled);
-
-    return Qt::ItemIsDropEnabled;
+Qt::ItemFlags SensorListModel::flags(const QModelIndex &index) const {
+    //todo
+    return Qt::ItemIsDropEnabled;//debug
 }
 
-int SensorsModel::rowCount(const QModelIndex &parent) const {
+int SensorListModel::rowCount(const QModelIndex &parent) const {
     return 666;//todo
 }

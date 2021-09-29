@@ -15,6 +15,10 @@ ApplicationWindow {
 
     required property var builtInStyles
     required property var profilesModel
+    required property var sensorsModel
+    required property var curvesModel
+    required property var governorsModel
+    required property var controllersModel
 
     Settings {
         id: settings
@@ -129,22 +133,9 @@ ApplicationWindow {
         width: parent.width
         title: "wow i'm collapsible"
 
-            model: ListModel {
-                ListElement {
-                    name: "Bill Smith"
-                    number: "555 3264"
-                }
-                ListElement {
-                    name: "John Brown"
-                    number: "555 8426"
-                }
-                ListElement {
-                    name: "Sam Wise"
-                    number: "555 0473"
-                }
-            }
+            model: window.currentProfileModel
             delegate: Text {
-                text: name + ": " + number
+                text: name
             }
     }
 
