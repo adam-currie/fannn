@@ -25,7 +25,13 @@ int main(int argc, char *argv[]){
 
     QStringList builtInStyles = { QLatin1String("Basic"), QLatin1String("Fusion"),
         QLatin1String("Imagine"), QLatin1String("Material"), QLatin1String("Universal") };
-    engine.setInitialProperties({{ "builtInStyles", builtInStyles }});
+
+    ProfilesModel profilesModel;
+
+    engine.setInitialProperties({
+        { "builtInStyles", builtInStyles },
+        { "profilesModel", QVariant::fromValue(&profilesModel) }
+    });
 
     const QUrl url(u"qrc:/fannn/main.qml"_qs);
     QObject::connect(

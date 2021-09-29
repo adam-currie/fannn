@@ -14,6 +14,7 @@ ApplicationWindow {
     title: qsTr("Fannn Profile Editor")
 
     required property var builtInStyles
+    required property var profilesModel
 
     Settings {
         id: settings
@@ -83,37 +84,36 @@ ApplicationWindow {
 
     header: ToolBar {
         Label {
-            anchors.fill: parent
+            id: headerTitle
+            anchors.centerIn: parent
             text: "Fannn"
             font.pixelSize: 18
             horizontalAlignment: Qt.AlignHCenter
             verticalAlignment: Qt.AlignVCenter
         }
-        RowLayout {
-            anchors.fill: parent
+        ComboBox {
+            //todo: size to content(without overlapping header title)
+            anchors.right: headerTitle.left
+            anchors.left: parent.left
+            flat: true
+            model: window.profilesModel
+            textRole: "name"
+        }
+        ToolButton {
+            icon.name: "view-more-symbolic"
+            anchors.right: parent.right
+            action: optionsMenuAction
 
-            ComboBox {
-                flat: true
-                Layout.leftMargin: 8
-                model: ProfilesModel
-            }
+            Menu {
+                id: optionsMenu
+                transformOrigin: Menu.TopRight
 
-            ToolButton {
-                icon.name: "view-more-symbolic"
-                Layout.alignment: Qt.AlignRight
-                action: optionsMenuAction
-
-                Menu {
-                    id: optionsMenu
-                    transformOrigin: Menu.TopRight
-
-                    Action {
-                        text: "Settings"
-                        onTriggered: settingsDialog.open()
-                    }
-                    Action {
-                        text: "About"
-                    }
+                Action {
+                    text: "Settings"
+                    onTriggered: settingsDialog.open()
+                }
+                Action {
+                    text: "About"
                 }
             }
         }

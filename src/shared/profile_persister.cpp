@@ -35,7 +35,7 @@ const vector<string> ProfilePersister::getProfileNames(){
     ensureDirectoryStructure(USER_CONFIG_FILE_DIR);
     vector<string> names;
     for (const auto & entry : filesystem::directory_iterator(USER_CONFIG_FILE_DIR))
-        names.push_back(entry.path());
+        names.push_back(entry.path().filename());
     return names;
 }
 
