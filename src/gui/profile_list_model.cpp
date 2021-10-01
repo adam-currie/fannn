@@ -17,7 +17,7 @@ QVariant ProfileListModel::data(const QModelIndex &index, int role) const {
 
 Qt::ItemFlags ProfileListModel::flags(const QModelIndex &index) const {
     //todo
-    return Qt::ItemIsDropEnabled;//debug
+    return Qt::NoItemFlags;
 }
 
 int ProfileListModel::rowCount(const QModelIndex &parent) const {
@@ -28,4 +28,15 @@ QHash<int, QByteArray> ProfileListModel::roleNames() const {
     QHash<int, QByteArray> roles;
     roles[NameRole] = "name";
     return roles;
+}
+
+void ProfileListModel::loadProfile(QString name){
+    Fannn::ProfilePersister persister(name.toStdString());
+    //persister.save();//debug
+    persister.load();//todo: LoadError
+
+    //todo: delete old profile model?
+
+    currentProfile = new ProfileModel(this, persister);
+    emit profileLoaded(currentProfile);
 }

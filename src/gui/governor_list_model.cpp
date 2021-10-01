@@ -14,7 +14,7 @@ QVariant GovernorListModel::data(const QModelIndex &index, int role) const {
 
 Qt::ItemFlags GovernorListModel::flags(const QModelIndex &index) const {
     //todo
-    return Qt::ItemIsDropEnabled;//debug
+    return Qt::NoItemFlags;
 }
 
 int GovernorListModel::rowCount(const QModelIndex &parent) const {

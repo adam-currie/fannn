@@ -36,13 +36,22 @@ int main(int argc, char *argv[]){
     GovernorListModel governorsModel;
     ControllerListModel controllersModel;
 
+    QObject::connect(
+        &profilesModel, &ProfileListModel::profileLoaded,
+        [&engine](ProfileModel* pm) {
+            engine.rootObjects().at(0)
+                ->setProperty("profileModel", QVariant::fromValue(pm));
+        }
+    );
+
     engine.setInitialProperties({
         { "builtInStyles", builtInStyles },
         { "profilesModel", QVariant::fromValue(&profilesModel) },
         { "sensorsModel", QVariant::fromValue(&sensorsModel) },
         { "curvesModel", QVariant::fromValue(&curvesModel) },
         { "governorsModel", QVariant::fromValue(&governorsModel) },
-        { "controllersModel", QVariant::fromValue(&controllersModel) }
+        { "controllersModel", QVariant::fromValue(&controllersModel) },
+        { "profileModel", QVariant::fromValue(nullptr) }
     });
 
     const QUrl url(u"qrc:/fannn/main.qml"_qs);

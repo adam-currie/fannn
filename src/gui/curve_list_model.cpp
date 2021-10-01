@@ -14,7 +14,7 @@ QVariant CurveListModel::data(const QModelIndex &index, int role) const {
 
 Qt::ItemFlags CurveListModel::flags(const QModelIndex &index) const {
     //todo
-    return Qt::ItemIsDropEnabled;//debug
+    return Qt::NoItemFlags;
 }
 
 int CurveListModel::rowCount(const QModelIndex &parent) const {

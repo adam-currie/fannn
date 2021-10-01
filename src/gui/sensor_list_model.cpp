@@ -23,9 +23,17 @@ QVariant SensorListModel::data(const QModelIndex &index, int role) const {
 
 Qt::ItemFlags SensorListModel::flags(const QModelIndex &index) const {
     //todo
-    return Qt::ItemIsDropEnabled;//debug
+    return Qt::NoItemFlags;
 }
 
 int SensorListModel::rowCount(const QModelIndex &parent) const {
-    return 666;//todo
+    return 3;//todo
+}
+
+QHash<int, QByteArray> SensorListModel::roleNames() const {
+    QHash<int, QByteArray> roles;
+    roles[NameRole] = "name";
+    roles[AliasRole] = "_alias";
+    roles[ValueRole] = "value";
+    return roles;
 }

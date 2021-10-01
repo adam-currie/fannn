@@ -91,13 +91,13 @@ void ProfilePersister::load() {
 
     nlohmann::json j = nlohmann::json::parse(fileContents);
 
-    //todo: from json
+    profile.setUpdateInterval(j["updateIntervalMs"]);
 }
 
 void ProfilePersister::save() {
     nlohmann::json j;
 
-    //todo: to json
+    j["updateIntervalMs"] = profile.getUpdateInterval();
 
     (AtomicFileWriter(USER_CONFIG_FILE_DIR + name) << j.dump())
         .atomicWrite();

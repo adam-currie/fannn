@@ -14,7 +14,7 @@ QVariant ControllerListModel::data(const QModelIndex &index, int role) const {
 
 Qt::ItemFlags ControllerListModel::flags(const QModelIndex &index) const {
     //todo
-    return Qt::ItemIsDropEnabled;//debug
+    return Qt::NoItemFlags;
 }
 
 int ControllerListModel::rowCount(const QModelIndex &parent) const {

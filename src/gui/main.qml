@@ -2,7 +2,6 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
 import Qt.labs.settings
-import fannn 1.0
 
 ApplicationWindow {
     id: window
@@ -19,16 +18,11 @@ ApplicationWindow {
     required property var curvesModel
     required property var governorsModel
     required property var controllersModel
+    required property var profileModel
 
     Settings {
         id: settings
         property string style
-    }
-
-    Action {
-        id: optionsMenuAction
-        icon.name: "menu"
-        onTriggered: optionsMenu.open()
     }
 
     Dialog {
@@ -102,11 +96,14 @@ ApplicationWindow {
             flat: true
             model: window.profilesModel
             textRole: "name"
+            onActivated: model.loadProfile(currentValue)
         }
         ToolButton {
             icon.name: "view-more-symbolic"
             anchors.right: parent.right
-            action: optionsMenuAction
+            action: Action {
+                onTriggered: optionsMenu.open()
+            }
 
             Menu {
                 id: optionsMenu
@@ -129,19 +126,47 @@ ApplicationWindow {
         qsTr("Settings 1.3")
     ]
 
-    Collapsible {
+    Flickable {
         width: parent.width
-        title: "wow i'm collapsible"
-
-            model: window.currentProfileModel
-            delegate: Text {
-                text: name
+        height: parent.height
+        contentHeight: column.height
+        ScrollBar.vertical: ScrollBar { }
+        Column {
+            id: column
+            width: parent.width
+            Row {
+                width: parent.width
+                height: childrenRect.height
+                Label {
+                    text: "update interval(ms): "
+                }
+                TextField {
+                    text: window.profileModel.updateIntervalMs
+                    onTextChanged:{
+                        if(window.profileModel !== null) {
+                            window.profileModel.updateIntervalMs = text
+                        }
+                    }
+                }
             }
+
+            Collapsible {
+                width: parent.width
+                title: "sensors"
+                model: window.sensorsModel
+                delegate: SensorDelegate {}
+            }
+        }
     }
 
     footer: ToolBar {
-        RowLayout {
-            anchors.fill: parent
+        Button {
+            text: "save profile"
+            flat: true
+            anchors.right: parent.right
+            enabled: window.profileModel && window.profileModel.unsavedChanges
+            visible: enabled
+            onClicked: window.profileModel.save()
         }
     }
 }
