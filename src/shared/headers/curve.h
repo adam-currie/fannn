@@ -17,6 +17,8 @@ namespace Fannn {
             }
 
         public:    
+            bool operator==(const Curve&) const = default;
+
             void setDomain(double minX, double maxX) { 
                 if (minX > maxX) throw std::out_of_range("minX > maxX");
                 this->minX = minX; 

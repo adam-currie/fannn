@@ -18,6 +18,8 @@ namespace Fannn {
             std::vector<SensorAlias> sensorAliases;
             std::vector<ControllerAlias> controllerAliases;
         public:
+            bool operator==(const Profile&) const = default;
+
             int getUpdateInterval() const { return updateIntervalMs; }
             void setUpdateInterval(int milliseconds){
                 if (milliseconds < 0) throw std::out_of_range("negative interval");

@@ -77,29 +77,33 @@ ProfilePersister ProfilePersister::loadActiveProfile() {
     throw LoadError(active, "failed to load active profile:'" + active + "', probably the file has been deleted");
 }
 
-ProfilePersister::ProfilePersister(string name) : name(name) {}
+ProfilePersister::ProfilePersister(string name) 
+    : scratch({name, Profile()}) {}
 
 void ProfilePersister::load() {
-    string path(USER_CONFIG_FILE_DIR+name);
+    string path(USER_CONFIG_FILE_DIR+scratch.name);
 
     string fileContents;
     try {
         fileContents = readFile(path);
     } catch (runtime_error) {
-        throw LoadError(name);
+        throw LoadError(scratch.name);
     }
 
     nlohmann::json j = nlohmann::json::parse(fileContents);
 
-    profile.setUpdateInterval(j["updateIntervalMs"]);
+    scratch.profile.setUpdateInterval(j["updateIntervalMs"]);
+
+    lastPersistanceSynced = scratch;
 }
 
 void ProfilePersister::save() {
     nlohmann::json j;
 
-    j["updateIntervalMs"] = profile.getUpdateInterval();
+    j["updateIntervalMs"] = scratch.profile.getUpdateInterval();
 
-    (AtomicFileWriter(USER_CONFIG_FILE_DIR + name) << j.dump())
+    (AtomicFileWriter(USER_CONFIG_FILE_DIR + scratch.name) << j.dump())
         .atomicWrite();
 
+    lastPersistanceSynced = scratch;
 }

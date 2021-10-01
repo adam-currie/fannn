@@ -8,17 +8,26 @@
 namespace Fannn {
     
     class ProfilePersister {
-        std::string name;
+
+        struct NamedProfile {
+            std::string name;
+            Profile profile;
+            bool operator==(const NamedProfile&) const = default;
+            bool operator==(const Profile& p) const { return profile == p; }
+        } typedef NamedProfile;
+
+        std::optional<NamedProfile> lastPersistanceSynced;
+        NamedProfile scratch;
 
         public:
-            Profile profile;
-
             class LoadError : std::runtime_error {
                 public:
                     std::string const name;
                     LoadError(std::string name, std::optional<std::string> msg = std::optional<std::string>())
                     : std::runtime_error(msg.value_or("failed to load profile:'" + name + "'")), name(name) {}
             };
+
+
 
             static std::string getActiveProfile();
             static void setActiveProfile(std::string name);
@@ -40,6 +49,15 @@ namespace Fannn {
             void load();
 
             void save(); 
+
+            bool unsavedChanges() const { return scratch != lastPersistanceSynced; }
+
+            Profile& profile() { return scratch.profile; }
+            Profile const & constProfile() const { return scratch.profile; }
+
+            void setName(std::string name) { scratch.name = name; }
+            
+            std::string getName() const { return scratch.name; }
     };
 
 }

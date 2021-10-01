@@ -8,14 +8,12 @@ class ProfileModel : public QAbstractItemModel {
     Q_OBJECT
     QML_ELEMENT
     Q_PROPERTY(int updateIntervalMs READ updateIntervalMs WRITE setUpdateIntervalMs NOTIFY updateIntervalMsChanged)
-    Q_PROPERTY(int unsavedChanges READ unsavedChanges NOTIFY unsavedChangesChanged)
+    Q_PROPERTY(bool unsavedChanges READ unsavedChanges NOTIFY unsavedChangesChanged)
 
     Fannn::ProfilePersister persister;
     bool __unsavedChanges;
-
     void setUnsavedChanges(bool value) {
         if (value != __unsavedChanges) {
-            //todo: keep a const copy of the last saved profile and do lastSavedProfile != persister.profile(probably do this in ProfilePersister instead)
             __unsavedChanges = value;
             emit unsavedChangesChanged(value);
         }
@@ -38,13 +36,13 @@ class ProfileModel : public QAbstractItemModel {
         QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override{
             return QModelIndex();
         }
-        QModelIndex parent(const QModelIndex &index) const override{
+        QModelIndex parent(const QModelIndex &index) const override {
             return QModelIndex();
         }
 
-        int updateIntervalMs();
+        int updateIntervalMs() const;
         void setUpdateIntervalMs(int);
-        int unsavedChanges() { return __unsavedChanges; }
+        bool unsavedChanges() const { return __unsavedChanges; }
 
     signals:
         void updateIntervalMsChanged(int);

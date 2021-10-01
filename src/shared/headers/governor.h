@@ -28,6 +28,10 @@ namespace Fannn {
         
             static const std::vector<char> RESERVED_SYMBOLS;
 
+            bool operator==(const Governor& g) const { 
+                return g.expStr == expStr; 
+            }
+
             std::function<double(std::string)> readSensorOrGovernor;
             std::function<std::function<double(double)>(std::string)> readCurve;
             
