@@ -24,5 +24,6 @@ void ProfileModel::setUpdateIntervalMs(int value) {
 
 void ProfileModel::save() {
     persister.save();
-    setUnsavedChanges(persister.unsavedChanges());
+    //todo: if save fails we dont want to call setunsavedchanges
+    setUnsavedChanges(false);
 }
