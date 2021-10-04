@@ -37,6 +37,5 @@ void ProfileListModel::loadProfile(QString name){
 
     //todo: delete old profile model?
 
-    currentProfile = new ProfileModel(this, persister);
-    emit profileLoaded(currentProfile);
+    setCurrentProfile(new ProfileModel(this, persister));
 }

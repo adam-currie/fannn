@@ -10,8 +10,7 @@ ProfileModel::ProfileModel(QObject *parent, Fannn::ProfilePersister persister)
 }
 
 int ProfileModel::updateIntervalMs() const {
-    const Fannn::Profile c = persister.constProfile();
-    return c.getUpdateInterval();
+    return persister.constProfile().getUpdateInterval();
 }
 
 void ProfileModel::setUpdateIntervalMs(int value) {

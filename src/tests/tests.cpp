@@ -70,16 +70,19 @@ TEST_CASE("governor_test"){
     //fake sensor values that increment each time they are read, starting at 10
     class : public ISensorReader { public:
         string prefix = "sensor";
-        vector<double> values = vector<double>(8, 10);
-        vector<string> getAll(){
+        mutable vector<double> values = vector<double>(8, 10);
+        vector<string> getAll() const override {
             vector<string> all(values.size());
             for(int i=0; i<all.size(); i++) all[i] = i;
             return all;
         }
-        double getValue(string id){
-            if (id.rfind(prefix, 0) != 0) throw runtime_error("that aint no sensor");
+        double getValue(string id) const override {
+            if (!hasSensor(id)) throw runtime_error("that aint no sensor");
             id = id.substr(prefix.size());
             return values[stoi(id)]++;
+        }
+        bool hasSensor(string id) const override {
+            return (id.rfind(prefix, 0) == 0);
         }
     } reader;
 

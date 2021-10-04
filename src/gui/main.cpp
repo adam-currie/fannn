@@ -18,9 +18,6 @@ int main(int argc, char *argv[]){
     if (qEnvironmentVariableIsEmpty("QT_QUICK_CONTROLS_STYLE"))
         QQuickStyle::setStyle(settings.value("style").toString());
 
-    // If this is the first time we're running the application,
-    // we need to set a style in the settings so that the QML
-    // can find it in the list of built-in styles.
     const QString styleInSettings = settings.value("style").toString();
     if (styleInSettings.isEmpty())
         settings.setValue(QLatin1String("style"), QQuickStyle::name());
@@ -31,27 +28,16 @@ int main(int argc, char *argv[]){
         QLatin1String("Imagine"), QLatin1String("Material"), QLatin1String("Universal") };
 
     ProfileListModel profilesModel;
-    SensorListModel sensorsModel;
     CurveListModel curvesModel;
     GovernorListModel governorsModel;
     ControllerListModel controllersModel;
 
-    QObject::connect(
-        &profilesModel, &ProfileListModel::profileLoaded,
-        [&engine](ProfileModel* pm) {
-            engine.rootObjects().at(0)
-                ->setProperty("profileModel", QVariant::fromValue(pm));
-        }
-    );
-
     engine.setInitialProperties({
         { "builtInStyles", builtInStyles },
         { "profilesModel", QVariant::fromValue(&profilesModel) },
-        { "sensorsModel", QVariant::fromValue(&sensorsModel) },
         { "curvesModel", QVariant::fromValue(&curvesModel) },
         { "governorsModel", QVariant::fromValue(&governorsModel) },
-        { "controllersModel", QVariant::fromValue(&controllersModel) },
-        { "profileModel", QVariant::fromValue(nullptr) }
+        { "controllersModel", QVariant::fromValue(&controllersModel) }
     });
 
     const QUrl url(u"qrc:/Fannn/main.qml"_qs);

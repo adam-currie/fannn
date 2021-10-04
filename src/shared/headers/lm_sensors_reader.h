@@ -6,14 +6,15 @@
 
 namespace Fannn {
 
-    class LmSensorsReader : ISensorReader{
+    class LmSensorsReader : public ISensorReader{
         class Impl;
         std::experimental::propagate_const<std::unique_ptr<Impl>> pImpl;
         public:
             LmSensorsReader();
             int debugListEverything();
-            std::vector<std::string> getAll() override;
-            double getValue(std::string sensorId) override;
+            bool hasSensor(std::string sensorId) const override;
+            std::vector<std::string> getAll() const override;
+            double getValue(std::string sensorId) const override;
             ~LmSensorsReader();
     };
 

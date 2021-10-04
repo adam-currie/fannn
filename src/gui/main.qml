@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
 import Qt.labs.settings
+import Fannn
 
 ApplicationWindow {
     id: window
@@ -14,11 +15,14 @@ ApplicationWindow {
 
     required property var builtInStyles
     required property var profilesModel
-    required property var sensorsModel
     required property var curvesModel
     required property var governorsModel
     required property var controllersModel
-    required property var profileModel
+
+    SensorListModel {
+        id: sensorsModel
+        profile: profilesModel.currentProfile
+    }
 
     Settings {
         id: settings
@@ -120,12 +124,6 @@ ApplicationWindow {
         }
     }
 
-    property var settingsModel: [
-        qsTr("Settings 1.1"),
-        qsTr("Settings 1.2"),
-        qsTr("Settings 1.3")
-    ]
-
     Flickable {
         width: parent.width
         height: parent.height
@@ -141,10 +139,12 @@ ApplicationWindow {
                     text: "update interval(ms): "
                 }
                 TextField {
-                    text: window.profileModel.updateIntervalMs
-                    onTextChanged:{
-                        if(window.profileModel !== null) {
-                            window.profileModel.updateIntervalMs = text
+                    id: textField
+                    text: profilesModel.currentProfile ?
+                        profilesModel.currentProfile.updateIntervalMs : ""
+                    onTextChanged: {
+                        if(profilesModel.currentProfile) {
+                            profilesModel.currentProfile.updateIntervalMs = text
                         }
                     }
                 }
@@ -153,7 +153,7 @@ ApplicationWindow {
             Collapsible {
                 width: parent.width
                 title: "sensors"
-                model: window.sensorsModel
+                model: sensorsModel
                 delegate: SensorDelegate {}
             }
         }
@@ -164,9 +164,10 @@ ApplicationWindow {
             text: "save profile"
             flat: true
             anchors.right: parent.right
-            enabled: window.profileModel && window.profileModel.unsavedChanges
+            enabled: profilesModel.currentProfile ?
+                profilesModel.currentProfile.unsavedChanges : false
             visible: enabled
-            onClicked: window.profileModel.save()
+            onClicked: profilesModel.currentProfile.save()
         }
     }
 }

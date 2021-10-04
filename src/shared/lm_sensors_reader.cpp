@@ -88,7 +88,13 @@ LmSensorsReader::LmSensorsReader() : pImpl{std::make_unique<Impl>()} {
     }
 }
 
-double LmSensorsReader::getValue(string sensorId){
+bool LmSensorsReader::hasSensor(string sensorId) const {
+    return pImpl->sensorMap.contains(sensorId);
+}
+
+double LmSensorsReader::getValue(string sensorId) const {
+    if (!hasSensor(sensorId)) throwSensorNotFound(sensorId);
+
     SensorData sensor = pImpl->sensorMap.at(sensorId);
 
     double value;
@@ -99,7 +105,7 @@ double LmSensorsReader::getValue(string sensorId){
     return value;
 }
 
-vector<string> LmSensorsReader::getAll(){
+vector<string> LmSensorsReader::getAll() const {
     vector<string> keys(pImpl->sensorMap.size());
     int i=0;
     for(auto pair : pImpl->sensorMap){

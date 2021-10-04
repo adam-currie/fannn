@@ -7,8 +7,14 @@
 class ProfileListModel : public QAbstractListModel {
     Q_OBJECT
     QML_ELEMENT
-
-    ProfileModel* currentProfile;
+    Q_PROPERTY(ProfileModel* currentProfile READ currentProfile NOTIFY currentProfileChanged)
+    ProfileModel* _currentProfile = nullptr;//
+    void setCurrentProfile(ProfileModel* value){
+        if(_currentProfile != value){
+            _currentProfile = value;
+            emit currentProfileChanged(value);
+        }
+    }
 
     public:
         enum Roles {
@@ -22,8 +28,10 @@ class ProfileListModel : public QAbstractListModel {
         int rowCount(const QModelIndex &parent) const override;
         QHash<int, QByteArray> roleNames() const override;
 
+        ProfileModel* currentProfile() { return _currentProfile; }
+
     signals:
-        void profileLoaded(ProfileModel* profileModel);
+        void currentProfileChanged(ProfileModel* value);
 
     public slots:
         void loadProfile(QString name);

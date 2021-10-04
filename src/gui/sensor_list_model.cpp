@@ -8,17 +8,16 @@ QVariant SensorListModel::data(const QModelIndex &index, int role) const {
     if (!index.isValid())
         return QVariant();
 
-//debug
-//    if (role == Qt::DecorationRole)
-//        return QIcon(pixmaps.value(index.row()).scaled(m_PieceSize, m_PieceSize,
-//                         Qt::KeepAspectRatio, Qt::SmoothTransformation));
-//    else if (role == Qt::UserRole)
-//        return pixmaps.value(index.row());
-//    else if (role == Qt::UserRole + 1)
-//        return locations.value(index.row());
-//    return QVariant();
-
-    return 666;//todo
+    switch (role) {
+        case NameRole:
+            return QString::fromStdString(compositeReader.getAll()[index.row()]);//todo: SLOW, DUMB
+        case AliasRole:
+            return "todo";
+        case ValueRole:
+            return compositeReader.getValue(compositeReader.getAll()[index.row()]);//todo: SLOWER, DUMBER
+        default:
+            return QVariant();
+    }
 }
 
 Qt::ItemFlags SensorListModel::flags(const QModelIndex &index) const {
@@ -27,7 +26,7 @@ Qt::ItemFlags SensorListModel::flags(const QModelIndex &index) const {
 }
 
 int SensorListModel::rowCount(const QModelIndex &parent) const {
-    return 3;//todo
+    return compositeReader.getAll().size();//todo: SLOW, DUMB
 }
 
 QHash<int, QByteArray> SensorListModel::roleNames() const {
