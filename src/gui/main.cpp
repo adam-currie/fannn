@@ -54,7 +54,7 @@ int main(int argc, char *argv[]){
         { "profileModel", QVariant::fromValue(nullptr) }
     });
 
-    const QUrl url(u"qrc:/fannn/main.qml"_qs);
+    const QUrl url(u"qrc:/Fannn/main.qml"_qs);
     QObject::connect(
         &engine,
         &QQmlApplicationEngine::objectCreated,

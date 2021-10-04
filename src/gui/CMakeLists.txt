@@ -13,7 +13,7 @@ find_package(Qt6 COMPONENTS QuickControls2 REQUIRED)
 qt6_add_executable(fannn-gui)
 
 qt6_add_qml_module(fannn-gui
-    URI fannn
+    URI Fannn
     VERSION 1.0
     SOURCES
         main.cpp
