@@ -2,6 +2,7 @@
 
 #include <QAbstractListModel>
 #include <qqml.h>
+#include <QTimer>
 #include "profile_model.h"
 #include "composite_sensor_reader.h"
 
@@ -10,10 +11,16 @@
 class SensorListModel : public QAbstractListModel {
     Q_OBJECT
     QML_ELEMENT
-    Q_PROPERTY(ProfileModel* profile MEMBER _profileModel)
+
+    Q_PROPERTY(ProfileModel* profile MEMBER _profileModel NOTIFY profileChanged)
     ProfileModel* _profileModel;
 
+    QTimer readTimer;
     Fannn::CompositeSensorReader compositeReader;
+
+    void onProfileChanged(ProfileModel* value);
+
+    QMetaObject::Connection updateIntervalConnection;
 
     public:
         enum Roles {
@@ -25,6 +32,9 @@ class SensorListModel : public QAbstractListModel {
         SensorListModel(QObject *parent = nullptr);
         QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
         Qt::ItemFlags flags(const QModelIndex &index) const override;
-        int rowCount(const QModelIndex &parent) const override;
+        int rowCount(const QModelIndex &parent = QModelIndex()) const override;
         QHash<int, QByteArray> roleNames() const override;
+
+    signals:
+        void profileChanged(ProfileModel* value);
 };

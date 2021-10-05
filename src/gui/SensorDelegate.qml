@@ -4,6 +4,10 @@ import QtQuick.Controls
 import Qt.labs.settings
 
 Rectangle{
+    required property var name
+    required property var _alias
+    required property var value
+
     Text {
         anchors.margins: 5
         id: nameText
