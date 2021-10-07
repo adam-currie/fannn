@@ -94,13 +94,24 @@ ApplicationWindow {
             verticalAlignment: Qt.AlignVCenter
         }
         ComboBox {
-            //todo: size to content(without overlapping header title)
-            anchors.right: headerTitle.left
+            property var bonusWidth: 50
+            property var minWidth: 10
+            popup.onAboutToHide: { minWidth = 10 }
+            width: Math.max(minWidth, contentItem.contentWidth + bonusWidth)
             anchors.left: parent.left
             flat: true
             model: window.profilesModel
             textRole: "name"
             onActivated: model.loadProfile(currentValue)
+            popup.onAboutToShow: {
+                var widest = 0
+                var originalCurrentIndex = currentIndex
+                do {
+                  widest = Math.max(widest, contentItem.contentWidth)
+                  currentIndex = (currentIndex + 1) % count
+                } while(currentIndex !== originalCurrentIndex)
+                minWidth = widest + bonusWidth
+            }
         }
         ToolButton {
             icon.name: "view-more-symbolic"
@@ -171,3 +182,4 @@ ApplicationWindow {
         }
     }
 }
+
