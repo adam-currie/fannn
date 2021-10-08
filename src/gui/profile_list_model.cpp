@@ -51,15 +51,13 @@ int ProfileListModel::indexOf(QString profileName) {
 
 void ProfileListModel::createAndSwitchTo() {
     std::string newName;
-
     int i = 0;
-    auto incrementName = [&](){
-        newName = "profile" + std::to_string(++i);
-    };
-    incrementName();
-    for (const std::string & name : profileNames)
+
+tryNextName:
+    newName = "profile" + std::to_string(++i);
+    for (const std::string& name : profileNames)
         if (name == newName)
-            incrementName();
+            goto tryNextName;
 
     Fannn::ProfilePersister pp(newName);
     pp.save(); //need to mark our territory
