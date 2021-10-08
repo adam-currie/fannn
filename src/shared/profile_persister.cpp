@@ -34,8 +34,19 @@ void ensureDirectoryStructure(string path){
 const vector<string> ProfilePersister::getProfileNames(){
     ensureDirectoryStructure(USER_CONFIG_FILE_DIR);
     vector<string> names;
+
+    auto sortedInsert = [&](string s){
+        for(auto i = names.begin(); i != names.end(); ++i)
+            if (*i > s) {
+                names.insert(i, s);
+                return;
+            }
+        names.push_back(s);
+    };
+
     for (const auto & entry : filesystem::directory_iterator(USER_CONFIG_FILE_DIR))
-        names.push_back(entry.path().filename());
+        sortedInsert(entry.path().filename());
+
     return names;
 }
 
