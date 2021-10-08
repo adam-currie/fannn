@@ -39,6 +39,7 @@ qt6_add_qml_module(fannn-gui
         ControllerDelegate.qml
         ProfilesComboBox.qml
         UnsavedChangesDialog.qml
+        SensorsCollapsible.qml
 )
 
 target_link_libraries(fannn-gui PRIVATE

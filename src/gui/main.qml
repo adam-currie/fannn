@@ -170,12 +170,9 @@ ApplicationWindow {
                     }
                 }
             }
-
-            Collapsible {
-                width: parent.width
-                title: "sensors"
+            SensorsCollapsible {
                 model: sensorsModel
-                delegate: SensorDelegate {}
+                width: parent.width
             }
         }
     }
