@@ -85,35 +85,17 @@ ApplicationWindow {
     }
 
     header: ToolBar {
-        ComboBox {
+        ProfilesComboBox {
             id: bongoBox
-            property var bonusWidth: 60
-            property var minWidth: 10
-            popup.onAboutToHide: { minWidth = 10 }
-            width: Math.max(minWidth, contentItem.contentWidth + bonusWidth)
-            anchors.left: parent.left
-            flat: true
             model: window.profilesModel
-            textRole: "name"
-            onActivated: model.loadProfile(currentValue)
-            popup.onAboutToShow: {
-                var widest = 0
-                var originalCurrentIndex = currentIndex
-                model.loadProfileNames()
-                do {
-                  widest = Math.max(widest, contentItem.contentWidth)
-                  currentIndex = (currentIndex + 1) % count
-                } while(currentIndex !== originalCurrentIndex)
-                minWidth = widest + bonusWidth
-            }
-            Connections {
-                target: bongoBox.model
-                function onCurrentProfileChanged(p) {
-                    bongoBox.currentIndex = bongoBox.model.indexOf(p.name)
-                }
+            anchors {
+                left: parent.left
+                leftMargin: 5
             }
         }
         RoundButton {
+            id: addButton
+
             function addProfile(){
                 profilesModel.createAndSwitchTo()
                 //todo: focus ComboBox textfield for editing new name
@@ -122,15 +104,18 @@ ApplicationWindow {
             UnsavedChangesDialog {
                 id: confirmationDialog
                 profileModel: profilesModel.currentProfile
-                onAccepted: addProfile()
-                onDiscarded: addProfile()
-                //onRejected: do nothing
+                Connections {
+                    target: confirmationDialog
+                    function onAccepted() { addProfile() }
+                    function onDiscarded() { addProfile() }
+                    //onRejected do nothing
+                }
             }
 
             icon.name: "list-add-symbolic"
             anchors {
                 left: bongoBox.right
-                leftMargin: -5
+                leftMargin: -6
             }
             radius: 0
             flat: true
@@ -174,7 +159,8 @@ ApplicationWindow {
                     text: "update interval(ms): "
                 }
                 TextField {
-                    id: textField
+                    id: updateIntervalField
+                    validator: IntValidator {bottom: 1}
                     text: profilesModel.currentProfile ?
                         profilesModel.currentProfile.updateIntervalMs : ""
                     onTextChanged: {

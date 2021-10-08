@@ -6,12 +6,8 @@ import Fannn
 
 Dialog {
     required property var profileModel
-
     modal: true
     title: "profile has unsaved changes"
     standardButtons: Dialog.Save | Dialog.Cancel | Dialog.Discard
-
-    Connections {
-        function accepted() { profileModel.save() }
-    }
+    onAccepted: profileModel.save()
 }
