@@ -10,4 +10,5 @@ Dialog {
     title: "profile has unsaved changes"
     standardButtons: Dialog.Save | Dialog.Cancel | Dialog.Discard
     onAccepted: profileModel.save()
+    onDiscarded: close()
 }

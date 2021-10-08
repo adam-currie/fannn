@@ -106,8 +106,8 @@ ApplicationWindow {
                 profileModel: profilesModel.currentProfile
                 Connections {
                     target: confirmationDialog
-                    function onAccepted() { addProfile() }
-                    function onDiscarded() { addProfile() }
+                    function onAccepted() { addButton.addProfile() }
+                    function onDiscarded() { addButton.addProfile() }
                     //onRejected do nothing
                 }
             }
