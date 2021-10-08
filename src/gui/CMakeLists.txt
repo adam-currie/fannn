@@ -37,6 +37,7 @@ qt6_add_qml_module(fannn-gui
         CurveDelegate.qml
         GovernorDelegate.qml
         ControllerDelegate.qml
+        UnsavedChangesDialog.qml
 )
 
 target_link_libraries(fannn-gui PRIVATE

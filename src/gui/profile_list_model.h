@@ -12,6 +12,7 @@ class ProfileListModel : public QAbstractListModel {
     ProfileModel* _currentProfile = nullptr;//
     void setCurrentProfile(ProfileModel* value){
         if(_currentProfile != value){
+            //todo: delete old profile model?
             _currentProfile = value;
             emit currentProfileChanged(value);
         }
@@ -32,6 +33,7 @@ class ProfileListModel : public QAbstractListModel {
         QHash<int, QByteArray> roleNames() const override;
 
         Q_INVOKABLE int indexOf(QString profileName);//todo: try string
+        Q_INVOKABLE void createAndSwitchTo();
 
         ProfileModel* currentProfile() { return _currentProfile; }
 

@@ -49,12 +49,26 @@ int ProfileListModel::indexOf(QString profileName) {
     throw std::out_of_range("'" + profileName.toStdString() + "' not found");
 }
 
+void ProfileListModel::createAndSwitchTo() {
+    std::string newName;
+
+    int i = 0;
+    auto incrementName = [&](){
+        newName = "profile" + std::to_string(++i);
+    };
+    incrementName();
+    for (const std::string & name : profileNames)
+        if (name == newName)
+            incrementName();
+
+    Fannn::ProfilePersister pp(newName);
+    pp.save(); //need to mark our territory
+    loadProfileNames();
+    setCurrentProfile(new ProfileModel(this, pp));
+}
+
 void ProfileListModel::loadProfile(QString name) {
     Fannn::ProfilePersister persister(name.toStdString());
-    //persister.save();//debug
     persister.load();//todo: LoadError
-
-    //todo: delete old profile model?
-
     setCurrentProfile(new ProfileModel(this, persister));
 }

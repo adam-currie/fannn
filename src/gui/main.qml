@@ -114,6 +114,19 @@ ApplicationWindow {
             }
         }
         RoundButton {
+            function addProfile(){
+                profilesModel.createAndSwitchTo()
+                //todo: focus ComboBox textfield for editing new name
+            }
+
+            UnsavedChangesDialog {
+                id: confirmationDialog
+                profileModel: profilesModel.currentProfile
+                onAccepted: addProfile()
+                onDiscarded: addProfile()
+                //onRejected: do nothing
+            }
+
             icon.name: "list-add-symbolic"
             anchors {
                 left: bongoBox.right
@@ -121,14 +134,15 @@ ApplicationWindow {
             }
             radius: 0
             flat: true
+            onClicked: (profilesModel.currentProfile && profilesModel.currentProfile.unsavedChanges) ?
+                           confirmationDialog.open() :
+                           addProfile()
         }
 
         ToolButton {
             icon.name: "view-more-symbolic"
             anchors.right: parent.right
-            action: Action {
-                onTriggered: optionsMenu.open()
-            }
+            onClicked: optionsMenu.open();
 
             Menu {
                 id: optionsMenu
