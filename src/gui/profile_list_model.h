@@ -7,6 +7,7 @@
 class ProfileListModel : public QAbstractListModel {
     Q_OBJECT
     QML_ELEMENT
+
     Q_PROPERTY(ProfileModel* currentProfile READ currentProfile NOTIFY currentProfileChanged)
     ProfileModel* _currentProfile = nullptr;//
     void setCurrentProfile(ProfileModel* value){
@@ -15,6 +16,8 @@ class ProfileListModel : public QAbstractListModel {
             emit currentProfileChanged(value);
         }
     }
+
+    std::vector<std::string> profileNames;
 
     public:
         enum Roles {
@@ -28,6 +31,8 @@ class ProfileListModel : public QAbstractListModel {
         int rowCount(const QModelIndex &parent) const override;
         QHash<int, QByteArray> roleNames() const override;
 
+        Q_INVOKABLE int indexOf(QString profileName);//todo: try string
+
         ProfileModel* currentProfile() { return _currentProfile; }
 
     signals:
@@ -35,4 +40,5 @@ class ProfileListModel : public QAbstractListModel {
 
     public slots:
         void loadProfile(QString name);
+        void loadProfileNames();
 };

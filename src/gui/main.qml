@@ -85,16 +85,9 @@ ApplicationWindow {
     }
 
     header: ToolBar {
-        Label {
-            id: headerTitle
-            anchors.centerIn: parent
-            text: "Fannn"
-            font.pixelSize: 18
-            horizontalAlignment: Qt.AlignHCenter
-            verticalAlignment: Qt.AlignVCenter
-        }
         ComboBox {
-            property var bonusWidth: 50
+            id: bongoBox
+            property var bonusWidth: 60
             property var minWidth: 10
             popup.onAboutToHide: { minWidth = 10 }
             width: Math.max(minWidth, contentItem.contentWidth + bonusWidth)
@@ -106,13 +99,30 @@ ApplicationWindow {
             popup.onAboutToShow: {
                 var widest = 0
                 var originalCurrentIndex = currentIndex
+                model.loadProfileNames()
                 do {
                   widest = Math.max(widest, contentItem.contentWidth)
                   currentIndex = (currentIndex + 1) % count
                 } while(currentIndex !== originalCurrentIndex)
                 minWidth = widest + bonusWidth
             }
+            Connections {
+                target: bongoBox.model
+                function onCurrentProfileChanged(p) {
+                    bongoBox.currentIndex = bongoBox.model.indexOf(p.name)
+                }
+            }
         }
+        RoundButton {
+            icon.name: "list-add-symbolic"
+            anchors {
+                left: bongoBox.right
+                leftMargin: -5
+            }
+            radius: 0
+            flat: true
+        }
+
         ToolButton {
             icon.name: "view-more-symbolic"
             anchors.right: parent.right

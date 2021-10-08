@@ -21,6 +21,10 @@ void ProfileModel::setUpdateIntervalMs(int value) {
     }
 }
 
+QString ProfileModel::name() {
+    return QString::fromStdString(persister.getName());
+}
+
 void ProfileModel::save() {
     persister.save();
     //todo: if save fails we dont want to call setunsavedchanges

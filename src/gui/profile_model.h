@@ -9,6 +9,7 @@ class ProfileModel : public QAbstractItemModel {
     QML_ELEMENT
     Q_PROPERTY(int updateIntervalMs READ updateIntervalMs WRITE setUpdateIntervalMs NOTIFY updateIntervalMsChanged)
     Q_PROPERTY(bool unsavedChanges READ unsavedChanges NOTIFY unsavedChangesChanged)
+    Q_PROPERTY(QString name READ name)
 
     Fannn::ProfilePersister persister;
     bool __unsavedChanges;
@@ -43,6 +44,7 @@ class ProfileModel : public QAbstractItemModel {
         int updateIntervalMs() const;
         void setUpdateIntervalMs(int);
         bool unsavedChanges() const { return __unsavedChanges; }
+        QString name();
 
     signals:
         void updateIntervalMsChanged(int);

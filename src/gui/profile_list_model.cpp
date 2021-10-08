@@ -1,18 +1,17 @@
 #include "profile_list_model.h"
 #include "profile_persister.h"
+#include <stdexcept>
 #include <string>
 
 ProfileListModel::ProfileListModel(QObject *parent) : QAbstractListModel(parent) {
-    //todo
+    profileNames = Fannn::ProfilePersister::getProfileNames();
 }
 
 QVariant ProfileListModel::data(const QModelIndex &index, int role) const {
     if (!index.isValid())
         return QVariant();
 
-    std::vector<std::string> names = Fannn::ProfilePersister::getProfileNames();
-
-    return QString::fromStdString(names.at(index.row()));
+    return QString::fromStdString(profileNames.at(index.row()));
 }
 
 Qt::ItemFlags ProfileListModel::flags(const QModelIndex &index) const {
@@ -21,7 +20,7 @@ Qt::ItemFlags ProfileListModel::flags(const QModelIndex &index) const {
 }
 
 int ProfileListModel::rowCount(const QModelIndex &parent) const {
-    return Fannn::ProfilePersister::getProfileNames().size();
+    return profileNames.size();
 }
 
 QHash<int, QByteArray> ProfileListModel::roleNames() const {
@@ -30,7 +29,27 @@ QHash<int, QByteArray> ProfileListModel::roleNames() const {
     return roles;
 }
 
-void ProfileListModel::loadProfile(QString name){
+void ProfileListModel::loadProfileNames() {
+    auto newNames = Fannn::ProfilePersister::getProfileNames();
+    if (newNames != profileNames){
+        //need to use begin and end functions or the private signals wont fire
+        beginRemoveRows(QModelIndex(), 0, profileNames.size()-1);
+        profileNames.clear();
+        endRemoveRows();
+        beginInsertRows(QModelIndex(), 0, newNames.size()-1);
+        profileNames = newNames;
+        endInsertRows();
+    }
+}
+
+int ProfileListModel::indexOf(QString profileName) {
+    for(int i=0; i<profileNames.size(); i++)
+        if (profileNames[i] == profileName.toStdString())
+            return i;
+    throw std::out_of_range("'" + profileName.toStdString() + "' not found");
+}
+
+void ProfileListModel::loadProfile(QString name) {
     Fannn::ProfilePersister persister(name.toStdString());
     //persister.save();//debug
     persister.load();//todo: LoadError
