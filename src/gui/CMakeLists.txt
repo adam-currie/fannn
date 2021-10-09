@@ -52,6 +52,3 @@ target_link_libraries(fannn-gui PRIVATE
 )
 
 set_property(TARGET fannn-gui PROPERTY POSITION_INDEPENDENT_CODE ON)
-
-#debug qt_finalize_executable(fannn-gui)
-

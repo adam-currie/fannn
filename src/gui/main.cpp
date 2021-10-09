@@ -15,17 +15,8 @@ int main(int argc, char *argv[]){
     QGuiApplication app(argc, argv);
 
     QSettings settings;
-    if (qEnvironmentVariableIsEmpty("QT_QUICK_CONTROLS_STYLE"))
-        QQuickStyle::setStyle(settings.value("style").toString());
-
-    const QString styleInSettings = settings.value("style").toString();
-    if (styleInSettings.isEmpty())
-        settings.setValue(QLatin1String("style"), QQuickStyle::name());
-
+    QQuickStyle::setStyle("Material");
     QQmlApplicationEngine engine;
-
-    QStringList builtInStyles = { QLatin1String("Basic"), QLatin1String("Fusion"),
-        QLatin1String("Imagine"), QLatin1String("Material"), QLatin1String("Universal") };
 
     ProfileListModel profilesModel;
     CurveListModel curvesModel;
@@ -33,7 +24,6 @@ int main(int argc, char *argv[]){
     ControllerListModel controllersModel;
 
     engine.setInitialProperties({
-        { "builtInStyles", builtInStyles },
         { "profilesModel", QVariant::fromValue(&profilesModel) },
         { "curvesModel", QVariant::fromValue(&curvesModel) },
         { "governorsModel", QVariant::fromValue(&governorsModel) },

@@ -10,11 +10,6 @@ Page {
 
     height: collapsed? header.height : implicitHeight
 
-    background: Rectangle {
-        color: Material.accent
-        opacity: .5
-    }
-
     header: Button {
         topInset: 0
         bottomInset: 0
@@ -24,7 +19,7 @@ Page {
         font.capitalization: "MixedCase"
         flat: true
         background: Rectangle {
-            color: Material.accent
+            color: Material.primary
         }
     }
 

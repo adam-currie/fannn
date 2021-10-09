@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
 import Qt.labs.settings
+import QtQuick.Controls.Material
 import Fannn
 
 ApplicationWindow {
@@ -13,11 +14,14 @@ ApplicationWindow {
     visible: true
     title: qsTr("Fannn Profile Editor")
 
-    required property var builtInStyles
     required property var profilesModel
     required property var curvesModel
     required property var governorsModel
     required property var controllersModel
+
+    Material.theme: Material.Dark
+    Material.primary: Material.BlueGrey
+    Material.accent: Material.Pink
 
     SensorListModel {
         id: sensorsModel
@@ -26,7 +30,6 @@ ApplicationWindow {
 
     Settings {
         id: settings
-        property string style
     }
 
     Dialog {
@@ -41,11 +44,9 @@ ApplicationWindow {
 
         standardButtons: Dialog.Ok | Dialog.Cancel
         onAccepted: {
-            settings.style = styleBox.displayText
             settingsDialog.close()
         }
         onRejected: {
-            styleBox.currentIndex = styleBox.styleIndex
             settingsDialog.close()
         }
 
@@ -55,32 +56,8 @@ ApplicationWindow {
 
             RowLayout {
                 spacing: 8
-
-                Label {
-                    text: "Style:"
-                }
-
-                ComboBox {
-                    id: styleBox
-                    property int styleIndex: -1
-                    model: window.builtInStyles
-                    Component.onCompleted: {
-                        styleIndex = find(settings.style, Qt.MatchFixedString)
-                        if (styleIndex !== -1)
-                            currentIndex = styleIndex
-                    }
-                    Layout.fillWidth: true
-                }
             }
 
-            Warning {
-                text: "Restart required"
-                opacity: styleBox.currentIndex !== styleBox.styleIndex ? 1.0 : 0.0
-                horizontalAlignment: Label.AlignRight
-                verticalAlignment: Label.AlignVCenter
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-            }
         }
     }
 
