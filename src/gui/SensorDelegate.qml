@@ -8,6 +8,8 @@ Rectangle{
     required property var _alias
     required property var value
 
+    color: Material.foreground
+
     Text {
         anchors.margins: 5
         id: nameText
@@ -16,13 +18,13 @@ Rectangle{
     Text {
         anchors.margins: 5
         id: aliasText
-        anchors.left: nameText.right
+        anchors.top: nameText.bottom
         text: "alias: " + _alias
     }
     Text {
         anchors.margins: 5
         id: valueText
-        anchors.top: nameText.bottom
-        text: "value: " + value
+        anchors.top: aliasText.bottom
+        text: "value: " + parent.value
     }
 }
