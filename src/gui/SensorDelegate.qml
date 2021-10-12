@@ -15,18 +15,21 @@ SpacedGridDelegate {
         id: nameText
         wrapMode: Text.WrapAnywhere
         width: top.width
+        color: Material.foreground
         text: name
     }
     Text {
         anchors.margins: 5
         id: aliasText
         anchors.top: nameText.bottom
+        color: Material.foreground
         text: "alias: " + top._alias
     }
     Text {
         anchors.margins: 5
         id: valueText
         anchors.top: aliasText.bottom
+        color: Material.foreground
         text: "value: " + top.value
     }
 }

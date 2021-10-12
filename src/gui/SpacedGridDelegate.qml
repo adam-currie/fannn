@@ -12,6 +12,7 @@ Item {
         id: inner
         anchors.fill: parent
         anchors.margins: spacing
-        color: Material.foreground
+        color: Material.shade(Material.background, Material.Shade100)
+        radius: 4
     }
 }

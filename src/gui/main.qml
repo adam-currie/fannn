@@ -21,7 +21,7 @@ ApplicationWindow {
 
     Material.theme: Material.Dark
     Material.primary: Material.BlueGrey
-    Material.accent: Material.Pink
+    Material.accent: Material.DeepOrange
 
     SensorListModel {
         id: sensorsModel
@@ -130,13 +130,18 @@ ApplicationWindow {
             id: column
             width: parent.width
             Row {
+                anchors.left: parent.left
+                anchors.margins: 5
                 width: parent.width
-                height: childrenRect.height
+                spacing: 5
                 Label {
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.verticalCenterOffset: -4
                     text: "update interval(ms): "
                 }
                 TextField {
                     id: updateIntervalField
+                    anchors.bottom: parent.bottom
                     validator: IntValidator {bottom: 1}
                     text: profilesModel.currentProfile ?
                         profilesModel.currentProfile.updateIntervalMs : ""
@@ -149,9 +154,10 @@ ApplicationWindow {
             }
             Collapsible {
                 width: parent.width
-                title: "sensors"
+                title: "Sensors"
                 SpacedGridView {
                     width: parent.width
+                    minCellWidth: 220
                     delegate: SensorDelegate {}
                     model: sensorsModel
                 }
@@ -164,9 +170,9 @@ ApplicationWindow {
             text: "save profile"
             flat: true
             anchors.right: parent.right
+            anchors.margins: 5
             enabled: profilesModel.currentProfile ?
                 profilesModel.currentProfile.unsavedChanges : false
-            visible: enabled
             onClicked: profilesModel.currentProfile.save()
         }
     }
