@@ -8,9 +8,10 @@ Item {
     property real spacing: parent.parent.parent.cellSpacing
     width: parent.parent.cellWidth
     height: parent.parent.cellHeight
-    Item {
+    Rectangle {
         id: inner
         anchors.fill: parent
         anchors.margins: spacing
+        color: Material.foreground
     }
 }
