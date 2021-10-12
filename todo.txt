@@ -13,3 +13,5 @@ add hide option to sensors and output devices in the gui, more hidden option bri
 hidden devices to be re-enabled
 
 find out why 'import fannn' produces an error when viewed in qt creator yet it runs fine
+
+optional extra information reported by sensors, such as units suffix, min max values, etc
