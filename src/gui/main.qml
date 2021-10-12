@@ -147,9 +147,14 @@ ApplicationWindow {
                     }
                 }
             }
-            SensorsCollapsible {
-                model: sensorsModel
+            Collapsible {
                 width: parent.width
+                title: "sensors"
+                SpacedGridView {
+                    width: parent.width
+                    delegate: SensorDelegate {}
+                    model: sensorsModel
+                }
             }
         }
     }
