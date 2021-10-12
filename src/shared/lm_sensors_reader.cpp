@@ -88,17 +88,22 @@ LmSensorsReader::LmSensorsReader() : pImpl{std::make_unique<Impl>()} {
         sensors_feature const *feature;
         int nextFeature = 0;
         while ((feature = sensors_get_features(chip, &nextFeature)) != 0) {
-            sensors_subfeature const *subFeature;
-            int nextSubFeature = 0;
             string featureLabel = sensors_get_label(chip, feature);
-            while ((subFeature = sensors_get_all_subfeatures(chip, feature, &nextSubFeature)) != 0) {
-                if(subFeature->flags & SENSORS_MODE_R){
-                    SensorData data(*chip, nextSubFeature-1);
-                    deliminatedStrBuilder idBuilder(IDSTR_DELIM, IDSTR_ESCAPE);
-                    idBuilder << chip->prefix << chip->addr << featureLabel << subFeature->name;
-                    pImpl->sensorMap.insert({idBuilder.get(), data});//todo: deal with dups
-                }
-            }
+            SensorData data(*chip, feature->first_subfeature);
+            deliminatedStrBuilder idBuilder(IDSTR_DELIM, IDSTR_ESCAPE);
+            idBuilder << chip->prefix << chip->addr << featureLabel;
+            pImpl->sensorMap.insert({idBuilder.get(), data});//todo: deal with dups
+            //debug
+//            sensors_subfeature const *subFeature;
+//            int nextSubFeature = 0;
+//            while ((subFeature = sensors_get_all_subfeatures(chip, feature, &nextSubFeature)) != 0) {
+//                if(subFeature->flags & SENSORS_MODE_R){
+//                    SensorData data(*chip, nextSubFeature-1);
+//                    deliminatedStrBuilder idBuilder(IDSTR_DELIM, IDSTR_ESCAPE);
+//                    idBuilder << chip->prefix << chip->addr << featureLabel << subFeature->name;
+//                    pImpl->sensorMap.insert({idBuilder.get(), data});//todo: deal with dups
+//                }
+//            }
         }
     }
 }
