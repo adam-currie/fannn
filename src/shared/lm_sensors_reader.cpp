@@ -6,6 +6,8 @@
 #include <sstream>
 #include <atomic>
 #include <map>
+#include <iomanip>
+#include <cmath>
 
 using namespace std;
 using namespace Fannn;
@@ -26,13 +28,13 @@ class LmSensorsReader::Impl {
         map<string, SensorData> sensorMap = map<string, SensorData>();
 };
 
-class deliminatedStrBuilder{
+class deliminatedStrBuilder {
     ostringstream out;
     char delim, escape;
     bool hasData = false;
     public:
         deliminatedStrBuilder(char delim, char escape) : delim(delim), escape(escape) {}
-        deliminatedStrBuilder& operator<<(string s){
+        deliminatedStrBuilder& operator<<(string s) {
             if(s.empty()) 
                 return *this;
 
@@ -52,7 +54,20 @@ class deliminatedStrBuilder{
 
             return *this;
         }
-        string get(){ return out.str(); }
+        deliminatedStrBuilder& operator<<(int n) {
+            static const char digits[] = {'0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'};
+
+            int digitCount = (31 - __builtin_clz(n))/4 + 1;
+            string s(digitCount, 0);
+
+            for(int i = digitCount-1; i>=0; i--) {
+                s[i] = digits[n%16];
+                n /= 16;
+            }
+
+            return operator<<(s);
+        }
+        string get() { return out.str(); }
 };
 
 LmSensorsReader::LmSensorsReader() : pImpl{std::make_unique<Impl>()} {
@@ -80,7 +95,7 @@ LmSensorsReader::LmSensorsReader() : pImpl{std::make_unique<Impl>()} {
                 if(subFeature->flags & SENSORS_MODE_R){
                     SensorData data(*chip, nextSubFeature-1);
                     deliminatedStrBuilder idBuilder(IDSTR_DELIM, IDSTR_ESCAPE);
-                    idBuilder << chip->prefix << to_string(chip->bus.type) << to_string(chip->bus.nr) << to_string(chip->addr) << featureLabel << subFeature->name;
+                    idBuilder << chip->prefix << chip->addr << featureLabel << subFeature->name;
                     pImpl->sensorMap.insert({idBuilder.get(), data});//todo: deal with dups
                 }
             }
