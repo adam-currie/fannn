@@ -157,7 +157,7 @@ ApplicationWindow {
                 title: "Sensors"
                 SpacedGridView {
                     width: parent.width
-                    minCellWidth: 220
+                    minCellWidth: 200
                     delegate: SensorDelegate {}
                     model: sensorsModel
                 }
