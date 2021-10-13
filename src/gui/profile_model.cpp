@@ -56,3 +56,15 @@ ProfileModel::SetAliasResult ProfileModel::setAliasForSensor(QString id, QString
         }
     }
 }
+
+QString ProfileModel::removeAliasForSensor(QString id) {
+    std::string removed = persister.profile()
+            .removeAliasForSensor(id.toStdString());
+
+    if (!removed.empty()) {
+        emit aliasesChanged();
+        setUnsavedChanges(persister.unsavedChanges());
+    }
+
+    return QString::fromStdString(removed);
+}

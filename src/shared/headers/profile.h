@@ -34,6 +34,7 @@ namespace Fannn {
             const std::vector<Alias>& getSensorAliases(){ return sensorAliases; }
 
             std::string getAliasForSensor(std::string sensorId);
+            std::string removeAliasForSensor(std::string sensorId);
 
             /**
              * @brief adds or updates the alias for a sensor, unless the alias is already used for a sensor or governor name

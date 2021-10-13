@@ -17,6 +17,8 @@ SpacedGridDelegate {
         height: childrenRect.height
         width:parent.width
 
+        //todo: x button visible when text field has focus, remove alias
+
         TextField {
             id: field
             anchors.top: parent.top
@@ -39,7 +41,7 @@ SpacedGridDelegate {
                         }
                     }
                 } else {
-                    //todo: remove the alias
+                    profile.removeAliasForSensor(name)
                 }
             }
         }

@@ -57,6 +57,7 @@ class ProfileModel : public QAbstractItemModel {
         Q_ENUM(SetAliasResult)
 
         Q_INVOKABLE SetAliasResult setAliasForSensor(QString id, QString alias);
+        Q_INVOKABLE QString removeAliasForSensor(QString id);
 
     signals:
         void updateIntervalMsChanged(int);

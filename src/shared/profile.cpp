@@ -4,9 +4,19 @@ using namespace Fannn;
 using namespace std;
 
 string Profile::getAliasForSensor(std::string sensorId) {
-    for (auto a : sensorAliases) {
+    for (auto const & a : sensorAliases) {
         if (a.id == sensorId)
             return a.alias;
+    }
+    return {};
+}
+
+string Profile::removeAliasForSensor(std::string sensorId) {
+    for (auto iter=sensorAliases.begin(); iter!=sensorAliases.end(); iter++) {
+        if (iter->id == sensorId) {
+            sensorAliases.erase(iter);
+            return iter->alias;
+        }
     }
     return {};
 }
@@ -17,7 +27,7 @@ bool Profile::setAliasForSensor(std::string sensorId, std::string alias, bool& g
     if (alias == "")//todo: check for illegal chars
         throw invalid_argument("alias can't be empty!");
 
-    for (Governor g : governors) {
+    for (Governor const & g : governors) {
         if (alias == g.name()) {
             govCollision = true;
             return false;
