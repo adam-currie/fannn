@@ -24,7 +24,7 @@ SpacedGridDelegate {
             anchors.top: parent.top
             anchors.right: parent.right
             anchors.left: parent.left
-            text: name
+            text: (top._alias && top._alias !== "")? top._alias : top.name
             color: Material.foreground
 
             onEditingFinished: {
@@ -50,7 +50,7 @@ SpacedGridDelegate {
             anchors.left: parent.left
             anchors.top: field.bottom
             text: top._alias? top.name : ""
-            visible: text != ""? true : false
+            visible: text !== ""? true : false
             height: visible? contentHeight : 0
             wrapMode: Text.WrapAnywhere
             color: Material.foreground

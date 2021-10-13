@@ -31,6 +31,20 @@ void ensureDirectoryStructure(string path){
         filesystem::create_directories(parent);
 }
 
+void serialize(nlohmann::ordered_json& j, vector<Profile::Alias> const & aliases) {
+    nlohmann::json list;
+    for (auto const & a : aliases) {
+        list.push_back({
+            {"id", a.id},
+            {"alias", a.alias}
+        });
+    }
+    j["sensors"] = list;
+}
+
+ProfilePersister::ProfilePersister(string name)
+    : scratch({name, Profile()}) {}
+
 const vector<string> ProfilePersister::getProfileNames(){
     ensureDirectoryStructure(USER_CONFIG_FILE_DIR);
     vector<string> names;
@@ -88,9 +102,6 @@ ProfilePersister ProfilePersister::loadActiveProfile() {
     throw LoadError(active, "failed to load active profile:'" + active + "', probably the file has been deleted");
 }
 
-ProfilePersister::ProfilePersister(string name) 
-    : scratch({name, Profile()}) {}
-
 void ProfilePersister::load() {
     string path(USER_CONFIG_FILE_DIR+scratch.name);
 
@@ -105,15 +116,19 @@ void ProfilePersister::load() {
 
     scratch.profile.setUpdateInterval(j["updateIntervalMs"]);
 
+    for (auto const & s : j["sensors"])
+        scratch.profile.setAliasForSensor(s["id"], s["alias"]);
+
     lastPersistanceSynced = scratch;
 }
 
 void ProfilePersister::save() {
-    nlohmann::json j;
+    nlohmann::ordered_json j;
 
     j["updateIntervalMs"] = scratch.profile.getUpdateInterval();
+    serialize(j, scratch.profile.getSensorAliases());
 
-    (AtomicFileWriter(USER_CONFIG_FILE_DIR + scratch.name) << j.dump())
+    (AtomicFileWriter(USER_CONFIG_FILE_DIR + scratch.name) << j.dump(4))
         .atomicWrite();
 
     lastPersistanceSynced = scratch;

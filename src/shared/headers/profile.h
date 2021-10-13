@@ -5,22 +5,22 @@
 #include "governor.h"
 #include "curve.h"
 #include <stdexcept>
-#include <tuple>
 
 namespace Fannn {
 
     class Profile {
-
-        typedef struct Alias {
-            std::string alias, id;
-            bool operator==(const Alias&) const = default;
-        } Alias;
+        public:
+            typedef struct Alias {
+                std::string id, alias;
+                bool operator==(const Alias&) const = default;
+            } Alias;
 
         private:
             int updateIntervalMs = 2000;
             std::vector<Governor> governors;
             std::vector<Curve> curves;
             std::vector<Alias> sensorAliases;
+
         public:
             bool operator==(const Profile&) const = default;
 
