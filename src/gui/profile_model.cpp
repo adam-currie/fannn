@@ -30,3 +30,29 @@ void ProfileModel::save() {
     //todo: if save fails we dont want to call setunsavedchanges
     setUnsavedChanges(false);
 }
+
+
+ProfileModel::SetAliasResult ProfileModel::setAliasForSensor(QString id, QString alias) {
+    bool govCollision, aliasCollision;
+    bool setOrUpdated = persister
+            .profile()
+            .setAliasForSensor(
+                id.toStdString(),
+                alias.toStdString(),
+                govCollision,
+                aliasCollision);
+
+    if (setOrUpdated) {
+        emit aliasesChanged();
+        setUnsavedChanges(persister.unsavedChanges());
+        return AliasSet;
+    } else {
+        if (govCollision) {
+            return AliasCollidesWithGovernor;
+        } else if (aliasCollision) {
+            return AliasCollidesWithSensorAlias;
+        } else {
+            return AliasAlreadySet;
+        }
+    }
+}

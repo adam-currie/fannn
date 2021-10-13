@@ -158,7 +158,9 @@ ApplicationWindow {
                 SpacedGridView {
                     width: parent.width
                     minCellWidth: 200
-                    delegate: SensorDelegate {}
+                    delegate: SensorDelegate {
+                        profile: profilesModel.currentProfile
+                    }
                     model: sensorsModel
                 }
             }

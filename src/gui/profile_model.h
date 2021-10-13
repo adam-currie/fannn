@@ -48,9 +48,20 @@ class ProfileModel : public QAbstractItemModel {
         bool unsavedChanges() const { return __unsavedChanges; }
         QString name();
 
+        enum SetAliasResult {
+            AliasSet,
+            AliasAlreadySet,
+            AliasCollidesWithSensorAlias,
+            AliasCollidesWithGovernor
+        };
+        Q_ENUM(SetAliasResult)
+
+        Q_INVOKABLE SetAliasResult setAliasForSensor(QString id, QString alias);
+
     signals:
         void updateIntervalMsChanged(int);
         void unsavedChangesChanged(bool);
+        void aliasesChanged();
 
     public slots:
         void save();

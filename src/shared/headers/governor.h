@@ -32,6 +32,8 @@ namespace Fannn {
             std::function<double(std::string)> readSensorOrGovernor;
             std::function<std::function<double(double)>(std::string)> readCurve;
             
+            std::string name() { return "todo"; }
+
             /**
              * @brief Construct a new Governor object
              * 

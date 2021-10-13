@@ -20,7 +20,7 @@ class SensorListModel : public QAbstractListModel {
 
     void onProfileChanged(ProfileModel* value);
 
-    QMetaObject::Connection updateIntervalConnection;
+    std::vector<QMetaObject::Connection> profileConnections;
 
     public:
         enum Roles {
