@@ -2,7 +2,6 @@
 #include "governor.h"
 #include "sysfs_pwm_writer.h"
 #include "lm_sensors_reader.h"
-#include "user_config.h"
 #include <sensors/error.h>
 #include <iostream>
 #include <cmath>
