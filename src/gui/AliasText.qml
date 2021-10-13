@@ -4,8 +4,8 @@ import QtQuick.Controls
 import Qt.labs.settings
 
 Item {
-    property string name
-    property string _alias
+    property var name
+    property var _alias
 
     id: top
     height: childrenRect.height
@@ -24,10 +24,11 @@ Item {
     }
 
     Text {
-        visible: _alias && _alias != ""
         anchors.left: parent.left
         anchors.top: field.bottom
-        text: _alias
+        text: top._alias? top._alias : ""
+        visible: text != ""? true : false
+        height: visible? contentHeight : 0
         wrapMode: Text.WrapAnywhere
         color: Material.foreground
     }
