@@ -6,9 +6,6 @@
 #include <stdexcept>
 #include <memory>
 
-const std::string NAMED_INPUT_PREFIX = "input:";
-const std::string NAMED_FUNCTION_PREFIX = "func:";
-
 namespace Fannn {
 
     class Governor {

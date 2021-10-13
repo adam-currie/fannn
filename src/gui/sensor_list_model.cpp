@@ -15,8 +15,13 @@ QVariant SensorListModel::data(const QModelIndex &index, int role) const {
     switch (role) {
         case NameRole:
             return QString::fromStdString(compositeReader.getAll()[index.row()]);//todo: SLOW, DUMB
-        case AliasRole:
-            return "todo";
+        case AliasRole: {
+            if (!_profileModel)
+                return QVariant();
+            Fannn::Profile p = _profileModel->constProfile();
+            std::string name = compositeReader.getAll()[index.row()];//todo: SLOW, DUMB
+            return QString::fromStdString(p.getAliasForSensor(name));
+        }
         case ValueRole:
             return QVariant{compositeReader.getValue(compositeReader.getAll()[index.row()])}.toString();//todo: SLOWER, DUMBER
         default:
@@ -25,6 +30,7 @@ QVariant SensorListModel::data(const QModelIndex &index, int role) const {
 }
 
 void SensorListModel::onProfileChanged(ProfileModel *value) {
+    emit dataChanged(index(0,0), index(rowCount()-1,0), {AliasRole});
     readTimer.stop();
     disconnect(updateIntervalConnection);
     if (value) {

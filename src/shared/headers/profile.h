@@ -5,18 +5,14 @@
 #include "governor.h"
 #include "curve.h"
 #include <stdexcept>
-#include <sensor_alias.h>
-#include <controller_alias.h>
 
 namespace Fannn {
 
-    class Profile{
+    class Profile {
         private:
             int updateIntervalMs = 2000;
             std::vector<Governor> governors;
             std::vector<Curve> curves;
-            std::vector<SensorAlias> sensorAliases;
-            std::vector<ControllerAlias> controllerAliases;
         public:
             bool operator==(const Profile&) const = default;
 
@@ -27,8 +23,8 @@ namespace Fannn {
             }
             const std::vector<Governor>& getGovernors(){ return governors; }
             const std::vector<Curve>& getCurves(){ return curves; }
-            const std::vector<SensorAlias>& getSensorAliases(){ return sensorAliases; }
-            const std::vector<ControllerAlias>& getControllerAliases(){ return controllerAliases; }
+
+            std::string getAliasForSensor(std::string sensorId);
     };
 
 }

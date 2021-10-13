@@ -41,6 +41,8 @@ class ProfileModel : public QAbstractItemModel {
             return QModelIndex();
         }
 
+        Fannn::Profile const & constProfile() const { return persister.constProfile(); }
+
         int updateIntervalMs() const;
         void setUpdateIntervalMs(int);
         bool unsavedChanges() const { return __unsavedChanges; }
