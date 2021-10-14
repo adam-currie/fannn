@@ -16,15 +16,19 @@ ApplicationWindow {
 
     required property var profilesModel
     required property var curvesModel
-    required property var governorsModel
     required property var controllersModel
 
     Material.theme: Material.Dark
     Material.primary: Material.BlueGrey
-    Material.accent: Material.DeepOrange
+    Material.accent: "#ff793b"
 
     SensorListModel {
         id: sensorsModel
+        profile: profilesModel.currentProfile
+    }
+
+    GovernorListModel {
+        id: governorsModel
         profile: profilesModel.currentProfile
     }
 
@@ -131,12 +135,13 @@ ApplicationWindow {
             width: parent.width
             Row {
                 anchors.left: parent.left
-                anchors.margins: 5
+                anchors.leftMargin: 10
+                height: 50
                 width: parent.width
                 spacing: 5
                 Label {
                     anchors.verticalCenter: parent.verticalCenter
-                    anchors.verticalCenterOffset: -4
+                    anchors.verticalCenterOffset: -2
                     text: "update interval(ms): "
                 }
                 TextField {
@@ -162,6 +167,27 @@ ApplicationWindow {
                         profile: profilesModel.currentProfile
                     }
                     model: sensorsModel
+                }
+            }
+            Collapsible {
+                width: parent.width
+                title: "Governors"
+                SpacedGridView {
+                    width: parent.width
+                    minCellWidth: 250
+                    delegate: GovernorDelegate {
+                        governors: governorsModel
+                    }
+                    model: governorsModel
+                }
+                RoundButton {
+                    //todo: ask spacedgridview nicely to calculate x and y value of the center of the next grid cell
+                    width: 64
+                    height: 64
+                    Material.background: Material.accent
+                    Material.elevation: 0
+                    icon.name: "list-add-symbolic"
+                    onClicked: governorsModel.add()
                 }
             }
         }

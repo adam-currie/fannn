@@ -185,13 +185,14 @@ class Parser{
         }
 };
 
-Governor::Governor(string userExpression, function<bool(string)> validateCurve, function<bool(string)> validateSensorOrGovernor)
-    : expStr(userExpression) {
+void Governor::setExpression(string userExpression, function<bool(string)> validateCurve, function<bool(string)> validateSensorOrGovernor) {
+    expStr = userExpression;//todo: what state do we leave everything in when this fails?
+
     Tokenizer tokenizer(userExpression, DELIMINATORS, RESERVED_SYMBOLS);
 
     try {
         exp = Parser(tokenizer.getTokens(), validateCurve, validateSensorOrGovernor, this)
-            .parse();
+                .parse();
     } catch(_TokenParseError e) {
         int start,end;
         try{

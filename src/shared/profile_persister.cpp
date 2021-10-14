@@ -117,7 +117,7 @@ void ProfilePersister::load() {
     scratch.profile.setUpdateInterval(j["updateIntervalMs"]);
 
     for (auto const & s : j["sensors"])
-        scratch.profile.setAliasForSensor(s["id"], s["alias"]);
+        scratch.profile.addOrUpdateSensorAlias(s["id"], s["alias"]);
 
     lastPersistanceSynced = scratch;
 }

@@ -96,7 +96,8 @@ TEST_CASE("governor_test"){
         }
     };
 
-    Governor gov1(
+    Governor gov1;
+    gov1.setExpression(
         "curve1 sensor1",
         [](string s){return true;},
         [](string s){return true;});
@@ -104,7 +105,8 @@ TEST_CASE("governor_test"){
     gov1.readSensorOrGovernor = readSensorOrGov;
     govMap.insert({"gov1", gov1});
 
-    Governor gov2(
+    Governor gov2;
+    gov2.setExpression(
         " curve1(gov1     +sensor2 * 2)^2 ^ 3  -2      ",
         [](string s){return true;},
         [](string s){return true;});

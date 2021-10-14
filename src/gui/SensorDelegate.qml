@@ -24,12 +24,13 @@ SpacedGridDelegate {
             anchors.top: parent.top
             anchors.right: parent.right
             anchors.left: parent.left
+            anchors.margins: 5
             text: (top._alias && top._alias !== "")? top._alias : top.name
             color: Material.foreground
 
             onEditingFinished: {
                 if (text !== name) {
-                    var result = profile.setAliasForSensor(name, text)
+                    var result = profile.addOrUpdateSensorAlias(name, text)
                     switch (result) {
                         case ProfileModel.AliasCollidesWithSensorAlias: {
                             //todo: dialog
@@ -49,6 +50,7 @@ SpacedGridDelegate {
         Text {
             anchors.left: parent.left
             anchors.top: field.bottom
+            anchors.margins: 5
             text: top._alias? top.name : ""
             visible: text !== ""? true : false
             height: visible? contentHeight : 0
@@ -58,9 +60,10 @@ SpacedGridDelegate {
     }
 
     Text {
+        anchors.top: nameText.bottom
+        anchors.left: parent.left
         anchors.margins: 5
         id: valueText
-        anchors.top: nameText.bottom
         color: Material.foreground
         text: "value: " + top.value
     }

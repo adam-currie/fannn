@@ -25,21 +25,19 @@ namespace Fannn {
         
             static const std::vector<char> RESERVED_SYMBOLS;
 
+            std::string name;
+
+            Governor() {}
+            Governor(std::string name) : name(name) {}
+
             bool operator==(const Governor& g) const { 
                 return g.expStr == expStr; 
             }
 
             std::function<double(std::string)> readSensorOrGovernor;
             std::function<std::function<double(double)>(std::string)> readCurve;
-            
-            std::string name() const { return "todo"; }
 
-            /**
-             * @brief Construct a new Governor object
-             * 
-             * @exception ParseError //todo
-             */
-            Governor(std::string userExpression, std::function<bool(std::string)> validateCurve, std::function<bool(std::string)> validateSensorOrGovernor);
+            void setExpression(std::string userExpression, std::function<bool(std::string)> validateCurve, std::function<bool(std::string)> validateSensorOrGovernor);
 
             double exec();
     };

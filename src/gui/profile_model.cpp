@@ -32,11 +32,11 @@ void ProfileModel::save() {
 }
 
 
-ProfileModel::SetAliasResult ProfileModel::setAliasForSensor(QString id, QString alias) {
+ProfileModel::SetAliasResult ProfileModel::addOrUpdateSensorAlias(QString id, QString alias) {
     bool govCollision, aliasCollision;
     bool setOrUpdated = persister
             .profile()
-            .setAliasForSensor(
+            .addOrUpdateSensorAlias(
                 id.toStdString(),
                 alias.toStdString(),
                 govCollision,
@@ -67,4 +67,14 @@ QString ProfileModel::removeAliasForSensor(QString id) {
     }
 
     return QString::fromStdString(removed);
+}
+
+void ProfileModel::addOrUpdateGovernor(Fannn::Governor gov) {
+    bool setOrUpdated = persister.profile()
+            .addOrUpdateGovernor(gov);
+
+    if (setOrUpdated) {
+        emit governorsChanged();
+        setUnsavedChanges(persister.unsavedChanges());
+    }
 }

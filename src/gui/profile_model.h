@@ -56,13 +56,16 @@ class ProfileModel : public QAbstractItemModel {
         };
         Q_ENUM(SetAliasResult)
 
-        Q_INVOKABLE SetAliasResult setAliasForSensor(QString id, QString alias);
+        Q_INVOKABLE SetAliasResult addOrUpdateSensorAlias(QString id, QString alias);
         Q_INVOKABLE QString removeAliasForSensor(QString id);
+
+        void addOrUpdateGovernor(Fannn::Governor gov);
 
     signals:
         void updateIntervalMsChanged(int);
         void unsavedChangesChanged(bool);
         void aliasesChanged();
+        void governorsChanged();
 
     public slots:
         void save();

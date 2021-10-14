@@ -21,14 +21,14 @@ string Profile::removeAliasForSensor(std::string sensorId) {
     return {};
 }
 
-bool Profile::setAliasForSensor(std::string sensorId, std::string alias, bool& govCollision, bool& aliasCollision) {
+bool Profile::addOrUpdateSensorAlias(std::string sensorId, std::string alias, bool& govCollision, bool& aliasCollision) {
     govCollision = aliasCollision = false;
 
     if (alias == "")//todo: check for illegal chars
         throw invalid_argument("alias can't be empty!");
 
     for (Governor const & g : governors) {
-        if (alias == g.name()) {
+        if (alias == g.name) {
             govCollision = true;
             return false;
         }
@@ -41,9 +41,10 @@ bool Profile::setAliasForSensor(std::string sensorId, std::string alias, bool& g
                 aliasCollision = true;
             }//else already set
             return false;
-        }
-        if (sensorAliases[i].id == sensorId)
+        } else if (sensorAliases[i].id == sensorId) {
             oldIndex = i;
+            break;
+        }
     }
 
     Alias a;
@@ -56,5 +57,34 @@ bool Profile::setAliasForSensor(std::string sensorId, std::string alias, bool& g
         sensorAliases[oldIndex] = a;
     }
 
+    return true;
+}
+
+bool Profile::addOrUpdateGovernor(Governor gov, bool& sensorAliasCollision) {
+    sensorAliasCollision = false;
+
+    if (gov.name == "")//todo: check for illegal chars
+        throw invalid_argument("name can't be empty!");
+
+    for (auto const & sa : sensorAliases) {
+        if (gov.name == sa.alias) {
+            sensorAliasCollision = true;
+            return false;
+        }
+    }
+
+    for (int i=0; i<governors.size(); i++){
+        if (governors[i].name == gov.name) {
+            if (governors[i] == gov) {
+                //already set, no change needed
+                return false;
+            } else {
+                governors[i] = gov;
+                return true;
+            }
+        }
+    }
+
+    governors.push_back(gov);
     return true;
 }

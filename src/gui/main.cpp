@@ -20,13 +20,11 @@ int main(int argc, char *argv[]){
 
     ProfileListModel profilesModel;
     CurveListModel curvesModel;
-    GovernorListModel governorsModel;
     ControllerListModel controllersModel;
 
     engine.setInitialProperties({
         { "profilesModel", QVariant::fromValue(&profilesModel) },
         { "curvesModel", QVariant::fromValue(&curvesModel) },
-        { "governorsModel", QVariant::fromValue(&governorsModel) },
         { "controllersModel", QVariant::fromValue(&controllersModel) }
     });
 

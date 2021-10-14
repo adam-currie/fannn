@@ -27,8 +27,6 @@ namespace Fannn {
                     : std::runtime_error(msg.value_or("failed to load profile:'" + name + "'")), name(name) {}
             };
 
-
-
             static std::string getActiveProfile();
             static void setActiveProfile(std::string name);
 
