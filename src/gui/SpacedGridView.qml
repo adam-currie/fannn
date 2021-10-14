@@ -18,7 +18,7 @@ Item {
         anchors.right: parent.right
         anchors.top: parent.top
         anchors.margins: cellSpacing
-        height: childrenRect.height
+        height: childrenRect.height + anchors.margins*2
         cellWidth: width/Math.floor(width/minCellWidth)
         cellHeight: 150
     }

@@ -10,7 +10,7 @@ Page {
     default property alias content: contentView.data
     property bool collapsed: false
 
-    height: collapsed? header.height : implicitHeight
+    height: wrapper.height + header.height
 
     header: Button {
         topInset: 0
@@ -38,7 +38,8 @@ Page {
         width: collapsible.width
         visible: height > 0
         clip: true
-        height: collapsed? 0 : contentView.implicitHeight
+        implicitHeight: contentView.implicitHeight
+        height: collapsed? 0 : implicitHeight
 
         Behavior on height {
             NumberAnimation {

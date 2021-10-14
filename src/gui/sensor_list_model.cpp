@@ -32,7 +32,7 @@ QVariant SensorListModel::data(const QModelIndex &index, int role) const {
 void SensorListModel::onProfileChanged(ProfileModel *value) {
     emit dataChanged(index(0,0), index(rowCount()-1,0), {AliasRole});
     readTimer.stop();
-    for (auto c : profileConnections) disconnect(c);
+    for (auto& c : profileConnections) disconnect(c);
     profileConnections.clear();
     if (value) {
         profileConnections.push_back(connect(
