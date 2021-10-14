@@ -10,14 +10,13 @@ SpacedGridDelegate {
 
     id: top
 
-    TextField {
+    STextField {
         id: nameField
         anchors.top: parent.top
         anchors.right: parent.right
         anchors.left: parent.left
         anchors.margins: 5
         text: name
-        color: Material.foreground
 
         onEditingFinished: {
             if (text !== name) {

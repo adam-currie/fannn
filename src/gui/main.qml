@@ -66,6 +66,8 @@ ApplicationWindow {
     }
 
     header: ToolBar {
+        focusPolicy: Qt.ClickFocus
+
         ProfilesComboBox {
             id: bongoBox
             model: window.profilesModel
@@ -85,12 +87,9 @@ ApplicationWindow {
             UnsavedChangesDialog {
                 id: confirmationDialog
                 profileModel: profilesModel.currentProfile
-                Connections {
-                    target: confirmationDialog
-                    function onAccepted() { addButton.addProfile() }
-                    function onDiscarded() { addButton.addProfile() }
-                    //onRejected do nothing
-                }
+                onAccepted: addButton.addProfile()
+                onDiscarded: addButton.addProfile()
+                //onRejected do nothing
             }
 
             icon.name: "list-add-symbolic"
@@ -130,6 +129,13 @@ ApplicationWindow {
         height: parent.height
         contentHeight: column.height
         ScrollBar.vertical: ScrollBar { }
+
+
+        Pane {
+            anchors.fill: parent
+            focusPolicy: Qt.ClickFocus
+        }
+
         Column {
             id: column
             width: parent.width
@@ -172,6 +178,7 @@ ApplicationWindow {
             Collapsible {
                 width: parent.width
                 title: "Governors"
+
                 SpacedGridView {
                     width: parent.width
                     minCellWidth: 250
@@ -194,6 +201,7 @@ ApplicationWindow {
     }
 
     footer: ToolBar {
+        focusPolicy: Qt.ClickFocus
         Button {
             text: "save profile"
             flat: true

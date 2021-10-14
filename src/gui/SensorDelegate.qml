@@ -19,14 +19,13 @@ SpacedGridDelegate {
 
         //todo: x button visible when text field has focus, remove alias
 
-        TextField {
+        STextField {
             id: field
             anchors.top: parent.top
             anchors.right: parent.right
             anchors.left: parent.left
             anchors.margins: 5
             text: (top._alias && top._alias !== "")? top._alias : top.name
-            color: Material.foreground
 
             onEditingFinished: {
                 if (text !== name) {
