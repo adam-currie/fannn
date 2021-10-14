@@ -24,7 +24,6 @@ SpacedGridDelegate {
             anchors.top: parent.top
             anchors.right: parent.right
             anchors.left: parent.left
-            anchors.margins: 5
             text: (top._alias && top._alias !== "")? top._alias : top.name
 
             onEditingFinished: {
