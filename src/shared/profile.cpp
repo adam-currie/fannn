@@ -88,3 +88,13 @@ bool Profile::addOrUpdateGovernor(Governor gov, bool& sensorAliasCollision) {
     governors.push_back(gov);
     return true;
 }
+
+bool Profile::removeGovernor(string name) {
+    for (auto iter = governors.begin(); iter != governors.end(); ++iter) {
+        if (iter->name == name) {
+            governors.erase(iter);
+            return true;
+        }
+    }
+    return false;
+}

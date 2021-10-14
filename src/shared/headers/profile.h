@@ -65,5 +65,7 @@ namespace Fannn {
                 return addOrUpdateGovernor(gov, b);
             }
 
+            bool removeGovernor(std::string name);
+
     };
 }

@@ -13,15 +13,26 @@ SpacedGridDelegate {
     STextField {
         id: nameField
         anchors.top: parent.top
-        anchors.right: parent.right
         anchors.left: parent.left
-        anchors.margins: 5
+        anchors.right: parent.right
+        bottomPadding: 0
+        rightPadding: removeButton.width
         text: name
 
-        onEditingFinished: {
-            if (text !== name) {
-                //todo
-            }
+        Button {
+            id: removeButton
+            anchors.top: parent.top
+            anchors.right: parent.right
+            height: parent.height + parent.topPadding
+            width: height
+            flat: true
+            topInset: 0
+            bottomInset: 0
+            padding: 0
+            icon.name: "window-close-symbolic"
+            icon.color: activeFocus || hovered ? Material.accent : Material.foreground
+            onClicked: governors.remove(name)
         }
     }
+
 }

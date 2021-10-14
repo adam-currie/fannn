@@ -27,6 +27,7 @@ class GovernorListModel : public QAbstractListModel {
         QHash<int, QByteArray> roleNames() const override;
 
         Q_INVOKABLE void add();
+        Q_INVOKABLE void remove(int row);
 
     signals:
         void profileChanged(ProfileModel* value);

@@ -78,3 +78,13 @@ void ProfileModel::addOrUpdateGovernor(Fannn::Governor gov) {
         setUnsavedChanges(persister.unsavedChanges());
     }
 }
+
+void ProfileModel::removeGovernor(string name) {
+    bool removed = persister.profile()
+            .removeGovernor(name);
+
+    if (removed) {
+        emit governorsChanged();
+        setUnsavedChanges(persister.unsavedChanges());
+    }
+}

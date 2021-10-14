@@ -60,6 +60,7 @@ class ProfileModel : public QAbstractItemModel {
         Q_INVOKABLE QString removeAliasForSensor(QString id);
 
         void addOrUpdateGovernor(Fannn::Governor gov);
+        void removeGovernor(std::string name);
 
     signals:
         void updateIntervalMsChanged(int);
