@@ -182,6 +182,7 @@ ApplicationWindow {
                 SpacedGridView {
                     width: parent.width
                     minCellWidth: 250
+                    cellHeight: 200
                     delegate: GovernorDelegate {
                         governors: governorsModel
                     }
