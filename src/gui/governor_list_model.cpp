@@ -1,9 +1,6 @@
 #include "governor_list_model.h"
 
-GovernorListModel::GovernorListModel(QObject *parent) : QAbstractListModel(parent) {
-    connect(this, &GovernorListModel::profileChanged,
-            &GovernorListModel::onProfileChanged);
-}
+GovernorListModel::GovernorListModel(QObject *parent) : QAbstractListModel(parent) {}
 
 QVariant GovernorListModel::data(const QModelIndex &index, int role) const {
     if (!index.isValid())
@@ -33,21 +30,6 @@ int GovernorListModel::rowCount(const QModelIndex &parent) const {
     return _profileModel ?
             _profileModel->constProfile().getGovernors().size() :
             0;
-}
-
-void GovernorListModel::onProfileChanged(ProfileModel *value) {
-    emit dataChanged(index(0,0), index(rowCount()-1,0));
-
-    for (auto& c : profileConnections) disconnect(c);
-    profileConnections.clear();
-
-    if (value) {
-        //todo: might not need this
-        profileConnections.push_back(connect(
-            value, &ProfileModel::governorsChanged,
-            [this] () { emit dataChanged(index(0,0), index(rowCount()-1,0)); }
-        ));
-    }
 }
 
 void GovernorListModel::add() {

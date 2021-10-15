@@ -7,6 +7,7 @@ import Fannn
 SpacedGridDelegate {
     required property var name
     required property var governors
+    required property int index
 
     id: top
 
@@ -31,7 +32,7 @@ SpacedGridDelegate {
             padding: 0
             icon.name: "window-close-symbolic"
             icon.color: activeFocus || hovered ? Material.accent : Material.foreground
-            onClicked: governors.remove(name)
+            onClicked: governors.remove(index)
         }
     }
 
