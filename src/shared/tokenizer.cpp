@@ -16,7 +16,7 @@ Tokenizer::Tokenizer(string str, vector<char> excludedDelims, vector<char> inclu
     int startOfToken = -1;
 
     auto addToken = [&](int start, int end){
-        backtraceMap.insert({tokens.size(),{start,end}});
+        backtraceMap.push_back({start,end});
         tokens.push_back(str.substr(start, end-start+1));
     };
 
@@ -42,6 +42,6 @@ Tokenizer::Tokenizer(string str, vector<char> excludedDelims, vector<char> inclu
 
 }
 
-tuple<int,int> Tokenizer::backtraceToken(int tokenIndex){
+pair<int,int> Tokenizer::backtraceToken(int tokenIndex){
     return backtraceMap[tokenIndex];
 }
