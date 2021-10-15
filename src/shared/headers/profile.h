@@ -66,6 +66,7 @@ namespace Fannn {
             }
 
             bool removeGovernor(std::string name);
+            void removeGovernor(int index);
 
     };
 }

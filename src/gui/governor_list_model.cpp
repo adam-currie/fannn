@@ -53,12 +53,10 @@ tryNextName:
 
 
  void GovernorListModel::remove(int row) {
-        auto govs = _profileModel->constProfile().getGovernors();
-        if (row < govs.size()) {
-            beginRemoveRows(QModelIndex(), row, row);
-            _profileModel->removeGovernor(govs[row].name);
-            endRemoveRows();
-        }
+    beginRemoveRows(QModelIndex(), row, row);
+    _profileModel->removeGovernor(row);
+    endRemoveRows();
+}
     }
 
 QHash<int, QByteArray> GovernorListModel::roleNames() const {
