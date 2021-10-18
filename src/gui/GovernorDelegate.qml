@@ -50,13 +50,13 @@ SpacedGridDelegate {
             anchors.top: nameField.bottom
             anchors.left: parent.left
             anchors.right: parent.right
-            anchors.bottom: errorText.top
+            anchors.bottom: errorBox.top
             anchors.topMargin: 10
             anchors.bottomMargin: -5
             TextArea {
                 id: expTextArea
                 padding: nameField.padding
-                wrapMode: TextEdit.Wrap//todo: wrap on more charecters
+                wrapMode: TextEdit.Wrap//todo: wrap on more charecters(example: sensor1+sensor2 should wrap at '+')
                 onTextChanged: governors.setExpression(index, text)
                 selectByMouse: true
                 ErrorHighlighter {
@@ -66,15 +66,22 @@ SpacedGridDelegate {
             }
         }
 
-        Warning {
-            id: errorText
-            anchors.left: parent.left
+        ScrollView {
+            id: errorBox
             anchors.bottom: parent.bottom
             anchors.margins: nameField.padding
             anchors.topMargin: 0
+            width: parent.width
             height: 26
-            verticalAlignment: Text.AlignVCenter
-            text: errorStr
+            contentWidth: availableWidth
+            Warning {
+                anchors.left: parent.left
+                anchors.right: parent.right
+                wrapMode: TextEdit.Wrap
+                verticalAlignment: Text.AlignVCenter
+                lineHeight: .666
+                text: errorStr
+            }
         }
     }
 }
