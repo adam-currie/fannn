@@ -50,6 +50,9 @@ struct _TokenParseError: public runtime_error {
         string errMsg;
         _TokenParseError(int tokenIndex, string errMsg) : runtime_error(errMsg),
             tokenIndex(tokenIndex), errMsg(errMsg) {}
+        static _TokenParseError disappoint(int tokenIndex, string wanted, string got){
+            return _TokenParseError(tokenIndex, "expected " + wanted + ", not '" + got + "'");
+        }
 };
 
 class Parser{
@@ -69,11 +72,11 @@ class Parser{
     ArithmeticOp parseArithmeticOp() {
         string token = getToken(n, "arithmetic operation");
         if(token.size() != 1) 
-            throw  _TokenParseError(n, "expected arithmetic operation");
+            throw _TokenParseError::disappoint(n, "arithmetic operation", token);
         
         auto opIterator = ARITHMETIC.find(token.at(0));
         if (opIterator == ARITHMETIC.end())
-            throw _TokenParseError(n, "expected arithmetic operation");
+            throw _TokenParseError::disappoint(n, "arithmetic operation", token);
 
         n++;
         return opIterator->second;
@@ -89,7 +92,7 @@ class Parser{
         string token = getToken(n, "expression");
 
         if(isArithmeticOp(token))
-            throw _TokenParseError(n, "expected expression");
+            throw _TokenParseError::disappoint(n, "expression", token);
 
         //CONSTANTS?
         try {
@@ -99,7 +102,7 @@ class Parser{
         }catch(invalid_argument){
             //so its not a constant, fine by me!
         }catch(out_of_range){
-            throw _TokenParseError(n, "constant value is out of range");
+            throw _TokenParseError(n, "constant value '" + token + "' is out of range");
         }
 
         //BRACKETS?
