@@ -151,7 +151,8 @@ ApplicationWindow {
                     anchors.verticalCenterOffset: -2
                     text: "update interval(ms): "
                 }
-                TextField {
+                STextField {
+                    padding: 4
                     id: updateIntervalField
                     anchors.bottom: parent.bottom
                     validator: IntValidator {bottom: 1}

@@ -5,8 +5,8 @@ import Qt.labs.settings
 
 TextField {
     color: Material.foreground
-    leftPadding: 5
-    rightPadding: 5
+    padding: 7
+    selectByMouse: true
     onActiveFocusChanged: {
         if (!activeFocus) select(0,0)
     }
