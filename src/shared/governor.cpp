@@ -34,6 +34,16 @@ const vector<char> Governor::RESERVED_SYMBOLS = [](){
     return symbols;
 }();
 
+template <typename T>
+bool contains(vector<T> v, T t){
+    return find(v.begin(), v.end(), t) != v.end();
+}
+
+bool isArithmeticOp(string s){
+    return  s.size() == 1 &&
+            ARITHMETIC.find(s.at(0)) != ARITHMETIC.end();
+}
+
 struct _TokenParseError: public runtime_error {
     public:
         int tokenIndex;
@@ -44,24 +54,20 @@ struct _TokenParseError: public runtime_error {
 
 class Parser{
     Governor *owner;
-    function<bool(string)> validateCurve;
-    function<bool(string)> validateSensorOrGovernor;
     vector<string> tokens;
     int n = 0;
 
-    string getToken(int n, string errMsg){
-        if (n >= tokens.size()) 
+    string getToken(int n, string expected){
+        if (n >= tokens.size()) {
+            string errMsg = "expected " + expected;
+            if (n > 0) errMsg += " after '" + tokens[--n] + "'";
             throw _TokenParseError(n, errMsg);
+        }
         return tokens[n];
     }
 
-    bool isArithmeticOp(string s){
-        return  s.size() == 1 &&
-                ARITHMETIC.find(s.at(0)) != ARITHMETIC.end();
-    }
-
     ArithmeticOp parseArithmeticOp() {
-        string token = getToken(n, "expected arithmetic operation");
+        string token = getToken(n, "arithmetic operation");
         if(token.size() != 1) 
             throw  _TokenParseError(n, "expected arithmetic operation");
         
@@ -73,15 +79,17 @@ class Parser{
         return opIterator->second;
     }
 
+
+
     /**
      * @brief parses a single expression without traversing operations
      *        (unless they are encapsulated within a function call or brackets)
      */
     function<double()> parseSelfContainedExp() {
-        string token = getToken(n, "expected an expression");
+        string token = getToken(n, "expression");
 
         if(isArithmeticOp(token))
-            throw _TokenParseError(n, "expected an expression"); 
+            throw _TokenParseError(n, "expected expression");
 
         //CONSTANTS?
         try {
@@ -103,17 +111,13 @@ class Parser{
         //SENSORS, GOVERNORS AND CURVES?
         if (tokens.size() > n+1 && !isArithmeticOp(tokens[n+1])){
             //should be a curve because it takes an argument
-            if(!validateCurve(token))
-                throw _TokenParseError(n, "no curve matching: '" + token + "'"); 
-
             n++;
             auto rightHandExp = parseSelfContainedExp();
             return [*this, token, rightHandExp](){ 
                 return owner->readCurve(token)(rightHandExp()); }
             ;
         } else {
-            if(!validateSensorOrGovernor(token))
-                throw _TokenParseError(n, "no sensor or governor matching: '" + token + "'");
+            //should be a sensor or governor
             n++;
             return [*this, token](){
                  return owner->readSensorOrGovernor(token); 
@@ -132,7 +136,7 @@ class Parser{
 
         auto endReached = [&](){
             if(bracketed){
-                bool bracketHit = getToken(n, "expected closing bracket") == ")";
+                bool bracketHit = getToken(n, "closing bracket") == ")";
                 if (bracketHit) n++;
                 return bracketHit;
             }else{
@@ -172,8 +176,8 @@ class Parser{
     }
 
     public:
-        Parser(vector<string> tokens, function<bool(string)> validateCurve, function<bool(string)> validateSensorOrGovernor, Governor *owner) 
-            :   tokens(tokens), validateCurve(validateCurve), validateSensorOrGovernor(validateSensorOrGovernor), owner(owner) {}
+        Parser(vector<string> tokens, Governor *owner)
+            :   tokens(tokens), owner(owner) {}
 
         /**
          * @brief parses the expression
@@ -181,30 +185,75 @@ class Parser{
          * @return function<double()> the parsed expression if successful
          */
         function<double()> parse(){
+            if (tokens.empty())
+                throw _TokenParseError(0, "empty expression");
             return parseExp();
         }
 };
 
-void Governor::setExpression(string userExpression, function<bool(string)> validateCurve, function<bool(string)> validateSensorOrGovernor) {
+void Governor::setExpression(string userExpression) {
     expStr = userExpression;//todo: what state do we leave everything in when this fails?
 
-    Tokenizer tokenizer(userExpression, DELIMINATORS, RESERVED_SYMBOLS);
+    errors.clear();
+
+    tokenizer = Tokenizer(userExpression, DELIMINATORS, RESERVED_SYMBOLS);
+
+    zeroArgFuncTokens = {};
+    oneArgFuncTokens = {};
+    auto const & tokens = tokenizer->getTokens();
+    for (int i=0; i<tokens.size(); i++) {
+        string tokenStr = tokens[i];
+
+        try {
+            const double constant = stod(tokenStr);
+            //constant
+            continue;
+        }catch(invalid_argument){
+            //not constant
+        }
+
+        if ( tokenStr.size() > 1 || !contains(RESERVED_SYMBOLS, tokenStr[0]) ) {
+            if (tokens.size() > i+1 && !isArithmeticOp(tokens[i+1])){
+                //should be curve
+                auto indexes = oneArgFuncTokens[tokenStr];
+                indexes.push_back(tokenizer->backtraceToken(i));
+                oneArgFuncTokens[tokenStr] = indexes;
+            } else {
+                //should be a sensor or governor
+                auto indexes = zeroArgFuncTokens[tokenStr];
+                indexes.push_back(tokenizer->backtraceToken(i));
+                zeroArgFuncTokens[tokenStr] = indexes;
+            }
+        }
+    }
 
     try {
-        exp = Parser(tokenizer.getTokens(), validateCurve, validateSensorOrGovernor, this)
+        exp = Parser(tokenizer->getTokens(), this)
                 .parse();
     } catch(_TokenParseError e) {
         int start,end;
         try{
-            tie(start,end) = tokenizer.backtraceToken(e.tokenIndex);
+            tie(start,end) = tokenizer->backtraceToken(e.tokenIndex);
         } catch(out_of_range) {
-            //probably our original error is that our token index went out of range!
-            //in any case this means that our error applies to the whole dang string
-            start = 0;
-            end = userExpression.size()-1;
+            //error doesn't point to specific token
+            start = -1;
+            end = -1;
         }
-        throw Governor::ParseError(userExpression, start, end, e.errMsg);
+        errors.push_back(Error(e.errMsg, {{start, end}}));
     }
+}
+
+void Governor::validateNameLookups(std::function<bool (std::string)> validateCurve, std::function<bool (std::string)> validateSensorOrGovernor) {
+    for (auto const & [identifier, ranges] : zeroArgFuncTokens){
+        if (name == identifier) {
+            errors.push_back(Error("infinite self-reference", ranges));
+        } else if (!validateSensorOrGovernor(identifier)) {
+            errors.push_back(Error("no governor or sensor named '" + identifier + "'", ranges));
+        }
+    }
+    for (auto const & [identifier, ranges] : oneArgFuncTokens)
+        if (!validateCurve(identifier))
+            errors.push_back(Error("no curve named '" + identifier + "'", ranges));
 }
 
 double Governor::exec(){

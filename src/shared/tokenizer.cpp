@@ -43,5 +43,5 @@ Tokenizer::Tokenizer(string str, vector<char> excludedDelims, vector<char> inclu
 }
 
 pair<int,int> Tokenizer::backtraceToken(int tokenIndex){
-    return backtraceMap[tokenIndex];
+    return backtraceMap.at(tokenIndex);
 }

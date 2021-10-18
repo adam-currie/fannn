@@ -30,6 +30,7 @@ ApplicationWindow {
     GovernorListModel {
         id: governorsModel
         profile: profilesModel.currentProfile
+        sensors: sensorsModel
     }
 
     Settings {

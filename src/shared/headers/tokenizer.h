@@ -20,7 +20,7 @@ namespace Fannn {
              */
             Tokenizer(std::string str, std::vector<char> excludedDelims, std::vector<char> includedDelims);
 
-            std::vector<std::string> getTokens() { return tokens; }
+            std::vector<std::string> const & getTokens() const { return tokens; }
             std::string getStr() { return str; }
 
             /**

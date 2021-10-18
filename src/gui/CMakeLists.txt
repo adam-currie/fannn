@@ -23,12 +23,15 @@ qt6_add_qml_module(fannn-gui
         controller_list_model.h
         profile_list_model.h
         profile_model.h
+        q_governor_error.h
+        error_highlighter.h
         sensor_list_model.cpp
         governor_list_model.cpp
         curve_list_model.cpp
         controller_list_model.cpp
         profile_list_model.cpp
         profile_model.cpp
+        error_highlighter.cpp
     QML_FILES
         main.qml
         Warning.qml

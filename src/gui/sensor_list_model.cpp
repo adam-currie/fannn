@@ -63,3 +63,25 @@ QHash<int, QByteArray> SensorListModel::roleNames() const {
     roles[ValueRole] = "value";
     return roles;
 }
+
+bool SensorListModel::hasSensor(std::string sensor) const {
+    std::string id = sensor;
+    for (auto const & sa : _profileModel->constProfile().getSensorAliases()) {
+        if (sensor == sa.alias){
+            id = sa.id;
+            break;
+        }
+    }
+    return compositeReader.hasSensor(id);
+}
+
+double SensorListModel::readSensor(std::string sensor) const {
+    std::string id = sensor;
+    for (auto const & sa : _profileModel->constProfile().getSensorAliases()) {
+        if (sensor == sa.alias){
+            id = sa.id;
+            break;
+        }
+    }
+    return compositeReader.getValue(id);
+}

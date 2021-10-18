@@ -35,6 +35,9 @@ class SensorListModel : public QAbstractListModel {
         int rowCount(const QModelIndex &parent = QModelIndex()) const override;
         QHash<int, QByteArray> roleNames() const override;
 
+        bool hasSensor(std::string sensor) const;
+        double readSensor(std::string sensor) const;
+
     signals:
         void profileChanged(ProfileModel* value);
 };

@@ -3,6 +3,8 @@
 #include <QAbstractListModel>
 #include <qqml.h>
 #include "profile_model.h"
+#include "sensor_list_model.h"
+#include "q_governor_error.h"
 
 class GovernorListModel : public QAbstractListModel {
     Q_OBJECT
@@ -11,11 +13,20 @@ class GovernorListModel : public QAbstractListModel {
     Q_PROPERTY(ProfileModel* profile MEMBER _profileModel NOTIFY profileChanged)
     ProfileModel* _profileModel;
 
+    Q_PROPERTY(SensorListModel* sensors MEMBER _sensorListModel)
+    SensorListModel* _sensorListModel;
+
     void onProfileChanged(ProfileModel* value);
+
+    std::vector<Fannn::Governor> const & governors() const {
+        return _profileModel->constProfile().getGovernors();
+    }
 
     public:
         enum Roles {
-            NameRole = Qt::UserRole + 1
+            NameRole = Qt::UserRole + 1,
+            ErrorsRole,
+            ErrorStrRole
         };
 
         GovernorListModel(QObject *parent = nullptr);
@@ -26,6 +37,7 @@ class GovernorListModel : public QAbstractListModel {
 
         Q_INVOKABLE void add();
         Q_INVOKABLE void remove(int row);
+        Q_INVOKABLE void setExpression(int row, QString exp);
 
     signals:
         void profileChanged(ProfileModel* value);
