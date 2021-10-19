@@ -13,10 +13,6 @@ SpacedGridDelegate {
 
     id: top
 
-    onErrorsChanged: {
-        debugHighlighter.formatErrors(errors)
-    }
-
     FocusScope {
         id: topFocus
         anchors.fill: parent
@@ -62,6 +58,12 @@ SpacedGridDelegate {
                 ErrorHighlighter {
                     id: debugHighlighter
                     document: expTextArea.textDocument
+                }
+                Connections {
+                    target: top
+                    function onErrorsChanged(errors) {
+                        debugHighlighter.formatErrors(errors)
+                    }
                 }
             }
         }
