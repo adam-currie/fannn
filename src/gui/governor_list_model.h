@@ -37,6 +37,7 @@ class GovernorListModel : public QAbstractListModel {
 
         Q_INVOKABLE void add();
         Q_INVOKABLE void remove(int row);
+        Q_INVOKABLE ProfileModel::SensorAliasOrGovNameCollision rename(int row, QString newName);
         Q_INVOKABLE void setExpression(int row, QString exp);
 
     signals:

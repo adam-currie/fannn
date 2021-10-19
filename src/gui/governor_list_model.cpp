@@ -73,7 +73,7 @@ tryNextName:
 
     int preRowCount = rowCount();
     beginInsertRows(QModelIndex(), preRowCount, preRowCount);
-    _profileModel->addOrUpdateGovernor(Fannn::Governor(name));
+    _profileModel->addGovernor(Fannn::Governor(name));
     endInsertRows();
 }
 
@@ -83,6 +83,23 @@ tryNextName:
     _profileModel->removeGovernor(row);
     endRemoveRows();
 }
+
+ ProfileModel::SensorAliasOrGovNameCollision GovernorListModel::rename(int row, QString newName) {
+     Fannn::Governor gov = governors()[row];
+     std::string nameStr = newName.toStdString();
+
+     if (nameStr == gov.name)
+         return ProfileModel::NoCollision;
+
+     gov.name = nameStr;
+
+     auto result = _profileModel->updateGovernor(row, gov);
+
+     if (result == ProfileModel::NoCollision)
+        emit dataChanged(index(row,0), index(row,0), {NameRole});
+
+     return result;
+ }
 
 void GovernorListModel::setExpression(int row, QString exp) {
     Fannn::Governor gov = governors()[row];
@@ -101,8 +118,7 @@ void GovernorListModel::setExpression(int row, QString exp) {
         }
     );
 
-    _profileModel->addOrUpdateGovernor(gov);
-
+    _profileModel->updateGovernor(row, gov);
     emit dataChanged(index(row,0), index(row,0), {ErrorsRole, ErrorStrRole});
 }
 

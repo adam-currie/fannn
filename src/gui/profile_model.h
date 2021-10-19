@@ -48,19 +48,19 @@ class ProfileModel : public QAbstractItemModel {
         bool unsavedChanges() const { return __unsavedChanges; }
         QString name();
 
-        enum SetAliasResult {
-            AliasSet,
-            AliasAlreadySet,
-            AliasCollidesWithSensorAlias,
-            AliasCollidesWithGovernor
+        enum SensorAliasOrGovNameCollision {
+            NoCollision,
+            CollidesWithSensorAlias,
+            CollidesWithGovernor
         };
-        Q_ENUM(SetAliasResult)
+        Q_ENUM(SensorAliasOrGovNameCollision)
 
-        Q_INVOKABLE SetAliasResult addOrUpdateSensorAlias(QString id, QString alias);
+        Q_INVOKABLE SensorAliasOrGovNameCollision addOrUpdateSensorAlias(QString id, QString alias);
         Q_INVOKABLE QString removeAliasForSensor(QString id);
 
-        void addOrUpdateGovernor(Fannn::Governor gov);
-        void removeGovernor(int index);
+        Q_INVOKABLE SensorAliasOrGovNameCollision updateGovernor(int index, Fannn::Governor gov);
+        Q_INVOKABLE void addGovernor(Fannn::Governor gov);
+        Q_INVOKABLE void removeGovernor(int index);
 
     signals:
         void updateIntervalMsChanged(int);

@@ -196,7 +196,6 @@ ApplicationWindow {
                     RoundButton {
                         y: parent.height/2 - height/2
                         x: y
-
                         width: 64
                         height: 64
                         Material.background: Material.accent

@@ -38,32 +38,22 @@ namespace Fannn {
 
             /**
              * @brief adds or updates the alias for a sensor, unless the alias is already used for a sensor alias or governor name
-             * @return true if set or updated, false if no changes
+             * @return true if successfully added or updated, or if already set
              */
             bool addOrUpdateSensorAlias(std::string sensorId, std::string alias, bool& govCollision, bool& aliasCollision);
 
             /**
              * @brief adds or updates the alias for a sensor, unless the alias is already used for a sensor alias or governor name
-             * @return true if set or updated, false if no changes
+             * @return true if successfully added or updated, or if already set
              */
             bool addOrUpdateSensorAlias(std::string sensorId, std::string alias) {
                 bool a,b;
                 return addOrUpdateSensorAlias(sensorId, alias, a,b);
             }
 
-            /**
-             * @brief adds or updates a Governor, unless it's name is already used for a sensor alias
-             * @return true if set or updated, false if no changes
-             */
-            bool addOrUpdateGovernor(Governor gov, bool& aliasCollision);
-            /**
-             * @brief adds or updates a Governor, unless it's name is already used for a sensor alias
-             * @return true if set or updated, false if no changes
-             */
-            bool addOrUpdateGovernor(Governor gov) {
-                bool b;
-                return addOrUpdateGovernor(gov, b);
-            }
+            bool addGovernor(Governor gov, bool& govCollision, bool& sensorAliasCollision);
+
+            bool updateGovernor(int index, Governor gov, bool& govCollision, bool& sensorAliasCollision);
 
             bool removeGovernor(std::string name);
             void removeGovernor(int index);

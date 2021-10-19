@@ -39,8 +39,8 @@ bool Profile::addOrUpdateSensorAlias(std::string sensorId, std::string alias, bo
         if (sensorAliases[i].alias == alias) {
             if (sensorAliases[i].id != sensorId) {
                 aliasCollision = true;
-            }//else already set
-            return false;
+            }
+            return true;//already set
         } else if (sensorAliases[i].id == sensorId) {
             oldIndex = i;
             break;
@@ -60,11 +60,18 @@ bool Profile::addOrUpdateSensorAlias(std::string sensorId, std::string alias, bo
     return true;
 }
 
-bool Profile::addOrUpdateGovernor(Governor gov, bool& sensorAliasCollision) {
-    sensorAliasCollision = false;
+bool Profile::addGovernor(Governor gov, bool& govCollision, bool& sensorAliasCollision) {
+    sensorAliasCollision = govCollision = false;
 
     if (gov.name == "")//todo: check for illegal chars
         throw invalid_argument("name can't be empty!");
+
+    for (const Governor & g : governors) {
+        if (g.name == gov.name) {
+            govCollision = true;
+            return false;
+        }
+    }
 
     for (auto const & sa : sensorAliases) {
         if (gov.name == sa.alias) {
@@ -73,19 +80,39 @@ bool Profile::addOrUpdateGovernor(Governor gov, bool& sensorAliasCollision) {
         }
     }
 
-    for (int i=0; i<governors.size(); i++){
-        if (governors[i].name == gov.name) {
-            if (governors[i] == gov) {
-                //already set, no change needed
+    governors.push_back(gov);
+    return true;
+}
+
+bool Profile::updateGovernor(int index, Governor newGov, bool& govCollision, bool& sensorAliasCollision) {
+    sensorAliasCollision = govCollision = false;
+
+    if (newGov.name == "")//todo: check for illegal chars
+        throw invalid_argument("name can't be empty!");
+
+    Governor oldGov = governors[index];
+
+    if (oldGov == newGov)
+        return true;//already set
+
+    //check for name collisions
+    if (oldGov.name != newGov.name) {
+        for (const Governor & g : governors) {
+            if (g.name == newGov.name){
+                govCollision = true;
                 return false;
-            } else {
-                governors[i] = gov;
-                return true;
+            }
+        }
+        for (auto const & sa : sensorAliases) {
+            if (newGov.name == sa.alias) {
+                sensorAliasCollision = true;
+                return false;
             }
         }
     }
 
-    governors.push_back(gov);
+    governors[index] = newGov;
+
     return true;
 }
 

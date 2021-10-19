@@ -1,6 +1,7 @@
 #include "profile_model.h"
 #include "profile_persister.h"
 #include <string>
+#include <assert.h>
 
 using namespace std;
 
@@ -32,9 +33,9 @@ void ProfileModel::save() {
 }
 
 
-ProfileModel::SetAliasResult ProfileModel::addOrUpdateSensorAlias(QString id, QString alias) {
+ProfileModel::SensorAliasOrGovNameCollision ProfileModel::addOrUpdateSensorAlias(QString id, QString alias) {
     bool govCollision, aliasCollision;
-    bool setOrUpdated = persister
+    bool success = persister
             .profile()
             .addOrUpdateSensorAlias(
                 id.toStdString(),
@@ -42,18 +43,31 @@ ProfileModel::SetAliasResult ProfileModel::addOrUpdateSensorAlias(QString id, QS
                 govCollision,
                 aliasCollision);
 
-    if (setOrUpdated) {
+    if (success) {
         emit aliasesChanged();
         setUnsavedChanges(persister.unsavedChanges());
-        return AliasSet;
+        return NoCollision;
     } else {
-        if (govCollision) {
-            return AliasCollidesWithGovernor;
-        } else if (aliasCollision) {
-            return AliasCollidesWithSensorAlias;
-        } else {
-            return AliasAlreadySet;
-        }
+        return govCollision ? CollidesWithGovernor : CollidesWithSensorAlias;
+    }
+}
+
+ProfileModel::SensorAliasOrGovNameCollision ProfileModel::updateGovernor(int index, Fannn::Governor gov) {
+    bool govCollision, aliasCollision;
+    bool success = persister
+            .profile()
+            .updateGovernor(
+                index,
+                gov,
+                govCollision,
+                aliasCollision);
+
+    if (success) {
+        emit governorsChanged();
+        setUnsavedChanges(persister.unsavedChanges());
+        return NoCollision;
+    } else {
+        return govCollision ? CollidesWithGovernor : CollidesWithSensorAlias;
     }
 }
 
@@ -69,14 +83,11 @@ QString ProfileModel::removeAliasForSensor(QString id) {
     return QString::fromStdString(removed);
 }
 
-void ProfileModel::addOrUpdateGovernor(Fannn::Governor gov) {
-    bool setOrUpdated = persister.profile()
-            .addOrUpdateGovernor(gov);
-
-    if (setOrUpdated) {
-        emit governorsChanged();
-        setUnsavedChanges(persister.unsavedChanges());
-    }
+void ProfileModel::addGovernor(Fannn::Governor gov) {
+    bool a,b;
+    assert (persister.profile().addGovernor(gov,a,b));
+    emit governorsChanged();
+    setUnsavedChanges(persister.unsavedChanges());
 }
 
 void ProfileModel::removeGovernor(int index) {

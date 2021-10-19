@@ -26,6 +26,11 @@ SpacedGridDelegate {
             rightPadding: removeButton.width
             text: name
 
+            onTextChanged: {
+                var result = governors.rename(index, text)
+                //todo
+            }
+
             Button {
                 id: removeButton
                 anchors.top: parent.top
@@ -56,13 +61,13 @@ SpacedGridDelegate {
                 onTextChanged: governors.setExpression(index, text)
                 selectByMouse: true
                 ErrorHighlighter {
-                    id: debugHighlighter
+                    id: errorHighlighter
                     document: expTextArea.textDocument
                 }
                 Connections {
                     target: top
-                    function onErrorsChanged(errors) {
-                        debugHighlighter.formatErrors(errors)
+                    function onErrorsChanged() {
+                        errorHighlighter.formatErrors(errors)
                     }
                 }
             }
