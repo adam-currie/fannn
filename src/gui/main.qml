@@ -182,6 +182,7 @@ ApplicationWindow {
                 title: "Governors"
 
                 SpacedGridView {
+                    id: govGrid
                     width: parent.width
                     minCellWidth: 250
                     cellHeight: 200
@@ -190,14 +191,19 @@ ApplicationWindow {
                     }
                     model: governorsModel
                 }
-                RoundButton {
-                    //todo: ask spacedgridview nicely to calculate x and y value of the center of the next grid cell
-                    width: 64
-                    height: 64
-                    Material.background: Material.accent
-                    Material.elevation: 0
-                    icon.name: "list-add-symbolic"
-                    onClicked: governorsModel.add()
+                GridViewCellPredictor {
+                    grid: govGrid
+                    RoundButton {
+                        y: parent.height/2 - height/2
+                        x: y
+
+                        width: 64
+                        height: 64
+                        Material.background: Material.accent
+                        Material.elevation: 0
+                        icon.name: "list-add-symbolic"
+                        onClicked: governorsModel.add()
+                    }
                 }
             }
         }

@@ -45,6 +45,7 @@ qt6_add_qml_module(fannn-gui
         SpacedGridView.qml
         SpacedGridDelegate.qml
         STextField.qml
+        GridViewCellPredictor.qml
 )
 
 target_link_libraries(fannn-gui PRIVATE
