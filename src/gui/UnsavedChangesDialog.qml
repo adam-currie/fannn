@@ -29,8 +29,12 @@ Item {
         x: (parent.width-width)/2
         y: (parent.height-height)/2
         modal: true
-        title: "profile '" + profileModel.name + "' has unsaved changes"
         standardButtons: Dialog.Save | Dialog.Cancel | Dialog.Discard
+
+        onAboutToShow: {
+            //setting here to avoid binding and changing while unshowing
+            title = "save changes to '" + profileModel.name + "'?"
+        }
 
         onAccepted: {
             if (profileModel.hasIssues) {
