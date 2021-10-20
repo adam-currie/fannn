@@ -10,13 +10,11 @@ class GovernorListModel : public QAbstractListModel {
     Q_OBJECT
     QML_ELEMENT
 
-    Q_PROPERTY(ProfileModel* profile MEMBER _profileModel NOTIFY profileChanged)
+    Q_PROPERTY(ProfileModel* profile READ profileModel WRITE setProfileModel NOTIFY profileChanged)
     ProfileModel* _profileModel;
 
     Q_PROPERTY(SensorListModel* sensors MEMBER _sensorListModel)
     SensorListModel* _sensorListModel;
-
-    void onProfileChanged(ProfileModel* value);
 
     std::vector<Fannn::Governor> const & governors() const {
         return _profileModel->constProfile().getGovernors();
@@ -34,6 +32,9 @@ class GovernorListModel : public QAbstractListModel {
         Qt::ItemFlags flags(const QModelIndex &index) const override;
         int rowCount(const QModelIndex &parent = QModelIndex()) const override;
         QHash<int, QByteArray> roleNames() const override;
+
+        ProfileModel* profileModel() { return _profileModel; }
+        void setProfileModel(ProfileModel* value);
 
         Q_INVOKABLE void add();
         Q_INVOKABLE void remove(int row);

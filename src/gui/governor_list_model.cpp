@@ -4,6 +4,12 @@
 
 GovernorListModel::GovernorListModel(QObject *parent) : QAbstractListModel(parent) {}
 
+void GovernorListModel::setProfileModel(ProfileModel* value) {
+    beginResetModel();
+    _profileModel = value;
+    endResetModel();
+}
+
 QVariant GovernorListModel::data(const QModelIndex &index, int role) const {
     if (!index.isValid())
         return QVariant();
