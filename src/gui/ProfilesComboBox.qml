@@ -8,6 +8,7 @@ ComboBox {
     id: combo
     property var bonusWidth: 60
     property var minWidth: 10
+    property Item modalDlgParent: this
 
     popup.onAboutToHide: { minWidth = 10 }
     width: Math.max(minWidth, contentItem.contentWidth + bonusWidth)
@@ -18,6 +19,7 @@ ComboBox {
 
     UnsavedChangesDialog {
         id: switchConfirmationDlg
+        parent: modalDlgParent
         profileModel: model.currentProfile
         Connections {
             target: switchConfirmationDlg

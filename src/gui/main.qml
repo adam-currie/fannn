@@ -76,6 +76,7 @@ ApplicationWindow {
 
         ProfilesComboBox {
             id: bongoBox
+            modalDlgParent: windowAreaItem
             model: window.profilesModel
             anchors {
                 left: parent.left
