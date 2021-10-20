@@ -7,9 +7,11 @@
 class ProfileModel : public QAbstractItemModel {
     Q_OBJECT
     QML_ELEMENT
+
     Q_PROPERTY(int updateIntervalMs READ updateIntervalMs WRITE setUpdateIntervalMs NOTIFY updateIntervalMsChanged)
     Q_PROPERTY(bool unsavedChanges READ unsavedChanges NOTIFY unsavedChangesChanged)
-    Q_PROPERTY(QString name READ name)
+    Q_PROPERTY(QString name READ name NOTIFY nameChanged)
+    Q_PROPERTY(bool hasIssues READ hasIssues)
 
     Fannn::ProfilePersister persister;
     bool __unsavedChanges;
@@ -47,6 +49,7 @@ class ProfileModel : public QAbstractItemModel {
         void setUpdateIntervalMs(int);
         bool unsavedChanges() const { return __unsavedChanges; }
         QString name();
+        bool hasIssues();
 
         enum SensorAliasOrGovNameCollision {
             NoCollision,
@@ -65,6 +68,7 @@ class ProfileModel : public QAbstractItemModel {
     signals:
         void updateIntervalMsChanged(int);
         void unsavedChangesChanged(bool);
+        void nameChanged(QString);
         void aliasesChanged();
         void governorsChanged();
 

@@ -26,6 +26,10 @@ QString ProfileModel::name() {
     return QString::fromStdString(persister.getName());
 }
 
+bool ProfileModel::hasIssues() {
+    return true;//todo
+}
+
 void ProfileModel::save() {
     persister.save();
     //todo: if save fails we dont want to call setunsavedchanges

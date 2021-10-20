@@ -32,7 +32,7 @@ ApplicationWindow {
         id: closingWindowSaveDlg
         parent: windowAreaItem
         profileModel: profilesModel.currentProfile
-        onAccepted: function (close) {
+        onSaved: function (close) {
             window._closing = true
             window.close()
         }
@@ -117,7 +117,7 @@ ApplicationWindow {
                 id: confirmationDialog
                 parent: windowAreaItem
                 profileModel: profilesModel.currentProfile
-                onAccepted: addButton.addProfile()
+                onSaved: addButton.addProfile()
                 onDiscarded: addButton.addProfile()
             }
 
@@ -129,7 +129,7 @@ ApplicationWindow {
             radius: 0
             flat: true
             onClicked: {
-                var openedDlg = closingWindowSaveDlg.openIfUnsaved()
+                var openedDlg = confirmationDialog.openIfUnsaved()
                 if (!openedDlg) addProfile()
             }
         }

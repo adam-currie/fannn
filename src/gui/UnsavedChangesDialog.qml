@@ -4,18 +4,61 @@ import QtQuick.Controls
 import Qt.labs.settings
 import Fannn
 
-Dialog {
+Item {
     required property var profileModel
-    x: (parent.width-width)/2
-    y: (parent.height-height)/2
-    modal: true
-    title: "profile has unsaved changes"
-    standardButtons: Dialog.Save | Dialog.Cancel | Dialog.Discard
-    onAccepted: profileModel.save()
-    onDiscarded: close()
+    id: top
+    anchors.fill: parent
+
+    signal saved()
+    signal discarded()
+    signal canceled()
+
+    function save() {
+        profileModel.save()
+        saved()
+    }
+
     function openIfUnsaved() {
         var unsaved = profileModel && profileModel.unsavedChanges
-        if (unsaved) open()
+        if (unsaved) unsavedChangesDlg.open()
         return unsaved
+    }
+
+    Dialog {
+        id: unsavedChangesDlg
+        x: (parent.width-width)/2
+        y: (parent.height-height)/2
+        modal: true
+        title: "profile '" + profileModel.name + "' has unsaved changes"
+        standardButtons: Dialog.Save | Dialog.Cancel | Dialog.Discard
+
+        onAccepted: {
+            if (profileModel.hasIssues) {
+                saveAnywayDlg.open()
+            } else {
+                top.save()
+            }
+        }
+        onDiscarded: {
+            close()
+            top.discarded()
+        }
+        onRejected: top.canceled()
+    }
+
+    SaveAnywayDialog {
+        id: saveAnywayDlg
+        profileModel: top.profileModel
+
+        Component.onCompleted: {
+            standardButtons = standardButtons | Dialog.Discard
+        }
+
+        onAccepted: saved()
+        onDiscarded: {
+            close()
+            unsavedChangesDlg.discarded()
+        }
+        onRejected: top.canceled()
     }
 }

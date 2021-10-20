@@ -42,6 +42,7 @@ qt6_add_qml_module(fannn-gui
         ControllerDelegate.qml
         ProfilesComboBox.qml
         UnsavedChangesDialog.qml
+        SaveAnywayDialog.qml
         SpacedGridView.qml
         SpacedGridDelegate.qml
         STextField.qml

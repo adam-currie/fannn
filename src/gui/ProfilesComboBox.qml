@@ -9,6 +9,7 @@ ComboBox {
     property var bonusWidth: 60
     property var minWidth: 10
     property Item modalDlgParent: this
+    property int _currentLoadedIndex: 0
 
     popup.onAboutToHide: { minWidth = 10 }
     width: Math.max(minWidth, contentItem.contentWidth + bonusWidth)
@@ -17,24 +18,32 @@ ComboBox {
         if (count > 0) combo.model.loadProfile(currentValue)
     }
 
+    function _loadCurrent() {
+        model.loadProfile(currentValue)
+        _currentLoadedIndex = currentIndex
+    }
+
     UnsavedChangesDialog {
         id: switchConfirmationDlg
         parent: modalDlgParent
         profileModel: model.currentProfile
         Connections {
             target: switchConfirmationDlg
-            function onAccepted() { combo.model.loadProfile(currentValue) }
-            function onDiscarded() { combo.model.loadProfile(currentValue) }
-            //onRejected do nothing
+            function onSaved() { _loadCurrent() }
+            function onDiscarded() { _loadCurrent() }
+            function onCanceled() {
+                combo.currentIndex = _currentLoadedIndex
+            }
         }
     }
 
     flat: true
     textRole: "name"
 
-    onActivated: (model.currentProfile && model.currentProfile.unsavedChanges) ?
-                     switchConfirmationDlg.open() :
-                     model.loadProfile(currentValue)
+    onActivated: {
+        var openedDlg = switchConfirmationDlg.openIfUnsaved()
+        if (!openedDlg) _loadCurrent()
+    }
 
     popup.onAboutToShow: {
         if (count === 0) return
