@@ -188,9 +188,14 @@ ApplicationWindow {
                     text: profilesModel.currentProfile ?
                         profilesModel.currentProfile.updateIntervalMs : ""
                     onTextChanged: {
-                        if(profilesModel.currentProfile) {
-                            profilesModel.currentProfile.updateIntervalMs = text
-                        }
+                        var num = (text.length === 0) ?
+                                    1 :
+                                    Math.max(1, parseInt(text))
+
+                        if (profilesModel.currentProfile)
+                            profilesModel.currentProfile.updateIntervalMs = num
+
+                        text = num
                     }
                 }
             }
