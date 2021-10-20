@@ -13,6 +13,7 @@ ApplicationWindow {
     height: 700
     visible: true
     title: qsTr("Fannn Profile Editor")
+    property bool _closing: false
 
     required property var profilesModel
     required property var curvesModel
@@ -25,6 +26,27 @@ ApplicationWindow {
     Item {
         id: windowAreaItem
         anchors.fill: parent
+    }
+
+    UnsavedChangesDialog {
+        id: closingWindowSaveDlg
+        parent: windowAreaItem
+        profileModel: profilesModel.currentProfile
+        onAccepted: function (close) {
+            window._closing = true
+            window.close()
+        }
+        onDiscarded: function (close) {
+            window._closing = true
+            window.close()
+        }
+    }
+
+    onClosing: function (close) {
+        if (!_closing) {
+            var openedDlg = closingWindowSaveDlg.openIfUnsaved()
+            close.accepted = !openedDlg
+        }
     }
 
     SensorListModel {
