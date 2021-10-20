@@ -27,7 +27,7 @@ QString ProfileModel::name() {
 }
 
 bool ProfileModel::hasIssues() {
-    return true;//todo
+    return constProfile().hasIssues();
 }
 
 void ProfileModel::save() {

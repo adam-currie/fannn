@@ -36,6 +36,8 @@ namespace Fannn {
             std::string getAliasForSensor(std::string sensorId);
             std::string removeAliasForSensor(std::string sensorId);
 
+            bool hasIssues() const;
+
             /**
              * @brief adds or updates the alias for a sensor, unless the alias is already used for a sensor alias or governor name
              * @return true if successfully added or updated, or if already set

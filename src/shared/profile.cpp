@@ -21,6 +21,17 @@ string Profile::removeAliasForSensor(std::string sensorId) {
     return {};
 }
 
+bool Profile::hasIssues() const {
+    //check gov issues
+    for (const Fannn::Governor & g : governors)
+        if (!g.getErrors().empty())
+            return true;
+
+    //todo: more issues
+
+    return false;
+}
+
 bool Profile::addOrUpdateSensorAlias(std::string sensorId, std::string alias, bool& govCollision, bool& aliasCollision) {
     govCollision = aliasCollision = false;
 
