@@ -13,4 +13,9 @@ Dialog {
     standardButtons: Dialog.Save | Dialog.Cancel | Dialog.Discard
     onAccepted: profileModel.save()
     onDiscarded: close()
+    function openIfUnsaved() {
+        var unsaved = profileModel && profileModel.unsavedChanges
+        if (unsaved) open()
+        return unsaved
+    }
 }

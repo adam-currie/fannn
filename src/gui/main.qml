@@ -106,9 +106,10 @@ ApplicationWindow {
             }
             radius: 0
             flat: true
-            onClicked: (profilesModel.currentProfile && profilesModel.currentProfile.unsavedChanges) ?
-                           confirmationDialog.open() :
-                           addProfile()
+            onClicked: {
+                var openedDlg = closingWindowSaveDlg.openIfUnsaved()
+                if (!openedDlg) addProfile()
+            }
         }
 
         ToolButton {
