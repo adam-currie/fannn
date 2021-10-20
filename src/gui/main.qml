@@ -22,6 +22,11 @@ ApplicationWindow {
     Material.primary: Material.BlueGrey
     Material.accent: "#ff793b"
 
+    Item {
+        id: windowAreaItem
+        anchors.fill: parent
+    }
+
     SensorListModel {
         id: sensorsModel
         profile: profilesModel.currentProfile
@@ -87,10 +92,10 @@ ApplicationWindow {
 
             UnsavedChangesDialog {
                 id: confirmationDialog
+                parent: windowAreaItem
                 profileModel: profilesModel.currentProfile
                 onAccepted: addButton.addProfile()
                 onDiscarded: addButton.addProfile()
-                //onRejected do nothing
             }
 
             icon.name: "list-add-symbolic"
