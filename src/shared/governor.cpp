@@ -197,7 +197,8 @@ class Parser{
 void Governor::setExpression(string userExpression) {
     expStr = userExpression;//todo: what state do we leave everything in when this fails?
 
-    errors.clear();
+    parseErrors.clear();
+    identifierErrors.clear();
 
     tokenizer = Tokenizer(userExpression, DELIMINATORS, RESERVED_SYMBOLS);
 
@@ -242,21 +243,23 @@ void Governor::setExpression(string userExpression) {
             start = -1;
             end = -1;
         }
-        errors.push_back(Error(e.errMsg, {{start, end}}));
+        parseErrors.push_back(Error(e.errMsg, {{start, end}}));
     }
 }
 
 void Governor::validateNameLookups(std::function<bool (std::string)> validateCurve, std::function<bool (std::string)> validateSensorOrGovernor) {
+    identifierErrors.clear();
+
     for (auto const & [identifier, ranges] : zeroArgFuncTokens){
         if (name == identifier) {
-            errors.push_back(Error("infinite self-reference", ranges));
+            identifierErrors.push_back(Error("infinite self-reference", ranges));
         } else if (!validateSensorOrGovernor(identifier)) {
-            errors.push_back(Error("no governor or sensor named '" + identifier + "'", ranges));
+            identifierErrors.push_back(Error("no governor or sensor named '" + identifier + "'", ranges));
         }
     }
     for (auto const & [identifier, ranges] : oneArgFuncTokens)
         if (!validateCurve(identifier))
-            errors.push_back(Error("no curve named '" + identifier + "'", ranges));
+            identifierErrors.push_back(Error("no curve named '" + identifier + "'", ranges));
 }
 
 double Governor::exec(){

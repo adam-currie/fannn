@@ -18,12 +18,13 @@ namespace Fannn {
                     std::vector<std::pair<int, int>> ranges;
                     std::string errMsg;
 
+                    Error() = default;
+
                     Error(std::string errMsg, std::vector<std::pair<int, int>> ranges)
                         : ranges(ranges), errMsg(errMsg) {}
 
                     bool operator==(const Error& e) const {
-                        return  e.errMsg == errMsg &&
-                                ranges == ranges;
+                        return  e.errMsg == errMsg;//intentionally ignoring ranges
                     }
             };
 
@@ -31,7 +32,8 @@ namespace Fannn {
             std::string expStr;
             std::function<double()> exp;
             std::optional<Tokenizer> tokenizer;
-            std::vector<Error> errors;
+            std::vector<Error> parseErrors;
+            std::vector<Error> identifierErrors;
             std::map<std::string, std::vector<std::pair<int,int>>> zeroArgFuncTokens, oneArgFuncTokens;
 
         public:
@@ -46,10 +48,20 @@ namespace Fannn {
             bool operator==(const Governor& g) const { 
                 return  g.expStr == expStr &&
                         g.name == name &&
-                        g.errors == errors;
+                        g.parseErrors == parseErrors &&
+                        g.identifierErrors == identifierErrors;
             }
 
-            std::vector<Error> const & getErrors() const { return errors; }
+            std::vector<Error> const getErrors() const {
+                //todo: good target for improving performance, this should be cached, or use iterators or something
+                std::vector<Error> all;
+                all.reserve(parseErrors.size() + identifierErrors.size());
+                all.insert(all.end(), parseErrors.begin(), parseErrors.end());
+                all.insert(all.end(), identifierErrors.begin(), identifierErrors.end());
+                return all;
+            }
+            std::vector<Error> const & getParseErrors() const { return parseErrors; }
+            std::vector<Error> const & getIdentifierErrors() const { return identifierErrors; }
 
             std::function<double(std::string)> readSensorOrGovernor;
             std::function<std::function<double(double)>(std::string)> readCurve;
