@@ -9,11 +9,14 @@ void ErrorHighlighter::formatErrors(QVariantList errors) {
 
     QTextDocument* doc = _document->textDocument();
     QTextCursor cursor = QTextCursor(doc);
+    cursor.beginEditBlock();
     cursor.movePosition(QTextCursor::MoveOperation::End, QTextCursor::KeepAnchor);
 
     for (QTextBlock block = doc->begin(); block.isValid(); block = block.next()) {
         QTextLayout * layout = block.layout();
-        QVector<QTextLayout::FormatRange> ranges = layout->formats();
+        layout->clearFormats();
+
+        QVector<QTextLayout::FormatRange> ranges;
         QTextLayout::FormatRange range;
         range.format.setForeground(Qt::red);
 /* todo: tooltip for error msgs, red underline instead of text color, so text color can be used for syntax highlighting instead
@@ -22,7 +25,6 @@ void ErrorHighlighter::formatErrors(QVariantList errors) {
         range.format.setUnderlineStyle(QTextCharFormat::WaveUnderline);
         range.format.setFontUnderline(true);//this gets reset to false if we set underline style after this, also, style and color do nothing
 */
-        ranges.clear();
 
         auto sortedInsertRange = [&](){
             for (auto it = ranges.begin(); it != ranges.end(); ++it) {
@@ -58,6 +60,7 @@ void ErrorHighlighter::formatErrors(QVariantList errors) {
         layout->setFormats(ranges);
     }
 
+    cursor.endEditBlock();
     doc->markContentsDirty(0, doc->characterCount());
 }
 
