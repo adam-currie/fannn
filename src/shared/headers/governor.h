@@ -17,8 +17,14 @@ namespace Fannn {
                 public:
                     std::vector<std::pair<int, int>> ranges;
                     std::string errMsg;
+
                     Error(std::string errMsg, std::vector<std::pair<int, int>> ranges)
                         : ranges(ranges), errMsg(errMsg) {}
+
+                    bool operator==(const Error& e) const {
+                        return  e.errMsg == errMsg &&
+                                ranges == ranges;
+                    }
             };
 
         private:
@@ -33,12 +39,14 @@ namespace Fannn {
 
             std::string name;
 
-            Governor() {}
-            Governor(std::string name) : name(name) {}
+            Governor(std::string name = "", std::string exp = "") : name(name) {
+                setExpression(exp);
+            }
 
             bool operator==(const Governor& g) const { 
                 return  g.expStr == expStr &&
-                        name == g.name;
+                        g.name == name &&
+                        g.errors == errors;
             }
 
             std::vector<Error> const & getErrors() const { return errors; }
