@@ -42,6 +42,17 @@ void serialize(nlohmann::ordered_json& j, vector<Profile::Alias> const & aliases
     j["sensors"] = list;
 }
 
+void serialize(nlohmann::ordered_json& j, std::vector<Governor> const & governors) {
+    nlohmann::json list;
+    for (auto const & g : governors) {
+        list.push_back({
+            {"name", g.name},
+            {"exp", g.getExpressionStr()}
+        });
+    }
+    j["governors"] = list;
+}
+
 ProfilePersister::ProfilePersister(string name)
     : scratch({name, Profile()}) {}
 
@@ -119,6 +130,10 @@ void ProfilePersister::load() {
     for (auto const & s : j["sensors"])
         scratch.profile.addOrUpdateSensorAlias(s["id"], s["alias"]);
 
+    bool a,b;//todo
+    for (auto const & g : j["governors"])
+        scratch.profile.addGovernor(Fannn::Governor(g["name"], g["exp"]),a,b);
+
     lastPersistanceSynced = scratch;
 }
 
@@ -127,6 +142,7 @@ void ProfilePersister::save() {
 
     j["updateIntervalMs"] = scratch.profile.getUpdateInterval();
     serialize(j, scratch.profile.getSensorAliases());
+    serialize(j, scratch.profile.getGovernors());
 
     (AtomicFileWriter(USER_CONFIG_FILE_DIR + scratch.name) << j.dump(4))
         .atomicWrite();
