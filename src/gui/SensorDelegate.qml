@@ -12,13 +12,9 @@ SpacedGridDelegate {
     required property var _alias
     required property var value
 
-    property bool _blankAliasText: false//todo: rename
+    property bool _blankAliasText: false
 
     id: top
-
-//    on_AliasChanged: {
-        //todo
-//    }
 
     STextField {
         id: aliasOrNameText
@@ -41,26 +37,26 @@ SpacedGridDelegate {
             if (!sensors)
                 return;
 
-            _blankAliasText = !text
-            if (_blankAliasText){
-                return;
-            }
-
-            if (text === name) {
-                sensors.removeAlias(index)
-            } else {
-                var result = sensors.setAlias(index, text)
-                switch (result) {
-                    case ProfileModel.CollidesWithSensorAlias: {
-                        //todo: dialog
-                        break;
-                    }
-                    case ProfileModel.CollidesWithGovernor: {
-                        //todo: dialog
-                        break;
+            var nextBlankAliasText = !text
+            //can't set actual value until after we set the text, or our text will get overwritten!
+            if (!nextBlankAliasText) {
+                if (text === name) {
+                    sensors.removeAlias(index)
+                } else {
+                    var result = sensors.setAlias(index, text)
+                    switch (result) {
+                        case ProfileModel.CollidesWithSensorAlias: {
+                            //todo: dialog
+                            break;
+                        }
+                        case ProfileModel.CollidesWithGovernor: {
+                            //todo: dialog
+                            break;
+                        }
                     }
                 }
             }
+            _blankAliasText = nextBlankAliasText
         }
     }
 
