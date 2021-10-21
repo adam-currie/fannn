@@ -6,6 +6,7 @@ import Fannn
 
 SpacedGridDelegate {
     required property var name
+    required property var expression
     required property var governors
     required property int index
     required property var errors
@@ -60,6 +61,7 @@ SpacedGridDelegate {
                 wrapMode: TextEdit.Wrap//todo: wrap on more charecters(example: sensor1+sensor2 should wrap at '+')
                 onTextChanged: governors.setExpression(index, text)
                 selectByMouse: true
+                text: expression
                 ErrorHighlighter {
                     id: errorHighlighter
                     document: expTextArea.textDocument

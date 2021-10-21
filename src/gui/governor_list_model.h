@@ -13,16 +13,19 @@ class GovernorListModel : public QAbstractListModel {
     Q_PROPERTY(ProfileModel* profile READ profileModel WRITE setProfileModel NOTIFY profileChanged)
     ProfileModel* _profileModel;
 
-    Q_PROPERTY(SensorListModel* sensors MEMBER _sensorListModel)
-    SensorListModel* _sensorListModel;
-
     std::vector<Fannn::Governor> const & governors() const {
         return _profileModel->constProfile().getGovernors();
     }
 
+    void onProfileChanged(ProfileModel* value);
+
+    void validateGovNameLookups(Fannn::Governor& gov);
+    void validateAllGovNameLookups();
+
     public:
         enum Roles {
             NameRole = Qt::UserRole + 1,
+            ExpressionRole,
             ErrorsRole,
             ErrorStrRole
         };

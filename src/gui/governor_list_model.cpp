@@ -4,10 +4,37 @@
 
 GovernorListModel::GovernorListModel(QObject *parent) : QAbstractListModel(parent) {}
 
+void GovernorListModel::validateGovNameLookups(Fannn::Governor& gov) {
+    gov.validateNameLookups(
+        [] (std::string s) { return true; }, //debug: todo: real curves
+        [this] (std::string s) {
+            for (auto const & g : governors())
+                if (g.name == s)
+                    return true;
+            return _profileModel->hasSensor(s);
+        }
+    );
+}
+
+void GovernorListModel::validateAllGovNameLookups() {
+    if (_profileModel) {
+        const auto & govs = governors();
+        for (int i = 0; i < govs.size(); ++i) {
+            auto g = govs.at(i);
+            validateGovNameLookups(g);
+            _profileModel->updateGovernor(i, g);
+        }
+    }
+}
+
 void GovernorListModel::setProfileModel(ProfileModel* value) {
+    if (value == _profileModel)
+        return;
     beginResetModel();
     _profileModel = value;
+    validateAllGovNameLookups();
     endResetModel();
+    emit profileChanged(value);
 }
 
 QVariant GovernorListModel::data(const QModelIndex &index, int role) const {
@@ -17,6 +44,8 @@ QVariant GovernorListModel::data(const QModelIndex &index, int role) const {
     switch (role) {
         case NameRole:
             return QString::fromStdString(governors().at(index.row()).name);
+        case ExpressionRole:
+            return QString::fromStdString(governors().at(index.row()).getExpressionStr());
         case ErrorsRole: {
             Fannn::Governor const & gov = governors().at(index.row());
 
@@ -39,7 +68,7 @@ QVariant GovernorListModel::data(const QModelIndex &index, int role) const {
 
             QString errStr;
             int i = 0;
-            while(1) {
+            while (1) {
                 errStr.append(QGovernorError(errors[i]).errMsg);
                 if (++i >= size)
                     break;
@@ -79,12 +108,12 @@ tryNextName:
 
     int preRowCount = rowCount();
     beginInsertRows(QModelIndex(), preRowCount, preRowCount);
-    _profileModel->addGovernor(Fannn::Governor(name));
+    _profileModel->addGovernor(Fannn::Governor(name, ""));
     endInsertRows();
 }
 
 
- void GovernorListModel::remove(int row) {
+void GovernorListModel::remove(int row) {
     beginRemoveRows(QModelIndex(), row, row);
     _profileModel->removeGovernor(row);
     endRemoveRows();
@@ -114,15 +143,7 @@ void GovernorListModel::setExpression(int row, QString exp) {
         return;
 
     gov.setExpression(exp.toStdString());
-    gov.validateNameLookups(
-        [] (std::string s) { return true; }, //debug: todo: real curves
-        [this] (std::string s) {
-            for (auto const & g : governors())
-                if (g.name == s)
-                    return true;
-            return _sensorListModel->hasSensor(s);
-        }
-    );
+    validateGovNameLookups(gov);
 
     _profileModel->updateGovernor(row, gov);
     emit dataChanged(index(row,0), index(row,0), {ErrorsRole, ErrorStrRole});
@@ -131,6 +152,7 @@ void GovernorListModel::setExpression(int row, QString exp) {
 QHash<int, QByteArray> GovernorListModel::roleNames() const {
     QHash<int, QByteArray> roles;
     roles[NameRole] = "name";
+    roles[ExpressionRole] = "expression";
     roles[ErrorsRole] = "errors";
     roles[ErrorStrRole] = "errorStr";
     return roles;

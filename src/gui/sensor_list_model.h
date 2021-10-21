@@ -16,7 +16,6 @@ class SensorListModel : public QAbstractListModel {
     ProfileModel* _profileModel;
 
     QTimer readTimer;
-    Fannn::CompositeSensorReader compositeReader;
 
     void onProfileChanged(ProfileModel* value);
 
@@ -34,9 +33,6 @@ class SensorListModel : public QAbstractListModel {
         Qt::ItemFlags flags(const QModelIndex &index) const override;
         int rowCount(const QModelIndex &parent = QModelIndex()) const override;
         QHash<int, QByteArray> roleNames() const override;
-
-        bool hasSensor(std::string sensor) const;
-        double readSensor(std::string sensor) const;
 
     signals:
         void profileChanged(ProfileModel* value);

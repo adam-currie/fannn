@@ -1,5 +1,7 @@
 #include "sensor_list_model.h"
 
+using Fannn::CompositeSensorReader;
+
 SensorListModel::SensorListModel(QObject *parent) : QAbstractListModel(parent), readTimer(QTimer(this)) {
     connect(this, &SensorListModel::profileChanged,
             &SensorListModel::onProfileChanged);
@@ -9,21 +11,23 @@ SensorListModel::SensorListModel(QObject *parent) : QAbstractListModel(parent), 
 }
 
 QVariant SensorListModel::data(const QModelIndex &index, int role) const {
+    auto& reader = CompositeSensorReader::instance();
+
     if (!index.isValid())
         return QVariant();
 
     switch (role) {
         case NameRole:
-            return QString::fromStdString(compositeReader.getAll()[index.row()]);//todo: SLOW, DUMB
+            return QString::fromStdString(reader.getAll()[index.row()]);//todo: SLOW, DUMB
         case AliasRole: {
             if (!_profileModel)
                 return QVariant();
             Fannn::Profile p = _profileModel->constProfile();
-            std::string name = compositeReader.getAll()[index.row()];//todo: SLOW, DUMB
+            std::string name = reader.getAll()[index.row()];//todo: SLOW, DUMB
             return QString::fromStdString(p.getAliasForSensor(name));
         }
         case ValueRole:
-            return QVariant{compositeReader.getValue(compositeReader.getAll()[index.row()])}.toString();//todo: SLOWER, DUMBER
+            return QVariant{reader.getValue(reader.getAll()[index.row()])}.toString();//todo: SLOWER, DUMBER
         default:
             return QVariant();
     }
@@ -53,7 +57,7 @@ Qt::ItemFlags SensorListModel::flags(const QModelIndex &index) const {
 }
 
 int SensorListModel::rowCount(const QModelIndex &parent) const {
-    return compositeReader.getAll().size();//todo: SLOW, DUMB
+    return CompositeSensorReader::instance().getAll().size();//todo: SLOW, DUMB
 }
 
 QHash<int, QByteArray> SensorListModel::roleNames() const {
@@ -62,26 +66,4 @@ QHash<int, QByteArray> SensorListModel::roleNames() const {
     roles[AliasRole] = "_alias";
     roles[ValueRole] = "value";
     return roles;
-}
-
-bool SensorListModel::hasSensor(std::string sensor) const {
-    std::string id = sensor;
-    for (auto const & sa : _profileModel->constProfile().getSensorAliases()) {
-        if (sensor == sa.alias){
-            id = sa.id;
-            break;
-        }
-    }
-    return compositeReader.hasSensor(id);
-}
-
-double SensorListModel::readSensor(std::string sensor) const {
-    std::string id = sensor;
-    for (auto const & sa : _profileModel->constProfile().getSensorAliases()) {
-        if (sensor == sa.alias){
-            id = sa.id;
-            break;
-        }
-    }
-    return compositeReader.getValue(id);
 }

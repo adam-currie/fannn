@@ -1,9 +1,12 @@
 #include "profile_model.h"
 #include "profile_persister.h"
+#include "composite_sensor_reader.h"
 #include <string>
 #include <assert.h>
 
 using namespace std;
+
+using Fannn::CompositeSensorReader;
 
 ProfileModel::ProfileModel(QObject *parent, Fannn::ProfilePersister persister)
     : QAbstractItemModel(parent), persister(persister) {
@@ -28,6 +31,17 @@ QString ProfileModel::name() {
 
 bool ProfileModel::hasIssues() {
     return constProfile().hasIssues();
+}
+
+bool ProfileModel::hasSensor(string idOrAlias) const {
+    for (auto const & sa : constProfile().getSensorAliases()) {
+        if (idOrAlias == sa.alias){
+            if (CompositeSensorReader::instance().hasSensor(sa.id))
+                return true;
+            break;
+        }
+    }
+    return CompositeSensorReader::instance().hasSensor(idOrAlias);
 }
 
 void ProfileModel::save() {

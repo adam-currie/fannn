@@ -42,6 +42,7 @@ ApplicationWindow {
         }
     }
 
+
     onClosing: function (close) {
         if (!_closing) {
             var openedDlg = closingWindowSaveDlg.openIfUnsaved()
@@ -57,7 +58,6 @@ ApplicationWindow {
     GovernorListModel {
         id: governorsModel
         profile: profilesModel.currentProfile
-        sensors: sensorsModel
     }
 
     Settings {

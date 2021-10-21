@@ -49,6 +49,7 @@ class ProfileModel : public QAbstractItemModel {
         void setUpdateIntervalMs(int);
         bool unsavedChanges() const { return __unsavedChanges; }
         QString name();
+        bool hasSensor(std::string idOrAlias) const;
         bool hasIssues();
 
         enum SensorAliasOrGovNameCollision {
