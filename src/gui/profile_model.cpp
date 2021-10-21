@@ -51,12 +51,13 @@ void ProfileModel::save() {
 }
 
 
-ProfileModel::SensorAliasOrGovNameCollision ProfileModel::addOrUpdateSensorAlias(QString id, QString alias) {
+ProfileModel::SensorAliasOrGovNameCollision ProfileModel::setSensorAlias(int index, QString alias) {
+    string id = CompositeSensorReader::instance().getAll().at(index);
     bool govCollision, aliasCollision;
     bool success = persister
             .profile()
             .addOrUpdateSensorAlias(
-                id.toStdString(),
+                id,
                 alias.toStdString(),
                 govCollision,
                 aliasCollision);
@@ -68,6 +69,19 @@ ProfileModel::SensorAliasOrGovNameCollision ProfileModel::addOrUpdateSensorAlias
     } else {
         return govCollision ? CollidesWithGovernor : CollidesWithSensorAlias;
     }
+}
+
+string ProfileModel::removeSensorAlias(int index) {
+    string id = CompositeSensorReader::instance().getAll().at(index);
+    string removedAlias = persister.profile()
+            .removeAliasForSensor(id);
+
+    if (!removedAlias.empty()) {
+        emit aliasesChanged();
+        setUnsavedChanges(persister.unsavedChanges());
+    }
+
+    return removedAlias;
 }
 
 ProfileModel::SensorAliasOrGovNameCollision ProfileModel::updateGovernor(int index, Fannn::Governor gov) {
@@ -87,18 +101,6 @@ ProfileModel::SensorAliasOrGovNameCollision ProfileModel::updateGovernor(int ind
     } else {
         return govCollision ? CollidesWithGovernor : CollidesWithSensorAlias;
     }
-}
-
-QString ProfileModel::removeAliasForSensor(QString id) {
-    std::string removed = persister.profile()
-            .removeAliasForSensor(id.toStdString());
-
-    if (!removed.empty()) {
-        emit aliasesChanged();
-        setUnsavedChanges(persister.unsavedChanges());
-    }
-
-    return QString::fromStdString(removed);
 }
 
 void ProfileModel::addGovernor(Fannn::Governor gov) {

@@ -206,7 +206,7 @@ ApplicationWindow {
                     width: parent.width
                     minCellWidth: 200
                     delegate: SensorDelegate {
-                        profile: profilesModel.currentProfile
+                        sensors: sensorsModel
                     }
                     model: sensorsModel
                 }

@@ -24,7 +24,8 @@ QVariant SensorListModel::data(const QModelIndex &index, int role) const {
                 return QVariant();
             Fannn::Profile p = _profileModel->constProfile();
             std::string name = reader.getAll()[index.row()];//todo: SLOW, DUMB
-            return QString::fromStdString(p.getAliasForSensor(name));
+            std::string alias = p.getAliasForSensor(name);
+            return QString::fromStdString(alias);
         }
         case ValueRole:
             return QVariant{reader.getValue(reader.getAll()[index.row()])}.toString();//todo: SLOWER, DUMBER
@@ -33,20 +34,30 @@ QVariant SensorListModel::data(const QModelIndex &index, int role) const {
     }
 }
 
+bool SensorListModel::removeAlias(int row) {
+    if (!_profileModel)
+        return false;
+
+    std::string removedAlias = _profileModel->removeSensorAlias(row);
+    bool removed = !removedAlias.empty();
+    if (removed)
+        emit dataChanged(index(row,0), index(row,0), {AliasRole});
+    return removed;
+}
+
+ProfileModel::SensorAliasOrGovNameCollision SensorListModel::setAlias(int row, QString alias) {
+    auto result = _profileModel->setSensorAlias(row, alias);
+
+    if (result == ProfileModel::NoCollision)
+        emit dataChanged(index(row,0), index(row,0), {AliasRole});
+
+    return result;
+}
+
 void SensorListModel::onProfileChanged(ProfileModel *value) {
     emit dataChanged(index(0,0), index(rowCount()-1,0), {AliasRole});
     readTimer.stop();
-    for (auto& c : profileConnections) disconnect(c);
-    profileConnections.clear();
     if (value) {
-        profileConnections.push_back(connect(
-            value, &ProfileModel::aliasesChanged,
-            [this] () { emit dataChanged(index(0,0), index(rowCount()-1,0), {AliasRole}); }
-        ));
-        profileConnections.push_back(connect(
-            value, &ProfileModel::updateIntervalMsChanged,
-            [this] (int value) { readTimer.start(value); }
-        ));
         readTimer.start(value->updateIntervalMs());
     }
 }

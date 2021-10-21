@@ -19,8 +19,6 @@ class SensorListModel : public QAbstractListModel {
 
     void onProfileChanged(ProfileModel* value);
 
-    std::vector<QMetaObject::Connection> profileConnections;
-
     public:
         enum Roles {
             NameRole = Qt::UserRole + 1,
@@ -33,6 +31,9 @@ class SensorListModel : public QAbstractListModel {
         Qt::ItemFlags flags(const QModelIndex &index) const override;
         int rowCount(const QModelIndex &parent = QModelIndex()) const override;
         QHash<int, QByteArray> roleNames() const override;
+
+        Q_INVOKABLE bool removeAlias(int row);
+        Q_INVOKABLE ProfileModel::SensorAliasOrGovNameCollision setAlias(int row, QString alias);
 
     signals:
         void profileChanged(ProfileModel* value);

@@ -59,8 +59,8 @@ class ProfileModel : public QAbstractItemModel {
         };
         Q_ENUM(SensorAliasOrGovNameCollision)
 
-        Q_INVOKABLE SensorAliasOrGovNameCollision addOrUpdateSensorAlias(QString id, QString alias);
-        Q_INVOKABLE QString removeAliasForSensor(QString id);
+        SensorAliasOrGovNameCollision setSensorAlias(int index, QString alias);
+        std::string removeSensorAlias(int index);
 
         Q_INVOKABLE SensorAliasOrGovNameCollision updateGovernor(int index, Fannn::Governor gov);
         Q_INVOKABLE void addGovernor(Fannn::Governor gov);

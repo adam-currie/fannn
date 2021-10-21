@@ -16,7 +16,7 @@ bool CompositeSensorReader::hasSensor(string sensor) const {
     return false;
 }
 
-vector<string> CompositeSensorReader::getAll() const {
+vector<string> CompositeSensorReader::getAll() const {//todo: cache
     vector<string> v;
     for (auto const & r : readers) {
         vector<string> names = r->getAll();

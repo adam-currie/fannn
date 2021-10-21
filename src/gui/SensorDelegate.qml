@@ -5,12 +5,20 @@ import Qt.labs.settings
 import Fannn
 
 SpacedGridDelegate {
+    required property var sensors
+
+    required property int index
     required property var name
     required property var _alias
     required property var value
-    required property var profile
+
+    property bool _blankAliasText: false//todo: rename
 
     id: top
+
+//    on_AliasChanged: {
+        //todo
+//    }
 
     STextField {
         id: aliasOrNameText
@@ -18,25 +26,40 @@ SpacedGridDelegate {
         anchors.right: parent.right
         anchors.left: parent.left
         anchors.bottomMargin: 0
-        text: (top._alias && top._alias !== "")? top._alias : top.name
+        text: (_blankAliasText)?
+                  "" :
+                  (_alias)? _alias : top.name
+
+        onEditingFinished: {
+            if (_blankAliasText) {
+                sensors.removeAlias(index)
+                _blankAliasText = false
+            }
+        }
 
         onTextChanged: {
-            if (!profile)
-                return
-            if (text !== name) {
-                var result = profile.addOrUpdateSensorAlias(name, text)
+            if (!sensors)
+                return;
+
+            _blankAliasText = !text
+            if (_blankAliasText){
+                return;
+            }
+
+            if (text === name) {
+                sensors.removeAlias(index)
+            } else {
+                var result = sensors.setAlias(index, text)
                 switch (result) {
-                    case ProfileModel.AliasCollidesWithSensorAlias: {
+                    case ProfileModel.CollidesWithSensorAlias: {
                         //todo: dialog
                         break;
                     }
-                    case ProfileModel.AliasCollidesWithGovernor: {
+                    case ProfileModel.CollidesWithGovernor: {
                         //todo: dialog
                         break;
                     }
                 }
-            } else {
-                profile.removeAliasForSensor(name)
             }
         }
     }
