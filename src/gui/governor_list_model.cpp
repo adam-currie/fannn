@@ -17,13 +17,11 @@ void GovernorListModel::validateGovNameLookups(Fannn::Governor& gov) {
 }
 
 void GovernorListModel::validateAllGovNameLookups() {
-    if (_profileModel) {
-        const auto & govs = governors();
-        for (int i = 0; i < govs.size(); ++i) {
-            auto g = govs.at(i);
-            validateGovNameLookups(g);
-            _profileModel->updateGovernor(i, g);
-        }
+    const auto & govs = governors();
+    for (int i = 0; i < govs.size(); ++i) {
+        auto g = govs.at(i);
+        validateGovNameLookups(g);
+        _profileModel->updateGovernor(i, g);
     }
 }
 
@@ -31,8 +29,26 @@ void GovernorListModel::setProfileModel(ProfileModel* value) {
     if (value == _profileModel)
         return;
     beginResetModel();
+
     _profileModel = value;
-    validateAllGovNameLookups();
+
+    if (value) {
+        validateAllGovNameLookups();
+
+        for (auto& c : profileConnections)
+            disconnect(c);
+        profileConnections.clear();
+
+        profileConnections.push_back(connect(
+            value, &ProfileModel::aliasesChanged,
+            [this] () {
+                validateAllGovNameLookups();
+                emit dataChanged(index(0,0), index(rowCount()-1,0), {ErrorsRole, ErrorStrRole});
+            }
+        ));
+        //todo: curves
+    }
+
     endResetModel();
     emit profileChanged(value);
 }
