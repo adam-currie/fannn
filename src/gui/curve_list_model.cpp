@@ -21,3 +21,15 @@ int CurveListModel::rowCount(const QModelIndex &parent) const {
     //todo
     return 3;//debug
 }
+
+void CurveListModel::add() {
+    //todo
+}
+
+void CurveListModel::remove(int row) {
+    //todo
+}
+
+bool CurveListModel::rename(int row, QString newName) {
+    return false;//todo
+}

@@ -18,8 +18,6 @@ ApplicationWindow {
     property bool _closing: false
 
     required property var profilesModel
-    required property var curvesModel
-    required property var controllersModel
 
     Material.theme: Material.Dark
     Material.primary: Material.BlueGrey
@@ -59,6 +57,11 @@ ApplicationWindow {
 
     GovernorListModel {
         id: governorsModel
+        profile: profilesModel.currentProfile
+    }
+
+    CurveListModel {
+        id: curvesModel
         profile: profilesModel.currentProfile
     }
 
@@ -220,6 +223,29 @@ ApplicationWindow {
                         sensors: sensorsModel
                     }
                     model: sensorsModel
+                }
+            }
+            Collapsible {
+                width: parent.width
+                title: "Curves"
+
+                SpacedGridView {
+                    id: curvesGrid
+                    width: parent.width
+                    minCellWidth: 280
+                    cellHeight: 240
+                    delegate: CurveDelegate {
+                        curves: curvesModel
+                    }
+                    model: curvesModel
+                }
+                GridViewCellPredictor {
+                    grid: curvesGrid
+                    AddButton {
+                        y: parent.height/2 - height/2
+                        x: y
+                        onClicked: curvesGrid.add()
+                    }
                 }
             }
             Collapsible {

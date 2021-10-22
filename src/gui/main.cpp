@@ -23,9 +23,7 @@ int main(int argc, char *argv[]){
     ControllerListModel controllersModel;
 
     engine.setInitialProperties({
-        { "profilesModel", QVariant::fromValue(&profilesModel) },
-        { "curvesModel", QVariant::fromValue(&curvesModel) },
-        { "controllersModel", QVariant::fromValue(&controllersModel) }
+        { "profilesModel", QVariant::fromValue(&profilesModel) }
     });
 
     const QUrl url(u"qrc:/Fannn/main.qml"_qs);
