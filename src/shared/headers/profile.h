@@ -55,8 +55,10 @@ namespace Fannn {
 
             bool addGovernor(Governor gov, bool& govCollision, bool& sensorAliasCollision);
             bool updateGovernor(int index, Governor gov, bool& govCollision, bool& sensorAliasCollision);
-            bool removeGovernor(std::string name);
             void removeGovernor(int index);
+
+            bool addCurve(Curve curve);
+            void removeCurve(int index);
 
     };
 }

@@ -244,7 +244,7 @@ ApplicationWindow {
                     AddButton {
                         y: parent.height/2 - height/2
                         x: y
-                        onClicked: curvesGrid.add()
+                        onClicked: curvesModel.add()
                     }
                 }
             }

@@ -105,7 +105,8 @@ ProfileModel::SensorAliasOrGovNameCollision ProfileModel::updateGovernor(int ind
 
 void ProfileModel::addGovernor(Fannn::Governor gov) {
     bool a,b;
-    assert (persister.profile().addGovernor(gov,a,b));
+    bool added = persister.profile().addGovernor(gov,a,b);
+    assert (added && !a && !b);
     emit governorsChanged();
     setUnsavedChanges(persister.unsavedChanges());
 }
@@ -113,5 +114,18 @@ void ProfileModel::addGovernor(Fannn::Governor gov) {
 void ProfileModel::removeGovernor(int index) {
     persister.profile().removeGovernor(index);
     emit governorsChanged();
+    setUnsavedChanges(persister.unsavedChanges());
+}
+
+void ProfileModel::addCurve(Fannn::Curve  curve) {
+    bool added = persister.profile().addCurve(curve);
+    assert (added);
+    emit curvesChanged();
+    setUnsavedChanges(persister.unsavedChanges());
+}
+
+void ProfileModel::removeCurve(int index) {
+    persister.profile().removeCurve(index);
+    emit curvesChanged();
     setUnsavedChanges(persister.unsavedChanges());
 }

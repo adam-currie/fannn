@@ -132,12 +132,20 @@ void Profile::removeGovernor(int index) {
     governors.erase(governors.begin() + index);
 }
 
-bool Profile::removeGovernor(string name) {
-    for (auto iter = governors.begin(); iter != governors.end(); ++iter) {
-        if (iter->name == name) {
-            governors.erase(iter);
-            return true;
+bool Profile::addCurve(Curve curve) {
+    if (curve.name == "")//todo: check for illegal chars
+        throw invalid_argument("name can't be empty!");
+
+    for (const Curve & c : curves) {
+        if (c.name == curve.name) {
+            return false;
         }
     }
-    return false;
+
+    curves.push_back(curve);
+    return true;
+}
+
+void Profile::removeCurve(int index) {
+    curves.erase(curves.begin() + index);
 }

@@ -8,8 +8,19 @@ CurveListModel::CurveListModel(QObject *parent) : QAbstractListModel(parent) {
 QVariant CurveListModel::data(const QModelIndex &index, int role) const {
     if (!index.isValid())
         return QVariant();
-    //todo
-    return QVariant();//debug
+
+    switch (role) {
+        case NameRole:
+            return QString::fromStdString(curves().at(index.row()).name);
+        default:
+            //todo
+            return QVariant();
+    }
+
+}
+
+int CurveListModel::rowCount(const QModelIndex &parent) const {
+    return _profileModel ? curves().size() : 0;
 }
 
 Qt::ItemFlags CurveListModel::flags(const QModelIndex &index) const {
@@ -17,17 +28,26 @@ Qt::ItemFlags CurveListModel::flags(const QModelIndex &index) const {
     return Qt::NoItemFlags;
 }
 
-int CurveListModel::rowCount(const QModelIndex &parent) const {
-    //todo
-    return 3;//debug
-}
-
 void CurveListModel::add() {
-    //todo
+    std::string name;
+    int i = 0;
+
+tryNextName:
+    name = "curve" + std::to_string(++i);
+    for (auto const & c : curves())
+        if (c.name == name)
+            goto tryNextName;
+
+    int preRowCount = rowCount();
+    beginInsertRows(QModelIndex(), preRowCount, preRowCount);
+    _profileModel->addCurve(Fannn::Curve(name));
+    endInsertRows();
 }
 
 void CurveListModel::remove(int row) {
-    //todo
+    beginRemoveRows(QModelIndex(), row, row);
+    _profileModel->removeCurve(row);
+    endRemoveRows();
 }
 
 bool CurveListModel::rename(int row, QString newName) {

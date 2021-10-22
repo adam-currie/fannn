@@ -17,6 +17,10 @@ namespace Fannn {
             }
 
         public:    
+            std::string name;
+
+            Curve(std::string name = "") : name(name) {}
+
             bool operator==(const Curve&) const = default;
 
             void setDomain(double minX, double maxX) { 

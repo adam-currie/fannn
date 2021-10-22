@@ -59,12 +59,19 @@ class ProfileModel : public QAbstractItemModel {
         };
         Q_ENUM(SensorAliasOrGovNameCollision)
 
+        //FOR SENSORS MODEL todo: limit access somehow
         SensorAliasOrGovNameCollision setSensorAlias(int index, QString alias);
         std::string removeSensorAlias(int index);
 
-        Q_INVOKABLE SensorAliasOrGovNameCollision updateGovernor(int index, Fannn::Governor gov);
-        Q_INVOKABLE void addGovernor(Fannn::Governor gov);
-        Q_INVOKABLE void removeGovernor(int index);
+        //FOR GOVERNORS MODEL todo: limit access somehow
+        SensorAliasOrGovNameCollision updateGovernor(int index, Fannn::Governor gov);
+        void addGovernor(Fannn::Governor gov);
+        void removeGovernor(int index);
+
+        //FOR CURVES MODEL limit access somehow
+        void addCurve(Fannn::Curve curve);
+        void removeCurve(int index);
+
 
     signals:
         void updateIntervalMsChanged(int);
@@ -72,6 +79,7 @@ class ProfileModel : public QAbstractItemModel {
         void nameChanged(QString);
         void aliasesChanged();
         void governorsChanged();
+        void curvesChanged();
 
     public slots:
         void save();
