@@ -60,5 +60,13 @@ namespace Fannn {
             bool addCurve(Curve curve);
             void removeCurve(int index);
 
+            /**
+             * @brief updates a curve
+             * @param nameCollision
+             *      true if the curve can't be updated because it's new name collides with another curves name
+             * @return true only if changes occur
+             */
+            bool updateCurve(int index, Curve curve, bool& nameCollision);
+
     };
 }

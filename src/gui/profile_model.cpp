@@ -129,3 +129,19 @@ void ProfileModel::removeCurve(int index) {
     emit curvesChanged();
     setUnsavedChanges(persister.unsavedChanges());
 }
+
+bool ProfileModel::updateCurve(int index, Fannn::Curve curve, bool& nameCollision) {
+    bool success = persister
+            .profile()
+            .updateCurve(
+                index,
+                curve,
+                nameCollision);
+
+    if (success) {
+        emit curvesChanged();
+        setUnsavedChanges(persister.unsavedChanges());
+    }
+
+    return success;
+}

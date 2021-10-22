@@ -149,3 +149,29 @@ bool Profile::addCurve(Curve curve) {
 void Profile::removeCurve(int index) {
     curves.erase(curves.begin() + index);
 }
+
+bool Profile::updateCurve(int index, Curve newCurve, bool& nameCollision) {
+    nameCollision = false;
+
+    if (newCurve.name == "")//todo: check for illegal chars
+        throw invalid_argument("name can't be empty!");
+
+    Curve oldCurve = curves[index];
+
+    if (oldCurve == newCurve)
+        return false;//already set
+
+    //check for name collisions
+    if (oldCurve.name != newCurve.name) {
+        for (const Curve & c : curves) {
+            if (c.name == newCurve.name){
+                nameCollision = true;
+                return false;
+            }
+        }
+    }
+
+    curves[index] = newCurve;
+    return true;
+}
+

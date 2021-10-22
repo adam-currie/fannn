@@ -51,5 +51,20 @@ void CurveListModel::remove(int row) {
 }
 
 bool CurveListModel::rename(int row, QString newName) {
-    return false;//todo
+    Fannn::Curve curve = curves()[row];
+    std::string nameStr = newName.toStdString();
+
+    if (nameStr == curve.name)
+        return true;
+
+    curve.name = nameStr;
+
+    bool nameCollision = false;
+    bool added = _profileModel->updateCurve(row, curve, nameCollision);
+
+    if (added){
+        emit dataChanged(index(row,0), index(row,0), {NameRole});
+    }
+
+    return !nameCollision;
 }

@@ -37,7 +37,7 @@ class CurveListModel : public QAbstractListModel {
 
         /**
          * @brief renames a curve
-         * @return true if name changed, false if name already taken
+         * @return true on success, including if no name change takes place, false for collisions
          */
         Q_INVOKABLE bool rename(int row, QString newName);
 
