@@ -238,14 +238,9 @@ ApplicationWindow {
                 }
                 GridViewCellPredictor {
                     grid: govGrid
-                    RoundButton {
+                    AddButton {
                         y: parent.height/2 - height/2
                         x: y
-                        width: 64
-                        height: 64
-                        Material.background: Material.accent
-                        Material.elevation: 0
-                        icon.name: "list-add-symbolic"
                         onClicked: governorsModel.add()
                     }
                 }

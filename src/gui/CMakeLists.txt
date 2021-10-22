@@ -48,6 +48,7 @@ qt6_add_qml_module(fannn-gui
         STextField.qml
         GridViewCellPredictor.qml
         IdentifierValidator.qml
+        AddButton.qml
 )
 
 target_link_libraries(fannn-gui PRIVATE
