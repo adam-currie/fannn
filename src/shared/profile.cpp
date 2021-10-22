@@ -103,7 +103,8 @@ bool Profile::updateGovernor(int index, Governor newGov, bool& govCollision, boo
 
     Governor oldGov = governors[index];
 
-    if (oldGov == newGov)
+    if (oldGov == newGov &&
+        oldGov.getErrors() == newGov.getErrors())
         return true;//already set
 
     //check for name collisions

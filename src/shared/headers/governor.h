@@ -47,9 +47,7 @@ namespace Fannn {
 
             bool operator==(const Governor& g) const { 
                 return  g.expStr == expStr &&
-                        g.name == name &&
-                        g.parseErrors == parseErrors &&
-                        g.identifierErrors == identifierErrors;
+                        g.name == name;
             }
 
             std::vector<Error> const getErrors() const {
