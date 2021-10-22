@@ -276,6 +276,11 @@ ApplicationWindow {
 
     footer: ToolBar {
         focusPolicy: Qt.ClickFocus
+        SaveAnywayDialog {
+            id: saveAnywayDlg
+            parent: windowAreaItem
+            profileModel: profilesModel.currentProfile
+        }
         Button {
             text: "save profile"
             flat: true
@@ -283,7 +288,9 @@ ApplicationWindow {
             anchors.margins: 5
             enabled: profilesModel.currentProfile ?
                 profilesModel.currentProfile.unsavedChanges : false
-            onClicked: profilesModel.currentProfile.save()
+            onClicked: profilesModel.currentProfile.hasIssues ?
+                           saveAnywayDlg.open() :
+                           profilesModel.currentProfile.save()
         }
     }
 }
