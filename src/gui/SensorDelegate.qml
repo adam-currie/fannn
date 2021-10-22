@@ -18,6 +18,7 @@ SpacedGridDelegate {
 
     STextField {
         id: aliasOrNameText
+        validator: IdentifierValidator {}
         anchors.top: parent.top
         anchors.right: parent.right
         anchors.left: parent.left

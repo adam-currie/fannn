@@ -20,16 +20,29 @@ SpacedGridDelegate {
 
         STextField {
             id: nameField
+            validator: IdentifierValidator {}
             anchors.top: parent.top
             anchors.left: parent.left
             anchors.right: parent.right
             bottomPadding: 0
             rightPadding: removeButton.width
-            text: name
+
+            property bool _blankNameText: false
+
+            text: (_blankNameText)? "" : name
+
+            onEditingFinished: {
+                _blankNameText = false
+            }
 
             onTextChanged: {
-                var result = governors.rename(index, text)
-                //todo
+                var nextBlankNameText = !text
+                //can't set actual value until after we set the text, or our text will get overwritten!
+                if (!nextBlankNameText) {
+                    var result = governors.rename(index, text)
+                    //todo
+                }
+                _blankNameText = nextBlankNameText
             }
 
             Button {
