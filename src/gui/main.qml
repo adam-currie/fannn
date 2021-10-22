@@ -184,18 +184,27 @@ ApplicationWindow {
                     padding: 4
                     id: updateIntervalField
                     anchors.bottom: parent.bottom
-                    validator: IntValidator {bottom: 1}
-                    text: profilesModel.currentProfile ?
-                        profilesModel.currentProfile.updateIntervalMs : ""
+                    validator: RegularExpressionValidator {
+                        //can't use IntValidator because we need to temporarily allow blank text
+                        regularExpression: /[0-9]*/
+                    }
+
+                    property bool _isBlank: false
+
+                    text: _isBlank || !profilesModel.currentProfile ?
+                              "" : profilesModel.currentProfile.updateIntervalMs
+
+                    onEditingFinished: {
+                        _isBlank = false
+                    }
+
                     onTextChanged: {
-                        var num = (text.length === 0) ?
-                                    1 :
-                                    Math.max(1, parseInt(text))
-
-                        if (profilesModel.currentProfile)
-                            profilesModel.currentProfile.updateIntervalMs = num
-
-                        text = num
+                        var nextIsBlank = !text
+                        if (!nextIsBlank) {
+                            if (profilesModel.currentProfile)
+                                profilesModel.currentProfile.updateIntervalMs = text
+                            }
+                        _isBlank = nextIsBlank
                     }
                 }
             }
