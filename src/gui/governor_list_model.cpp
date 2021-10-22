@@ -6,7 +6,12 @@ GovernorListModel::GovernorListModel(QObject *parent) : QAbstractListModel(paren
 
 void GovernorListModel::validateGovNameLookups(Fannn::Governor& gov) {
     gov.validateNameLookups(
-        [] (std::string s) { return true; }, //debug: todo: real curves
+        [this] (std::string s) {
+            for (auto const & c : _profileModel->constProfile().getCurves())
+                if (c.name == s)
+                    return true;
+            return false;
+        },
         [this] (std::string s) {
             for (auto const & g : governors())
                 if (g.name == s)
@@ -39,14 +44,17 @@ void GovernorListModel::setProfileModel(ProfileModel* value) {
             disconnect(c);
         profileConnections.clear();
 
+        auto validateNameLookUpsAndSignal = [this] () {
+            validateAllGovNameLookups();
+            emit dataChanged(index(0,0), index(rowCount()-1,0), {ErrorsRole, ErrorStrRole});
+        };
+
         profileConnections.push_back(connect(
-            value, &ProfileModel::aliasesChanged,
-            [this] () {
-                validateAllGovNameLookups();
-                emit dataChanged(index(0,0), index(rowCount()-1,0), {ErrorsRole, ErrorStrRole});
-            }
+            value, &ProfileModel::aliasesChanged, validateNameLookUpsAndSignal
         ));
-        //todo: curves
+        profileConnections.push_back(connect(
+            value, &ProfileModel::curvesChanged, validateNameLookUpsAndSignal
+        ));
     }
 
     endResetModel();
