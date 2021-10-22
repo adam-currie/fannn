@@ -21,18 +21,23 @@ class SensorListModel : public QAbstractListModel {
 
     std::vector<QMetaObject::Connection> profileConnections;
 
-    public:
-        enum Roles {
-            NameRole = Qt::UserRole + 1,
-            AliasRole,
-            ValueRole
-        };
+    enum Roles {
+        NameRole = Qt::UserRole + 1,
+        AliasRole,
+        ValueRole
+    };
+    inline static QHash<int, QByteArray> const rolesHash = {
+        {NameRole, "name"},
+        {AliasRole, "_alias"},
+        {ValueRole, "value"}
+    };
 
+    public:
+        QHash<int, QByteArray> roleNames() const override { return rolesHash; }
         SensorListModel(QObject *parent = nullptr);
         QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
         Qt::ItemFlags flags(const QModelIndex &index) const override;
         int rowCount(const QModelIndex &parent = QModelIndex()) const override;
-        QHash<int, QByteArray> roleNames() const override;
 
         Q_INVOKABLE bool removeAlias(int row);
         Q_INVOKABLE ProfileModel::SensorAliasOrGovNameCollision setAlias(int row, QString alias);

@@ -23,12 +23,6 @@ int ProfileListModel::rowCount(const QModelIndex &parent) const {
     return profileNames.size();
 }
 
-QHash<int, QByteArray> ProfileListModel::roleNames() const {
-    QHash<int, QByteArray> roles;
-    roles[NameRole] = "name";
-    return roles;
-}
-
 void ProfileListModel::loadProfileNames() {
     auto newNames = Fannn::ProfilePersister::getProfileNames();
     if (newNames != profileNames){

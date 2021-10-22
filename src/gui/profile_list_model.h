@@ -20,17 +20,19 @@ class ProfileListModel : public QAbstractListModel {
 
     std::vector<std::string> profileNames;
 
-    public:
-        enum Roles {
-            NameRole = Qt::UserRole + 1
-            //todo:more roles will start after userrole + 1
-        };
+    enum Roles {
+        NameRole = Qt::UserRole + 1
+    };
+    inline static QHash<int, QByteArray> const rolesHash = {
+        {NameRole, "name"}
+    };
 
+    public:
         ProfileListModel(QObject *parent = nullptr);
         QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
         Qt::ItemFlags flags(const QModelIndex &index) const override;
         int rowCount(const QModelIndex &parent) const override;
-        QHash<int, QByteArray> roleNames() const override;
+        QHash<int, QByteArray> roleNames() const override { return rolesHash; }
 
         Q_INVOKABLE int indexOf(QString profileName);//todo: try string
         Q_INVOKABLE void createAndSwitchTo();

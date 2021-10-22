@@ -79,11 +79,3 @@ Qt::ItemFlags SensorListModel::flags(const QModelIndex &index) const {
 int SensorListModel::rowCount(const QModelIndex &parent) const {
     return CompositeSensorReader::instance().getAll().size();//todo: SLOW, DUMB
 }
-
-QHash<int, QByteArray> SensorListModel::roleNames() const {
-    QHash<int, QByteArray> roles;
-    roles[NameRole] = "name";
-    roles[AliasRole] = "_alias";
-    roles[ValueRole] = "value";
-    return roles;
-}

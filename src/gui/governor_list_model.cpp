@@ -170,12 +170,3 @@ void GovernorListModel::setExpression(int row, QString exp) {
     _profileModel->updateGovernor(row, gov);
     emit dataChanged(index(row,0), index(row,0), {ErrorsRole, ErrorStrRole});
 }
-
-QHash<int, QByteArray> GovernorListModel::roleNames() const {
-    QHash<int, QByteArray> roles;
-    roles[NameRole] = "name";
-    roles[ExpressionRole] = "expression";
-    roles[ErrorsRole] = "errors";
-    roles[ErrorStrRole] = "errorStr";
-    return roles;
-}
