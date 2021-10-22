@@ -13,7 +13,7 @@ class GovernorListModel : public QAbstractListModel {
     Q_PROPERTY(ProfileModel* profile READ profileModel WRITE setProfileModel NOTIFY profileChanged)
     ProfileModel* _profileModel;
 
-    std::vector<Fannn::Governor> const & governors() const {
+    inline std::vector<Fannn::Governor> const & governors() const {
         return _profileModel->constProfile().getGovernors();
     }
 
