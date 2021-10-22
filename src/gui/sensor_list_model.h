@@ -19,6 +19,8 @@ class SensorListModel : public QAbstractListModel {
 
     void onProfileChanged(ProfileModel* value);
 
+    std::vector<QMetaObject::Connection> profileConnections;
+
     public:
         enum Roles {
             NameRole = Qt::UserRole + 1,

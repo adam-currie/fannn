@@ -59,6 +59,15 @@ void SensorListModel::onProfileChanged(ProfileModel *value) {
     readTimer.stop();
     if (value) {
         readTimer.start(value->updateIntervalMs());
+
+        for (auto& c : profileConnections)
+            disconnect(c);
+        profileConnections.clear();
+
+        profileConnections.push_back(connect(
+            value, &ProfileModel::updateIntervalMsChanged,
+            [this] (int value) { readTimer.start(value); }
+        ));
     }
 }
 
