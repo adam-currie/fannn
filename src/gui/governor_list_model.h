@@ -22,7 +22,7 @@ class GovernorListModel : public QAbstractListModel {
     void validateGovNameLookups(Fannn::Governor& gov);
     void validateAllGovNameLookups();
 
-     std::vector<QMetaObject::Connection> profileConnections;
+    std::vector<QMetaObject::Connection> profileConnections;
 
     public:
         enum Roles {
