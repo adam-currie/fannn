@@ -9,8 +9,10 @@ ApplicationWindow {
     id: window
     minimumHeight: 440
     minimumWidth: 440
+    visibility: Window.Maximized
     width: 700
     height: 700
+
     visible: true
     title: qsTr("Fannn Profile Editor")
     property bool _closing: false
