@@ -50,8 +50,11 @@ bool Profile::addOrUpdateSensorAlias(std::string sensorId, std::string alias, bo
         if (sensorAliases[i].alias == alias) {
             if (sensorAliases[i].id != sensorId) {
                 aliasCollision = true;
+                return false;
+            } else {
+                //already set
+                return true;
             }
-            return true;//already set
         } else if (sensorAliases[i].id == sensorId) {
             oldIndex = i;
             break;
