@@ -12,8 +12,7 @@
 using namespace std;
 using namespace Fannn;
 
-const char IDSTR_DELIM = '/';
-const char IDSTR_ESCAPE = '\\';
+const char IDSTR_DELIM = '\\';
 
 static atomic<LmSensorsReader*> instance(nullptr);
 
@@ -33,7 +32,7 @@ class deliminatedStrBuilder {
     char delim, escape;
     bool hasData = false;
     public:
-        deliminatedStrBuilder(char delim, char escape) : delim(delim), escape(escape) {}
+        deliminatedStrBuilder(char delim) : delim(delim) {}
         deliminatedStrBuilder& operator<<(string s) {
             if(s.empty()) 
                 return *this;
@@ -46,26 +45,22 @@ class deliminatedStrBuilder {
                 hasData = true;
             }
 
-            for(char c : s){
-                if(c == escape || c == delim)
-                    out << escape;
-                out << c;
-            }
-
+            out << s;
             return *this;
         }
         deliminatedStrBuilder& operator<<(int n) {
             static const char digits[] = {'0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'};
 
+            //convert to base 16,
             int digitCount = (31 - __builtin_clz(n))/4 + 1;
             string s(digitCount, 0);
-
             for(int i = digitCount-1; i>=0; i--) {
                 s[i] = digits[n%16];
                 n /= 16;
             }
 
-            return operator<<(s);
+            out << s;
+            return *this;
         }
         string get() { return out.str(); }
 };
@@ -90,7 +85,7 @@ LmSensorsReader::LmSensorsReader() : pImpl{std::make_unique<Impl>()} {
         while ((feature = sensors_get_features(chip, &nextFeature)) != 0) {
             string featureLabel = sensors_get_label(chip, feature);
             SensorData data(*chip, feature->first_subfeature);
-            deliminatedStrBuilder idBuilder(IDSTR_DELIM, IDSTR_ESCAPE);
+            deliminatedStrBuilder idBuilder(IDSTR_DELIM);
             idBuilder << chip->prefix << chip->addr << featureLabel;
             pImpl->sensorMap.insert({idBuilder.get(), data});//todo: deal with dups
             //debug
