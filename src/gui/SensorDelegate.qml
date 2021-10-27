@@ -12,8 +12,6 @@ SpacedGridDelegate {
     required property var _alias
     required property var value
 
-    property bool _blankAliasText: false
-
     id: top
 
     STextField {
@@ -23,41 +21,59 @@ SpacedGridDelegate {
         anchors.right: parent.right
         anchors.left: parent.left
         anchors.bottomMargin: 0
-        text: (_blankAliasText)?
-                  "" :
-                  (_alias)? _alias : top.name
+
+        property bool _isEditing: false
+        property string _aliasAtStartOfEditing: ""
+        property int _aliasCollision: ProfileModel.NoCollision
+
+        property var aliasOrName: (_alias)? _alias : top.name
+
+        Dialog {
+            id: badAliasDlg
+        }
+
+        text: aliasOrName
 
         onEditingFinished: {
-            if (_blankAliasText) {
-                sensors.removeAlias(index)
-                _blankAliasText = false
+            var nameBad = false
+            if (!text) {
+                badAliasDlg.title = "alias cannot be empty"
+                nameBad = true
+            } else if (_aliasCollision === ProfileModel.CollidesWithGovernor) {
+                badAliasDlg.title = "alias already used by governor name"
+                nameBad = true
+            } else if (_aliasCollision === ProfileModel.CollidesWithSensorAlias) {
+                badAliasDlg.title = "alias already used by another sensor"
+                nameBad = true
             }
+
+            if (nameBad) {
+                badAliasDlg.open()
+                if (!_aliasAtStartOfEditing) {
+                    sensors.removeAlias(index)
+                    text = aliasOrName
+                } else {
+                    text = _aliasAtStartOfEditing
+                }
+            }
+
+            _aliasCollision = ProfileModel.NoCollision
+            _aliasAtStartOfEditing = ""
+            _isEditing = false
         }
 
         onTextChanged: {
-            if (!sensors)
-                return;
-
-            var nextBlankAliasText = !text
-            //can't set actual value until after we set the text, or our text will get overwritten!
-            if (!nextBlankAliasText) {
-                if (text === name) {
-                    sensors.removeAlias(index)
-                } else {
-                    var result = sensors.setAlias(index, text)
-                    switch (result) {
-                        case ProfileModel.CollidesWithSensorAlias: {
-                            //todo: dialog
-                            break;
-                        }
-                        case ProfileModel.CollidesWithGovernor: {
-                            //todo: dialog
-                            break;
-                        }
-                    }
-                }
+            if (!_isEditing) {
+                _aliasAtStartOfEditing = (_alias)? _alias : null
+                _isEditing = true
             }
-            _blankAliasText = nextBlankAliasText
+
+            // null is fine here, just not empty
+            if (text === null || text === name) {
+                sensors.removeAlias(index)
+            } else if (text.length > 0) {
+                _aliasCollision = sensors.setAlias(index, text)
+            }
         }
     }
 

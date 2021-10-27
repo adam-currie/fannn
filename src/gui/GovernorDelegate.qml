@@ -26,22 +26,42 @@ SpacedGridDelegate {
             bottomPadding: 0
             rightPadding: removeButton.width
 
-            property bool _blankNameText: false
+            property string _nameAtStartEditing: ""
+            property int _nameCollision: ProfileModel.NoCollision
 
-            text: (_blankNameText)? "" : name
+            text: name
+
+            Dialog {
+                id: badNameDlg
+            }
 
             onEditingFinished: {
-                _blankNameText = false
+                var nameBad = false
+
+                if (!text) {
+                    badNameDlg.title = "name cannot be empty"
+                    nameBad = true
+                } else if (_nameCollision === ProfileModel.CollidesWithGovernor) {
+                    badNameDlg.title = "name already used by another governor"
+                    nameBad = true
+                } else if (_nameCollision === ProfileModel.CollidesWithSensorAlias) {
+                    badNameDlg.title = "name already used by a sensor alias"
+                    nameBad = true
+                }
+
+                _nameCollision = ProfileModel.NoCollision
+                if (nameBad) {
+                    badNameDlg.open()
+                    text = _nameAtStartEditing
+                }
+                _nameAtStartEditing = ""
             }
 
             onTextChanged: {
-                var nextBlankNameText = !text
-                //can't set actual value until after we set the text, or our text will get overwritten!
-                if (!nextBlankNameText) {
-                    var result = governors.rename(index, text)
-                    //todo
-                }
-                _blankNameText = nextBlankNameText
+                if (!_nameAtStartEditing)
+                    _nameAtStartEditing = name
+                if (text)
+                    _nameCollision = governors.rename(index, text)
             }
 
             Button {
