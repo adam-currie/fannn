@@ -10,6 +10,7 @@ add_library(fannn-shared SHARED
     profile_persister.cpp
     composite_sensor_reader.cpp
     profile.cpp
+    curve.cpp
 )
 
 set_property(TARGET fannn-shared PROPERTY POSITION_INDEPENDENT_CODE ON)

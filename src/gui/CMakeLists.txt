@@ -9,6 +9,7 @@ find_package(Qt6 COMPONENTS Gui REQUIRED)
 find_package(Qt6 COMPONENTS Qml REQUIRED)
 find_package(Qt6 COMPONENTS Quick REQUIRED)
 find_package(Qt6 COMPONENTS QuickControls2 REQUIRED)
+find_package(Qt6 COMPONENTS Widgets REQUIRED)
 
 qt6_add_executable(fannn-gui)
 
@@ -25,6 +26,7 @@ qt6_add_qml_module(fannn-gui
         profile_model.h
         q_governor_error.h
         error_highlighter.h
+        curve_model.h
         sensor_list_model.cpp
         governor_list_model.cpp
         curve_list_model.cpp
@@ -32,6 +34,7 @@ qt6_add_qml_module(fannn-gui
         profile_list_model.cpp
         profile_model.cpp
         error_highlighter.cpp
+        curve_model.cpp
     QML_FILES
         main.qml
         Warning.qml
@@ -57,6 +60,7 @@ target_link_libraries(fannn-gui PRIVATE
     Qt6::QuickControls2
     Qt6::Qml
     Qt6::Gui
+    Qt6::Widgets
     fannn-shared
 )
 

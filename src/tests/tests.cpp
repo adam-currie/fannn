@@ -10,6 +10,7 @@
 #include "profile_engine.h"
 #include "ranges"
 #include "tokenizer.h"
+#include <random>
 #include <math.h>
 
 using namespace std;
@@ -33,21 +34,36 @@ TEST_CASE("curve_gety_test"){
     REQUIRE_THROWS_AS( c.setDomain(101, 100), typeof(out_of_range) );
     REQUIRE_THROWS_AS( c.setRange(101, 100), typeof(out_of_range) );
 
-    c.points = map<double,double>({
+    c.setPoints({
         {0,0},
         {10,5}
     });
     REQUIRE(c.getY(9) == 4.5);
 
-    c.points = map<double,double>({
+    c.setPoints({
         {1,1},
         {2,2}
     });
 
     c.setDomain(420,420);
     c.setRange(666,666);
+
     REQUIRE_THROWS_AS( c.getY(419), typeof(out_of_range) );
     REQUIRE_THROWS_AS( c.getY(421), typeof(out_of_range) );
+    REQUIRE(c.getY(420) == 666);
+
+    uniform_real_distribution<double> r(-1000,1000);
+    default_random_engine re;
+
+    vector<Curve::Point> points;
+    for (int i=0; i<10000; ++i) {
+        Curve::Point p = {r(re), r(re)};
+        points.push_back(p);
+    }
+    c.setPoints(points);
+
+    REQUIRE(c.getPoints().size() == 1);
+    REQUIRE(c.getPoints()[0] == Curve::Point(420, 666));
     REQUIRE(c.getY(420) == 666);
 }
 
@@ -59,7 +75,7 @@ TEST_CASE("tokenizer_test"){
 TEST_CASE("governor_test"){
     auto readCurve = [](string name){
         Curve curve1;
-        curve1.points = {{0,0},{100,50}};
+        curve1.setPoints({{0,0},{100,50}});
         if (name == "curve1") {
             return [=](double x){ return curve1.getY(x); };
         }else{

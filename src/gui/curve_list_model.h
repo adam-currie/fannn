@@ -2,7 +2,11 @@
 
 #include <QAbstractListModel>
 #include <qqml.h>
+#include <vector>
+#include "curve_model.h"
 #include "profile_model.h"
+
+class CurveModel;
 
 class CurveListModel : public QAbstractListModel {
     Q_OBJECT
@@ -12,15 +16,16 @@ class CurveListModel : public QAbstractListModel {
     ProfileModel* _profileModel;
 
     enum Roles {
-        NameRole = Qt::UserRole + 1
+        CurveRole = Qt::UserRole + 1
     };
     inline static QHash<int, QByteArray> const rolesHash = {
-        {NameRole, "name"}
+        {CurveRole, "curve"}
     };
 
-    inline std::vector<Fannn::Curve> const & curves() const {
-        return _profileModel->constProfile().getCurves();
-    }
+    std::vector<CurveModel*> curveModels;
+    std::vector<QMetaObject::Connection> curveModelDestroyedSignalConnections;
+
+    void addCurveHereNotInProfile(Fannn::Curve c);
 
     public:
         QHash<int, QByteArray> roleNames() const override { return rolesHash; }
@@ -30,16 +35,13 @@ class CurveListModel : public QAbstractListModel {
         int rowCount(const QModelIndex &parent = QModelIndex()) const override;
 
         ProfileModel* profileModel() { return _profileModel; }
-        void setProfileModel(ProfileModel* value) { _profileModel = value; }
+        void setProfileModel(ProfileModel* value);
+
+        bool checkNameInUse(std::string name);
+
+        void pushChanges(CurveModel* curveModel);
 
         Q_INVOKABLE void add();
-        Q_INVOKABLE void remove(int row);
-
-        /**
-         * @brief renames a curve
-         * @return true on success, including if no name change takes place, false for collisions
-         */
-        Q_INVOKABLE bool rename(int row, QString newName);
 
     signals:
         void profileChanged(ProfileModel* value);

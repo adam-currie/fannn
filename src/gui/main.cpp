@@ -1,4 +1,4 @@
-#include <QGuiApplication>
+#include <QApplication>
 #include <QQmlApplicationEngine>
 #include <QSettings>
 #include <QQuickStyle>
@@ -10,9 +10,9 @@
 #include "curve_list_model.h"
 
 int main(int argc, char *argv[]){
-    QGuiApplication::setApplicationName("Fannn");
-    QGuiApplication::setOrganizationName("Fannn");
-    QGuiApplication app(argc, argv);
+    QApplication::setApplicationName("Fannn");
+    QApplication::setOrganizationName("Fannn");
+    QApplication app(argc, argv);
 
     QSettings settings;
     QQuickStyle::setStyle("Material");

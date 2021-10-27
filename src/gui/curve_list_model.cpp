@@ -1,8 +1,63 @@
 #include "curve_list_model.h"
+#include <assert.h>
+#include <exception>
 #include <string>
 
-CurveListModel::CurveListModel(QObject *parent) : QAbstractListModel(parent) {
-    //todo
+CurveListModel::CurveListModel(QObject *parent) : QAbstractListModel(parent) {}
+
+void CurveListModel::addCurveHereNotInProfile(Fannn::Curve c) {
+    CurveModel* curveModel = new CurveModel(this, this, c);
+    curveModelDestroyedSignalConnections.push_back(connect(curveModel, &CurveModel::destroyed, this, [this, curveModel](){
+        for (int i=0;;++i){
+            assert(i < curveModels.size());
+            if (curveModels[i] == curveModel) {
+                beginRemoveRows(QModelIndex(), i, i);
+                curveModels.erase(curveModels.begin()+i);
+                _profileModel->removeCurve(i);
+                endRemoveRows();
+                break;
+            }
+        }
+    }));
+    curveModels.push_back(curveModel);
+}
+
+bool CurveListModel::checkNameInUse(std::string name) {
+    for (auto c : _profileModel->constProfile().getCurves())
+        if (c.name == name)
+            return true;
+    return false;
+}
+
+void CurveListModel::pushChanges(CurveModel *curveModel) {
+    int i = 0;
+    while (i < curveModels.size() && curveModels[i] != curveModel) ++i;
+    if (i == curveModels.size()) throw std::invalid_argument("curve not in list");
+    _profileModel->updateCurve(i, curveModels[i]->getCurve());
+}
+
+void CurveListModel::setProfileModel(ProfileModel* value) {
+    if (value == _profileModel)
+        return;
+
+    beginResetModel();
+
+    _profileModel = value;
+
+    for (auto c : curveModelDestroyedSignalConnections)
+        disconnect(c);
+    curveModelDestroyedSignalConnections.clear();
+    for (auto c : curveModels)
+        delete c;
+    curveModels.clear();
+
+    if (value) {
+        for (auto c : _profileModel->constProfile().getCurves())
+            addCurveHereNotInProfile(c);
+    }
+
+    endResetModel();
+    emit profileChanged(value);
 }
 
 QVariant CurveListModel::data(const QModelIndex &index, int role) const {
@@ -10,8 +65,9 @@ QVariant CurveListModel::data(const QModelIndex &index, int role) const {
         return QVariant();
 
     switch (role) {
-        case NameRole:
-            return QString::fromStdString(curves().at(index.row()).name);
+        case CurveRole:  {
+            return QVariant::fromValue<QObject*>(curveModels[index.row()]);
+        }
         default:
             //todo
             return QVariant();
@@ -20,7 +76,7 @@ QVariant CurveListModel::data(const QModelIndex &index, int role) const {
 }
 
 int CurveListModel::rowCount(const QModelIndex &parent) const {
-    return _profileModel ? curves().size() : 0;
+    return curveModels.size();
 }
 
 Qt::ItemFlags CurveListModel::flags(const QModelIndex &index) const {
@@ -34,37 +90,15 @@ void CurveListModel::add() {
 
 tryNextName:
     name = "curve" + std::to_string(++i);
-    for (auto const & c : curves())
-        if (c.name == name)
-            goto tryNextName;
+    if (checkNameInUse(name))
+        goto tryNextName;
 
     int preRowCount = rowCount();
     beginInsertRows(QModelIndex(), preRowCount, preRowCount);
-    _profileModel->addCurve(Fannn::Curve(name));
+
+    Fannn::Curve c(name);
+    _profileModel->addCurve(c);
+    addCurveHereNotInProfile(c);
+
     endInsertRows();
-}
-
-void CurveListModel::remove(int row) {
-    beginRemoveRows(QModelIndex(), row, row);
-    _profileModel->removeCurve(row);
-    endRemoveRows();
-}
-
-bool CurveListModel::rename(int row, QString newName) {
-    Fannn::Curve curve = curves()[row];
-    std::string nameStr = newName.toStdString();
-
-    if (nameStr == curve.name)
-        return true;
-
-    curve.name = nameStr;
-
-    bool nameCollision = false;
-    bool added = _profileModel->updateCurve(row, curve, nameCollision);
-
-    if (added){
-        emit dataChanged(index(row,0), index(row,0), {NameRole});
-    }
-
-    return !nameCollision;
 }

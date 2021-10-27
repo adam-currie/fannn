@@ -130,7 +130,8 @@ void ProfileModel::removeCurve(int index) {
     setUnsavedChanges(persister.unsavedChanges());
 }
 
-bool ProfileModel::updateCurve(int index, Fannn::Curve curve, bool& nameCollision) {
+bool ProfileModel::updateCurve(int index, Fannn::Curve curve) {
+    bool nameCollision;//todo
     bool success = persister
             .profile()
             .updateCurve(

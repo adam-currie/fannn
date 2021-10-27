@@ -36,7 +36,6 @@ ApplicationWindow {
         }
     }
 
-
     onClosing: function (close) {
         if (!_closing) {
             var openedDlg = closingWindowSaveDlg.openIfUnsaved()
