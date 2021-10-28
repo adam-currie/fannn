@@ -214,6 +214,7 @@ ApplicationWindow {
                     width: parent.width
                     title: "Sensors"
                     SpacedGridView {
+                        interactive: false
                         width: parent.width
                         minCellWidth: 200
                         delegate: SensorDelegate {
@@ -228,6 +229,7 @@ ApplicationWindow {
 
                     SpacedGridView {
                         id: curvesGrid
+                        interactive: false
                         width: parent.width
                         minCellWidth: 280
                         cellHeight: 240
@@ -252,6 +254,7 @@ ApplicationWindow {
 
                     SpacedGridView {
                         id: govGrid
+                        interactive: false
                         width: parent.width
                         minCellWidth: 250
                         cellHeight: 200
