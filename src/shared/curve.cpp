@@ -144,6 +144,11 @@ void Curve::setRange(double minY, double maxY) {
         chopTopAndBottom(points);
 }
 
+void Curve::addPoint(Point point) {
+    //todo: coerce or reject point
+    sortedInsert(points, point);
+}
+
 void Curve::setPoints(vector<Point> const & points) {
     vector<Point> sorted;
     if (points.empty()) {

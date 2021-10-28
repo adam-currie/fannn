@@ -41,16 +41,19 @@ namespace Fannn {
                 return lerp(a.y, b.y, a.x, b.x, x);
             }
 
+            inline void sortedInsert(std::vector<Point>& sorted, Point point) {
+                auto r = sorted.rbegin();
+                while (r != sorted.rend() && point.x < r->x) ++r;
+                sorted.insert(r.base(), point);
+            }
+
             //if points share an x coordinate their original order is preserved
             inline void sortPoints(std::vector<Point>& sorted, std::vector<Point> const & points) {
                 assert(sorted.empty());
                 sorted.reserve(points.size());
                 sorted.push_back(points[0]);
-                for (int i=1; i<points.size(); ++i) {
-                    auto r = sorted.rbegin();
-                    while (r != sorted.rend() && points[i].x < r->x) ++r;
-                    sorted.insert(r.base(), points[i]);
-                }
+                for (int i=1; i<points.size(); ++i)
+                    sortedInsert(sorted, points[i]);
             }
 
             template<typename T>
@@ -80,6 +83,11 @@ namespace Fannn {
             void setDomain(double minX, double maxX);
             void setRange(double minY, double maxY);
 
+            void setMinX(double minX) { setDomain(minX, maxX); }
+            void setMaxX(double maxX) { setDomain(minX, maxX); }
+            void setMinY(double minY) { setRange(minY, maxY); }
+            void setMaxY(double maxY) { setRange(minY, maxY); }
+
             double getMinX() const { return minX; }
             double getMaxX() const { return maxX; }
             double getMinY() const { return minY; }
@@ -88,6 +96,7 @@ namespace Fannn {
             std::vector<Point> const & getPoints() const { return points; }
 
             void setPoints(std::vector<Point> const & points);
+            void addPoint(Point point);
 
             double getY(double x) const;
 
