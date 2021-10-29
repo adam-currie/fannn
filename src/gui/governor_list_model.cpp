@@ -37,12 +37,12 @@ void GovernorListModel::setProfileModel(ProfileModel* value) {
 
     _profileModel = value;
 
+    for (auto& c : profileConnections)
+        disconnect(c);
+    profileConnections.clear();
+
     if (value) {
         validateAllGovNameLookups();
-
-        for (auto& c : profileConnections)
-            disconnect(c);
-        profileConnections.clear();
 
         auto validateNameLookUpsAndSignal = [this] () {
             validateAllGovNameLookups();

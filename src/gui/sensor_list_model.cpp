@@ -57,12 +57,13 @@ ProfileModel::SensorAliasOrGovNameCollision SensorListModel::setAlias(int row, Q
 void SensorListModel::onProfileChanged(ProfileModel *value) {
     emit dataChanged(index(0,0), index(rowCount()-1,0), {AliasRole});
     readTimer.stop();
+
+    for (auto& c : profileConnections)
+        disconnect(c);
+    profileConnections.clear();
+
     if (value) {
         readTimer.start(value->updateIntervalMs());
-
-        for (auto& c : profileConnections)
-            disconnect(c);
-        profileConnections.clear();
 
         profileConnections.push_back(connect(
             value, &ProfileModel::updateIntervalMsChanged,
