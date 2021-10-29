@@ -17,6 +17,22 @@ SpacedGridDelegate {
         id: badNameDlg
     }
 
+    ValueAxis {
+        id: axisX
+        labelsColor: "white"//todo: not sure why Material.foreground doesn't work
+        min: curve.minX
+        max: curve.maxX
+        tickCount: 5
+    }
+
+    ValueAxis {
+        id: axisY
+        labelsColor: "white"//todo: not sure why Material.foreground doesn't work
+        min: curve.minY
+        max: curve.maxY
+        tickCount: 5
+    }
+
     FocusScope {
         id: topFocus
         anchors.fill: parent
@@ -88,10 +104,119 @@ SpacedGridDelegate {
             standardButtons: Dialog.NoButton
 
             ChartView {
-                anchors.fill:parent
+                id: dlgChart
+                anchors.fill: parent
                 antialiasing: true
                 backgroundColor: "transparent"
                 legend.visible: false
+
+                Repeater {
+                    model: curve
+
+                    Rectangle {
+                        id: indicator
+                        required property int index
+                        required property var _point
+
+                        property real chartPointX: (_point.x * dlgChart.plotArea.width / 100) + dlgChart.plotArea.x //todo: less magic
+                        property real chartPointY: dlgChart.plotArea.height - (_point.y * dlgChart.plotArea.height / 100) + dlgChart.plotArea.y //todo: less magic
+
+                        radius: 10
+                        width: radius * 2
+                        height: radius * 2
+                        color: "orange"//todo
+                        x: chartPointX - radius
+                        y: chartPointY - radius
+
+                        Item {
+                            id: handle
+                            parent: dlgChart
+                            width: indicator.width
+                            height: indicator.height
+
+                            Binding {
+                                target: handle
+                                property: "x"
+                                value: indicator.x
+                                when: !mouseArea.drag.active
+                            }
+
+                            Binding {
+                                target: handle
+                                property: "y"
+                                value: indicator.y
+                                when: !mouseArea.drag.active
+                            }
+
+                            MouseArea {
+                                id: mouseArea
+                                anchors.fill: parent
+                                drag.target: handle
+                                drag.threshold: 0
+                                preventStealing: true
+
+                                drag.onActiveChanged: {
+                                    if (drag.active)
+                                        curve.beginMovePoint(index)
+                                    else
+                                        curve.endMovePoint()
+                                }
+
+                                function move() {
+                                    let point = dlgChart.mapToValue(Qt.point(handle.x + width / 2, handle.y + height / 2), dlgSeries)
+                                    curve.movePoint(point)
+                                }
+
+                                onMouseXChanged: { if (drag.active) move() }
+                                onMouseYChanged: { if (drag.active) move() }
+                            }
+                        }
+                    }
+                }
+
+                MouseArea {
+                    y: dlgChart.plotArea.y
+                    x: dlgChart.plotArea.x
+                    width: dlgChart.plotArea.width
+                    height: dlgChart.plotArea.height
+
+                    onClicked: function(mouse) {
+                        let dlgPoint = mapToItem(dlgChart, Qt.point(mouse.x, mouse.y))
+                        let modelPoint = dlgChart.mapToValue(dlgPoint, dlgSeries)
+                        console.log("onClicked: " + modelPoint.x + ", " + modelPoint.y);//debug
+                        curve.addPoint(modelPoint)
+                    }
+                }
+
+                ValueAxis {
+                    id: dlgAxisX
+                    labelsColor: "white"//todo: not sure why Material.foreground doesn't work
+                    min: curve.minX
+                    max: curve.maxX
+                    tickCount: 5
+                }
+
+                ValueAxis {
+                    id: dlgAxisY
+                    labelsColor: "white"//todo: not sure why Material.foreground doesn't work
+                    min: curve.minY
+                    max: curve.maxY
+                    tickCount: 5
+                }
+
+                LineSeries {
+                    id: dlgSeries
+                    axisX: dlgAxisX
+                    axisY: dlgAxisY
+                    //todo: color: Material.accent doesnt work, all of the material colours are off here for some reason, maybe we can make a conversion function
+                }
+
+                VXYModelMapper {
+                    xColumn: 0
+                    yColumn: 1
+                    series: dlgSeries
+                    model: curve
+                }
             }
         }
 
@@ -113,34 +238,17 @@ SpacedGridDelegate {
                 onClicked: curveEditorDlg.open()
             }
 
-
-            ValueAxis {
-                id: axisX
-                labelsColor: "white"//todo: not sure why Material.foreground doesn't work
-                min: 0
-                max: 100
-                tickCount: 5
-            }
-
-            ValueAxis {
-                id: axisY
-                labelsColor: "white"//todo: not sure why Material.foreground doesn't work
-                min: 0
-                max: 100
-                tickCount: 5
-            }
-
             LineSeries {
-                name: "LineSeries"
+                id: series
                 axisX: axisX
                 axisY: axisY
-                XYPoint { x: 0; y: 0 }
-                XYPoint { x: 1.1; y: 2.1 }
-                XYPoint { x: 1.9; y: 3.3 }
-                XYPoint { x: 2.1; y: 2.1 }
-                XYPoint { x: 2.9; y: 4.9 }
-                XYPoint { x: 3.4; y: 3.0 }
-                XYPoint { x: 4.1; y: 3.3 }
+            }
+
+            VXYModelMapper {
+                xColumn: 0
+                yColumn: 1
+                series: series
+                model: curve
             }
         }
     }

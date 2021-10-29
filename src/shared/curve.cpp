@@ -1,3 +1,4 @@
+#include <algorithm>
 #include "curve.h"
 
 using namespace std;
@@ -6,12 +7,12 @@ using namespace Fannn;
 void Curve::chopLeft(vector<Point>& points) {
     size_t numOutside = 0;
 
-    while (numOutside != points.size() && points[numOutside].x < minX) 
+    while (numOutside != points.size() && points[numOutside].x < minX)
         ++numOutside;
 
     if (numOutside > 0) {
-        bool alreadyHavePointOnBorder = 
-                points.size() > numOutside && 
+        bool alreadyHavePointOnBorder =
+                points.size() > numOutside &&
                 points[numOutside].x == minX;
 
         if (alreadyHavePointOnBorder){
@@ -31,17 +32,17 @@ void Curve::chopLeft(vector<Point>& points) {
 
 void Curve::chopRight(vector<Point>& points) {
     size_t numOutside = 0;
-    
+
     //todo: ensure inlined
     auto indexOfFirstOutside = [&](){ return points.size()-numOutside; };
     auto indexOfLastInside = [&](){ return indexOfFirstOutside()-1; };
 
-    while (numOutside != points.size() && points[indexOfLastInside()].x > maxX) 
+    while (numOutside != points.size() && points[indexOfLastInside()].x > maxX)
         ++numOutside;
 
     if (numOutside > 0) {
-        bool alreadyHavePointOnBorder = 
-                points.size() > numOutside && 
+        bool alreadyHavePointOnBorder =
+                points.size() > numOutside &&
                 points[indexOfLastInside()].x == minX;
 
         if (alreadyHavePointOnBorder){
@@ -60,7 +61,7 @@ void Curve::chopRight(vector<Point>& points) {
     }
 }
 
-void Curve::chopTopAndBottom(vector<Point>& points) {           
+void Curve::chopTopAndBottom(vector<Point>& points) {
     for (int i=0; i<points.size(); ++i) {
         if (points[i].y < minY) {
             //TRUNCATE RANGE BELOW minY
@@ -118,35 +119,49 @@ void Curve::chopTopAndBottom(vector<Point>& points) {
     }
 }
 
-void Curve::setDomain(double minX, double maxX) { 
+void Curve::setDomain(double minX, double maxX) {
     if (minX > maxX) throw out_of_range("minX > maxX");
 
     bool shrinkingLeft = this->minX < minX;
     bool shrinkingRight = this->maxX > maxX;
 
-    this->minX = minX; 
+    this->minX = minX;
     this->maxX = maxX;
-    
+
     if (shrinkingLeft) chopLeft(points);
     if (shrinkingRight) chopRight(points);
 }
 
-void Curve::setRange(double minY, double maxY) { 
+void Curve::setRange(double minY, double maxY) {
     if (minY > maxY) throw out_of_range("minY > maxY");
 
     bool shrinkingBottom = this->minY < minY;
     bool shrinkingTop = this->maxY > maxY;
 
-    this->minY = minY; 
+    this->minY = minY;
     this->maxY = maxY;
-    
-    if (shrinkingBottom || shrinkingTop) 
+
+    if (shrinkingBottom || shrinkingTop)
         chopTopAndBottom(points);
 }
 
-void Curve::addPoint(Point point) {
+int Curve::addPoint(Point point) {
     //todo: coerce or reject point
-    sortedInsert(points, point);
+    return sortedInsert(points, point);
+}
+
+void Curve::updatePoint(int index, Point point) {
+    point.x = clamp(point.x,
+                    index>0? points[index-1].x : minX,
+                    (index<points.size()-1)? points[index+1].x : maxX);
+    point.y = clamp(point.y, minY, maxY);
+    points[index] = point;
+}
+
+void Curve::removePoints(int first, int last) {
+    if (first > last || first < 0 || last >= points.size())
+        throw invalid_argument("invalid indexes to remove");
+    points.erase(points.begin()+first, points.begin()+last+1);
 }
 
 void Curve::setPoints(vector<Point> const & points) {
@@ -169,9 +184,9 @@ double Curve::getY(double x) const {
         if(point.x >= x){
             //EARLY RETURN
             return lerp(
-                prevPointY, 
-                point.y, 
-                point.x == prevPointX ? 
+                prevPointY,
+                point.y,
+                point.x == prevPointX ?
                     1 : (x-prevPointX)/(point.x-prevPointX));
         }else{
             prevPointX = point.x;

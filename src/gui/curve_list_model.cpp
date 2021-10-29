@@ -97,6 +97,7 @@ tryNextName:
     beginInsertRows(QModelIndex(), preRowCount, preRowCount);
 
     Fannn::Curve c(name);
+    c.setPoints({{0,0},{100,100}});
     _profileModel->addCurve(c);
     addCurveHereNotInProfile(c);
 

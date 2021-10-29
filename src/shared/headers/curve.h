@@ -27,10 +27,7 @@ namespace Fannn {
 
             //scales a reference lerp to a lerp between a and b
             static inline double lerp(double a, double b, double refStart, double refEnd, double refBetween) {
-                return lerp(
-                        a, 
-                        b, 
-                        (refBetween - refStart) / (refBetween - refStart));
+                return lerp(a, b, (refBetween - refStart) / (refBetween - refStart));
             }
 
             static inline double lerpXBasedOnY(const Point a, const Point b, double y) {
@@ -41,10 +38,11 @@ namespace Fannn {
                 return lerp(a.y, b.y, a.x, b.x, x);
             }
 
-            inline void sortedInsert(std::vector<Point>& sorted, Point point) {
-                auto r = sorted.rbegin();
-                while (r != sorted.rend() && point.x < r->x) ++r;
-                sorted.insert(r.base(), point);
+            inline int sortedInsert(std::vector<Point>& sorted, Point point) {
+                int i = sorted.size();
+                while (i>0 && point.x < sorted[i-1].x) --i;
+                sorted.insert(sorted.begin()+i, point);
+                return i;
             }
 
             //if points share an x coordinate their original order is preserved
@@ -96,7 +94,10 @@ namespace Fannn {
             std::vector<Point> const & getPoints() const { return points; }
 
             void setPoints(std::vector<Point> const & points);
-            void addPoint(Point point);
+            //returns the new index of the point
+            int addPoint(Point point);
+            void updatePoint(int index, Point point);
+            void removePoints(int first, int last);
 
             double getY(double x) const;
 
