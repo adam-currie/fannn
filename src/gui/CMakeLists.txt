@@ -27,6 +27,7 @@ qt6_add_qml_module(fannn-gui
         q_governor_error.h
         error_highlighter.h
         curve_model.h
+        horz_extended_xy_model_wrapper.h
         sensor_list_model.cpp
         governor_list_model.cpp
         curve_list_model.cpp
@@ -35,6 +36,7 @@ qt6_add_qml_module(fannn-gui
         profile_model.cpp
         error_highlighter.cpp
         curve_model.cpp
+        horz_extended_xy_model_wrapper.cpp
     QML_FILES
         main.qml
         Warning.qml

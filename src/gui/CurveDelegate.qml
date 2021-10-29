@@ -13,6 +13,12 @@ SpacedGridDelegate {
 
     id: top
 
+    HorzExtendedXYModelWrapper {
+        id: extendedCurve
+        model: curve
+        //todo: min and max
+    }
+
     Dialog {
         id: badNameDlg
     }
@@ -183,7 +189,6 @@ SpacedGridDelegate {
                     onClicked: function(mouse) {
                         let dlgPoint = mapToItem(dlgChart, Qt.point(mouse.x, mouse.y))
                         let modelPoint = dlgChart.mapToValue(dlgPoint, dlgSeries)
-                        console.log("onClicked: " + modelPoint.x + ", " + modelPoint.y);//debug
                         curve.addPoint(modelPoint)
                     }
                 }
@@ -215,7 +220,7 @@ SpacedGridDelegate {
                     xColumn: 0
                     yColumn: 1
                     series: dlgSeries
-                    model: curve
+                    model: extendedCurve
                 }
             }
         }
@@ -248,7 +253,7 @@ SpacedGridDelegate {
                 xColumn: 0
                 yColumn: 1
                 series: series
-                model: curve
+                model: extendedCurve
             }
         }
     }
