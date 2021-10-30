@@ -98,6 +98,7 @@ namespace Fannn {
             int addPoint(Point point);
             void updatePoint(int index, Point point);
             void removePoints(int first, int last);
+            void removePoint(int index);
 
             double getY(double x) const;
 

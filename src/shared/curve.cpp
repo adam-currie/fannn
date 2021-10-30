@@ -145,6 +145,10 @@ void Curve::setRange(double minY, double maxY) {
         chopTopAndBottom(points);
 }
 
+void Curve::removePoint(int index) {
+    points.erase(points.begin()+index, points.begin()+index+1);
+}
+
 int Curve::addPoint(Point point) {
     //todo: coerce or reject point
     return sortedInsert(points, point);
