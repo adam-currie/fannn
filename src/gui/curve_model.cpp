@@ -51,8 +51,8 @@ void CurveModel::pushChanges() {
 void CurveModel::beginMovePoint(int row) {
     if (row < 0 || row > rowCount())
         throw invalid_argument("invalid point index");
-    if (_movingPointIndex != -1)
-        throw logic_error("point at: " + to_string(_movingPointIndex) + " already moving, you need to call endMovePoint first");
+    if (_movingPointIndex != row)
+        endMovePoint();
 
     _movingPointIndex = row;
 }
