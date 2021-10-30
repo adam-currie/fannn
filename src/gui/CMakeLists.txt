@@ -54,6 +54,7 @@ qt6_add_qml_module(fannn-gui
         GridViewCellPredictor.qml
         IdentifierValidator.qml
         AddButton.qml
+        CurveChartView.qml
 )
 
 target_link_libraries(fannn-gui PRIVATE

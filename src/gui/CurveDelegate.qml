@@ -13,30 +13,8 @@ SpacedGridDelegate {
 
     id: top
 
-    HorzExtendedXYModelWrapper {
-        id: extendedCurve
-        model: curve
-        //todo: min and max
-    }
-
     Dialog {
         id: badNameDlg
-    }
-
-    ValueAxis {
-        id: axisX
-        labelsColor: "white"//todo: not sure why Material.foreground doesn't work
-        min: curve.minX
-        max: curve.maxX
-        tickCount: 5
-    }
-
-    ValueAxis {
-        id: axisY
-        labelsColor: "white"//todo: not sure why Material.foreground doesn't work
-        min: curve.minY
-        max: curve.maxY
-        tickCount: 5
     }
 
     FocusScope {
@@ -109,12 +87,10 @@ SpacedGridDelegate {
             modal: true
             standardButtons: Dialog.NoButton
 
-            ChartView {
+            CurveChartView {
                 id: dlgChart
+                curve: top.curve
                 anchors.fill: parent
-                antialiasing: true
-                backgroundColor: "transparent"
-                legend.visible: false
 
                 Repeater {
                     model: curve
@@ -176,7 +152,7 @@ SpacedGridDelegate {
 
                                 onPositionChanged: {
                                     if (index === curve.movingPointIndex) {
-                                        let point = dlgChart.mapToValue(Qt.point(handle.x + width / 2, handle.y + height / 2), dlgSeries)
+                                        let point = dlgChart.mapToValue(Qt.point(handle.x + width / 2, handle.y + height / 2), dlgChart.series(0))
                                         curve.movePoint(point)
                                     }
                                 }
@@ -195,7 +171,7 @@ SpacedGridDelegate {
                     onPressed: function(mouse) {
                         if (mouse.button === Qt.LeftButton) {
                             let dlgPoint = mapToItem(dlgChart, Qt.point(mouse.x, mouse.y))
-                            let modelPoint = dlgChart.mapToValue(dlgPoint, dlgSeries)
+                            let modelPoint = dlgChart.mapToValue(dlgPoint, dlgChart.series(0))
                             lastAddedPoint = curve.addPoint(modelPoint)
                             curve.beginMovePoint(lastAddedPoint)
                         }
@@ -210,74 +186,29 @@ SpacedGridDelegate {
                     onPositionChanged: function(mouse) {
                         if (lastAddedPoint === curve.movingPointIndex) {
                             let dlgPoint = mapToItem(dlgChart, Qt.point(mouse.x, mouse.y))
-                            let modelPoint = dlgChart.mapToValue(dlgPoint, dlgSeries)
+                            let modelPoint = dlgChart.mapToValue(dlgPoint, dlgChart.series(0))
                             curve.movePoint(modelPoint);
                         }
                     }
 
                 }
-
-                ValueAxis {
-                    id: dlgAxisX
-                    labelsColor: "white"//todo: not sure why Material.foreground doesn't work
-                    min: curve.minX
-                    max: curve.maxX
-                    tickCount: 5
-                }
-
-                ValueAxis {
-                    id: dlgAxisY
-                    labelsColor: "white"//todo: not sure why Material.foreground doesn't work
-                    min: curve.minY
-                    max: curve.maxY
-                    tickCount: 5
-                }
-
-                LineSeries {
-                    id: dlgSeries
-                    axisX: dlgAxisX
-                    axisY: dlgAxisY
-                    //todo: color: Material.accent doesnt work, all of the material colours are off here for some reason, maybe we can make a conversion function
-                }
-
-                VXYModelMapper {
-                    xColumn: 0
-                    yColumn: 1
-                    series: dlgSeries
-                    model: extendedCurve
-                }
             }
         }
 
-        ChartView {
+        CurveChartView {
+            curve: top.curve
             anchors.top: nameField.bottom
             anchors.bottom: parent.bottom
             anchors.right: parent.right
             anchors.left: parent.left
-            antialiasing: true
-            backgroundColor: "transparent"
             margins.top: 10
             margins.left: 0
             margins.right: 0
             margins.bottom: 0
-            legend.visible: false
 
             MouseArea {
                 anchors.fill: parent
                 onClicked: curveEditorDlg.open()
-            }
-
-            LineSeries {
-                id: series
-                axisX: axisX
-                axisY: axisY
-            }
-
-            VXYModelMapper {
-                xColumn: 0
-                yColumn: 1
-                series: series
-                model: extendedCurve
             }
         }
     }
