@@ -51,20 +51,20 @@ void CurveModel::pushChanges() {
 void CurveModel::beginMovePoint(int row) {
     if (row < 0 || row > rowCount())
         throw invalid_argument("invalid point index");
-    if (movingPointIndex != -1)
-        throw logic_error("point at: " + to_string(movingPointIndex) + " already moving, you need to call endMovePoint first");
+    if (_movingPointIndex != -1)
+        throw logic_error("point at: " + to_string(_movingPointIndex) + " already moving, you need to call endMovePoint first");
 
-    movingPointIndex = row;
+    _movingPointIndex = row;
 }
 
 void CurveModel::movePoint(QPointF p) {
-    if (movingPointIndex == -1)
+    if (_movingPointIndex == -1)
         throw logic_error("no move operation started, you need to call beginMovePoint first");
-    scratchCurve.updatePoint(movingPointIndex, {p.x(), p.y()});
-    emit dataChanged(index(movingPointIndex,0), index(movingPointIndex,1), {PointRole});
+    scratchCurve.updatePoint(_movingPointIndex, {p.x(), p.y()});
+    emit dataChanged(index(_movingPointIndex,0), index(_movingPointIndex,1), {PointRole});
 }
 
-void CurveModel::addPoint(QPointF p) {
+int CurveModel::addPoint(QPointF p) {
     //todo: doing this a slow way cause i don't know if it's okay to update the model before calling
     //      beginInsertRows, maybe we can not worry about that, or implement a more efficient way
     auto tempCurve = scratchCurve;
@@ -72,18 +72,19 @@ void CurveModel::addPoint(QPointF p) {
     beginInsertRows(QModelIndex(), newIndex, newIndex);
     scratchCurve = tempCurve;
     endInsertRows();
+    return newIndex;
 }
 
 void CurveModel::endMovePoint(){
-    if (movingPointIndex == -1) return;
+    if (_movingPointIndex == -1) return;
 
     auto points = scratchCurve.getPoints();
 
-    int firstOnThisX = movingPointIndex;
-    int lastOnThisX = movingPointIndex;
-    while (firstOnThisX > 0 && points[firstOnThisX-1].x == points[movingPointIndex].x)
+    int firstOnThisX = _movingPointIndex;
+    int lastOnThisX = _movingPointIndex;
+    while (firstOnThisX > 0 && points[firstOnThisX-1].x == points[_movingPointIndex].x)
         --firstOnThisX;
-    while (lastOnThisX < points.size()-1 && points[lastOnThisX+1].x == points[movingPointIndex].x)
+    while (lastOnThisX < points.size()-1 && points[lastOnThisX+1].x == points[_movingPointIndex].x)
         ++lastOnThisX;
 
     int otherPointsOnThisX = lastOnThisX - firstOnThisX;
@@ -95,7 +96,7 @@ void CurveModel::endMovePoint(){
         endRemoveRows();
     }
 
-    movingPointIndex = -1;
+    _movingPointIndex = -1;
 }
 
 bool CurveModel::rename(QString newName) {

@@ -159,7 +159,6 @@ SpacedGridDelegate {
                                 anchors.fill: parent
                                 drag.target: handle
                                 drag.threshold: 0
-                                preventStealing: true
 
                                 drag.onActiveChanged: {
                                     if (drag.active)
@@ -168,13 +167,12 @@ SpacedGridDelegate {
                                         curve.endMovePoint()
                                 }
 
-                                function move() {
-                                    let point = dlgChart.mapToValue(Qt.point(handle.x + width / 2, handle.y + height / 2), dlgSeries)
-                                    curve.movePoint(point)
+                                onPositionChanged: {
+                                    if (index === curve.movingPointIndex) {
+                                        let point = dlgChart.mapToValue(Qt.point(handle.x + width / 2, handle.y + height / 2), dlgSeries)
+                                        curve.movePoint(point)
+                                    }
                                 }
-
-                                onMouseXChanged: { if (drag.active) move() }
-                                onMouseYChanged: { if (drag.active) move() }
                             }
                         }
                     }
@@ -185,12 +183,31 @@ SpacedGridDelegate {
                     x: dlgChart.plotArea.x
                     width: dlgChart.plotArea.width
                     height: dlgChart.plotArea.height
+                    property int lastAddedPoint: -1
 
-                    onClicked: function(mouse) {
-                        let dlgPoint = mapToItem(dlgChart, Qt.point(mouse.x, mouse.y))
-                        let modelPoint = dlgChart.mapToValue(dlgPoint, dlgSeries)
-                        curve.addPoint(modelPoint)
+                    onPressed: function(mouse) {
+                        if (mouse.button === Qt.LeftButton) {
+                            let dlgPoint = mapToItem(dlgChart, Qt.point(mouse.x, mouse.y))
+                            let modelPoint = dlgChart.mapToValue(dlgPoint, dlgSeries)
+                            lastAddedPoint = curve.addPoint(modelPoint)
+                            curve.beginMovePoint(lastAddedPoint)
+                        }
                     }
+
+                    onReleased: function(mouse) {
+                        if (mouse.button === Qt.LeftButton) {
+                            curve.endMovePoint()
+                        }
+                    }
+
+                    onPositionChanged: function(mouse) {
+                        if (lastAddedPoint === curve.movingPointIndex) {
+                            let dlgPoint = mapToItem(dlgChart, Qt.point(mouse.x, mouse.y))
+                            let modelPoint = dlgChart.mapToValue(dlgPoint, dlgSeries)
+                            curve.movePoint(modelPoint);
+                        }
+                    }
+
                 }
 
                 ValueAxis {

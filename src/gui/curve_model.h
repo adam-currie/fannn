@@ -17,6 +17,7 @@ class CurveModel : public QAbstractListModel {
     Q_PROPERTY(qreal minY READ minY WRITE setMinY NOTIFY minYChanged)
     Q_PROPERTY(qreal maxX READ maxX WRITE setMaxX NOTIFY maxXChanged)
     Q_PROPERTY(qreal maxY READ maxY WRITE setMaxY NOTIFY maxYChanged)
+    Q_PROPERTY(int movingPointIndex MEMBER _movingPointIndex NOTIFY movingPointIndexChanged)
 
     enum Roles {
         PointRole = Qt::UserRole + 1
@@ -29,7 +30,7 @@ class CurveModel : public QAbstractListModel {
     Fannn::Curve scratchCurve,pushedCurve;
     CurveListModel* owner;
 
-    int movingPointIndex = -1;
+    int _movingPointIndex = -1;
 
     public:
         QHash<int, QByteArray> roleNames() const override { return rolesHash; }
@@ -63,7 +64,7 @@ class CurveModel : public QAbstractListModel {
         Q_INVOKABLE bool rename(QString newName);
         Q_INVOKABLE void remove() { delete this; };
         Q_INVOKABLE void pushChanges();
-        Q_INVOKABLE void addPoint(QPointF);
+        Q_INVOKABLE int addPoint(QPointF);
 
         Q_INVOKABLE void beginMovePoint(int index);
         //moves point contrained by the bounds of the graph, but also by the x value of it's neighbors
@@ -71,6 +72,7 @@ class CurveModel : public QAbstractListModel {
         Q_INVOKABLE void endMovePoint();
 
     signals:
+        void movingPointIndexChanged(int value);
         void nameChanged(QString value);
         void minXChanged(double value);
         void minYChanged(double value);

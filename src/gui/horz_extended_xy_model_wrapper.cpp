@@ -99,7 +99,7 @@ QVariant HorzExtendedXYModelWrapper::data(const QModelIndex &index, int role) co
     bool gettingX = index.column() == 0;
     if (gettingX && (first || last)) {
         qreal x = var.value<qreal>();
-        x = first ? _min :_max;
+        x = first ? _min : _max;
         var.setValue(x);
     }
 
