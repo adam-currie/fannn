@@ -64,6 +64,12 @@ void CurveModel::movePoint(QPointF p) {
     emit dataChanged(index(_movingPointIndex,0), index(_movingPointIndex,1), {PointRole});
 }
 
+void CurveModel::removePoint(int index) {
+    beginRemoveRows(QModelIndex(), index, index);
+    scratchCurve.removePoint(index);
+    endRemoveRows();
+}
+
 int CurveModel::addPoint(QPointF p) {
     //todo: doing this a slow way cause i don't know if it's okay to update the model before calling
     //      beginInsertRows, maybe we can not worry about that, or implement a more efficient way

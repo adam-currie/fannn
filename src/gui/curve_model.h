@@ -64,7 +64,9 @@ class CurveModel : public QAbstractListModel {
         Q_INVOKABLE bool rename(QString newName);
         Q_INVOKABLE void remove() { delete this; };
         Q_INVOKABLE void pushChanges();
+
         Q_INVOKABLE int addPoint(QPointF);
+        Q_INVOKABLE void removePoint(int index);
 
         Q_INVOKABLE void beginMovePoint(int index);
         //moves point contrained by the bounds of the graph, but also by the x value of it's neighbors

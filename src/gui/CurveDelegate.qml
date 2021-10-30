@@ -159,12 +159,19 @@ SpacedGridDelegate {
                                 anchors.fill: parent
                                 drag.target: handle
                                 drag.threshold: 0
+                                acceptedButtons: Qt.LeftButton | Qt.RightButton
 
                                 drag.onActiveChanged: {
                                     if (drag.active)
                                         curve.beginMovePoint(index)
                                     else
                                         curve.endMovePoint()
+                                }
+
+                                onPressed: function(mouse) {
+                                    if (mouse.button === Qt.RightButton && curve.rowCount() > 1) {
+                                        curve.removePoint(index)
+                                    }
                                 }
 
                                 onPositionChanged: {
