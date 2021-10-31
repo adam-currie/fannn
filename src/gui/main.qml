@@ -180,15 +180,15 @@ ApplicationWindow {
                     Label {
                         anchors.verticalCenter: parent.verticalCenter
                         anchors.verticalCenterOffset: -2
-                        text: "update interval(ms): "
+                        text: "update interval(ms)"
                     }
                     STextField {
-                        padding: 4
                         id: updateIntervalField
                         anchors.bottom: parent.bottom
+                        width: contentWidth + 16
                         validator: RegularExpressionValidator {
                             //can't use IntValidator because we need to temporarily allow blank text
-                            regularExpression: /[0-9]*/
+                            regularExpression: /[0-9]{0,10}/
                         }
 
                         property bool _isBlank: false
