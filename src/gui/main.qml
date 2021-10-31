@@ -185,7 +185,7 @@ ApplicationWindow {
                     STextField {
                         id: updateIntervalField
                         anchors.bottom: parent.bottom
-                        width: contentWidth + 16
+                        width: contentWidth + 18
                         validator: RegularExpressionValidator {
                             //can't use IntValidator because we need to temporarily allow blank text
                             regularExpression: /[0-9]{0,10}/
