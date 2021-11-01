@@ -14,65 +14,44 @@ SpacedGridDelegate {
 
     id: top
 
-    STextField {
+    SSoftValidatedField {
         id: aliasOrNameText
         validator: IdentifierValidator {}
         anchors.top: parent.top
         anchors.right: parent.right
         anchors.left: parent.left
-        anchors.bottomMargin: 0
-
-        property bool _isEditing: false
-        property string _aliasAtStartOfEditing: ""
-        property int _aliasCollision: ProfileModel.NoCollision
 
         property var aliasOrName: (_alias)? _alias : top.name
 
-        Dialog {
-            id: badAliasDlg
-        }
-
         text: aliasOrName
 
-        onEditingFinished: {
-            var nameBad = false
-            if (!text) {
-                badAliasDlg.title = "alias cannot be empty"
-                nameBad = true
-            } else if (_aliasCollision === ProfileModel.CollidesWithGovernor) {
-                badAliasDlg.title = "alias already used by governor name"
-                nameBad = true
-            } else if (_aliasCollision === ProfileModel.CollidesWithSensorAlias) {
-                badAliasDlg.title = "alias already used by another sensor"
-                nameBad = true
+        //overload
+        function set(v) {
+            if (!v)  //no error, we will reset when finished editing
+                return ""
+
+            if (v === name) {
+                sensors.removeAlias(index)
+                return ""
             }
 
-            if (nameBad) {
-                badAliasDlg.open()
-                if (!_aliasAtStartOfEditing) {
-                    sensors.removeAlias(index)
-                    text = aliasOrName
-                } else {
-                    text = _aliasAtStartOfEditing
-                }
+            switch (sensors.setAlias(index, v)) {
+                case ProfileModel.CollidesWithGovernor:
+                    return "alias used by governor"
+                case ProfileModel.CollidesWithSensorAlias:
+                    return "alias used by another sensor"
+                case ProfileModel.NoCollision:
+                    return ""
+                default:
+                    console.error("whats the error?")
+                    return "error"
             }
-
-            _aliasCollision = ProfileModel.NoCollision
-            _aliasAtStartOfEditing = ""
-            _isEditing = false
         }
 
-        onTextChanged: {
-            if (!_isEditing) {
-                _aliasAtStartOfEditing = (_alias)? _alias : null
-                _isEditing = true
-            }
-
-            // null is fine here, just not empty
-            if (text === null || text === name) {
+        onEditingFinished: {
+            if (!text) {
                 sensors.removeAlias(index)
-            } else if (text.length > 0) {
-                _aliasCollision = sensors.setAlias(index, text)
+                text = aliasOrName
             }
         }
     }

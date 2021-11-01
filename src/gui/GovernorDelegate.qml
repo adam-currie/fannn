@@ -17,58 +17,38 @@ SpacedGridDelegate {
         id: topFocus
         anchors.fill: parent
 
-        STextField {
+        SSoftValidatedField {
             id: nameField
             validator: IdentifierValidator {}
             anchors.top: parent.top
             anchors.left: parent.left
             anchors.right: parent.right
-            bottomPadding: 0
             rightPadding: removeButton.width
-
-            property string _nameAtStartEditing: ""
-            property int _nameCollision: ProfileModel.NoCollision
-
             text: name
 
-            Dialog {
-                id: badNameDlg
-            }
+            //overload
+            function set(v) {
+                if (!text)
+                    return "name cannot be empty"
 
-            onEditingFinished: {
-                var nameBad = false
-
-                if (!text) {
-                    badNameDlg.title = "name cannot be empty"
-                    nameBad = true
-                } else if (_nameCollision === ProfileModel.CollidesWithGovernor) {
-                    badNameDlg.title = "name already used by another governor"
-                    nameBad = true
-                } else if (_nameCollision === ProfileModel.CollidesWithSensorAlias) {
-                    badNameDlg.title = "name already used by a sensor alias"
-                    nameBad = true
+                switch (governors.rename(index, text)) {
+                    case ProfileModel.CollidesWithGovernor:
+                        return "name used by another governor"
+                    case ProfileModel.CollidesWithSensorAlias:
+                        return "name used by a sensor alias"
+                    case ProfileModel.NoCollision:
+                        return ""
+                    default:
+                        console.error("whats the error?")
+                        return "error"
                 }
-
-                _nameCollision = ProfileModel.NoCollision
-                if (nameBad) {
-                    badNameDlg.open()
-                    text = _nameAtStartEditing
-                }
-                _nameAtStartEditing = ""
-            }
-
-            onTextChanged: {
-                if (!_nameAtStartEditing)
-                    _nameAtStartEditing = name
-                if (text)
-                    _nameCollision = governors.rename(index, text)
             }
 
             Button {
                 id: removeButton
                 anchors.top: parent.top
                 anchors.right: parent.right
-                height: parent.height + parent.topPadding
+                height: parent.height + parent.topPadding - parent.bottomPadding
                 width: height
                 flat: true
                 topInset: 0
@@ -85,8 +65,9 @@ SpacedGridDelegate {
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.bottom: errorBox.top
-            anchors.topMargin: 10
+            anchors.topMargin: 0
             anchors.bottomMargin: -5
+
             TextArea {
                 id: expTextArea
                 padding: nameField.padding
