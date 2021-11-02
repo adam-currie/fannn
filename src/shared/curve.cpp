@@ -97,6 +97,7 @@ void Curve::chopTopAndBottom(vector<Point>& points) {
             int to = i-1;
 
             eraseIfValidRange(points, from+1, to);
+            if (to > from) to = from + 1;//account for erase
 
             bool atBegining = from == 0;
             bool atEnd = to == points.size()-1;
@@ -104,7 +105,7 @@ void Curve::chopTopAndBottom(vector<Point>& points) {
 
             Point p = points[from];
             if (!onlyOnePoint && !atBegining || onlyOnePoint && atEnd && !atBegining)
-                p.x = lerpXBasedOnY(points[from], points[from-1], maxY);
+                p.x = lerpXBasedOnY(points[from-1], points[from], maxY);
             p.y = maxY;
             points[from] = p;
 
