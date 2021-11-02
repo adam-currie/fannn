@@ -62,6 +62,7 @@ class CurveModel : public QAbstractListModel {
         Q_INVOKABLE bool rename(QString newName);
         Q_INVOKABLE void remove() { delete this; };
         Q_INVOKABLE void pushChanges();
+        Q_INVOKABLE void discardChanges();
 
         Q_INVOKABLE int addPoint(QPointF);
         Q_INVOKABLE void removePoint(int index);

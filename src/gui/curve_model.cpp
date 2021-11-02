@@ -48,6 +48,20 @@ void CurveModel::pushChanges() {
     pushedCurve = scratchCurve;
 }
 
+void CurveModel::discardChanges() {
+    bool minXDiff = scratchCurve.getMinX() == scratchCurve.getMinX();
+    bool maxXDiff = scratchCurve.getMaxX() == scratchCurve.getMaxX();
+    bool minYDiff = scratchCurve.getMinY() == scratchCurve.getMinY();
+    bool maxYDiff = scratchCurve.getMaxY() == scratchCurve.getMaxY();
+    beginResetModel();
+    scratchCurve = pushedCurve;
+    endResetModel();
+    if (minXDiff) emit minXChanged(minX());
+    if (maxXDiff) emit maxXChanged(maxX());
+    if (minYDiff) emit minYChanged(minY());
+    if (maxYDiff) emit maxYChanged(maxY());
+}
+
 void CurveModel::beginMovePoint(int row) {
     if (row < 0 || row > rowCount())
         throw invalid_argument("invalid point index");

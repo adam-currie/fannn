@@ -23,7 +23,15 @@ SpacedGridDelegate {
         rightPadding: 40
         leftPadding: 40
         modal: true
-        standardButtons: Dialog.NoButton
+        closePolicy: Dialog.NoAutoClose
+        standardButtons: Dialog.Ok | Dialog.Cancel
+
+        Component.onCompleted: {
+            curveEditorDlg.standardButton(Dialog.Ok).text = "Accept"
+        }
+
+        onAccepted: curve.pushChanges()
+        onRejected: curve.discardChanges()
 
         Item {
             id: dlgName
@@ -237,6 +245,7 @@ SpacedGridDelegate {
 
             }
         }
+
     }
 
     FocusScope {
