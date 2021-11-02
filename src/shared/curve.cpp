@@ -43,7 +43,7 @@ void Curve::chopRight(vector<Point>& points) {
     if (numOutside > 0) {
         bool alreadyHavePointOnBorder =
                 points.size() > numOutside &&
-                points[indexOfLastInside()].x == minX;
+                points[indexOfLastInside()].x == maxX;
 
         if (alreadyHavePointOnBorder){
             eraseIfValidRange(points, indexOfFirstOutside(), points.size());
