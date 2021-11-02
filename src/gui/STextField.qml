@@ -9,6 +9,7 @@ TextField {
     color: Material.foreground
     bottomPadding: 8 + spaceAboveLine
     leftPadding: 5
+    rightPadding: 5
     selectByMouse: true
 
     onActiveFocusChanged: {

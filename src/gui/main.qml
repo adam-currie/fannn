@@ -185,10 +185,11 @@ ApplicationWindow {
                     STextField {
                         id: updateIntervalField
                         anchors.bottom: parent.bottom
-                        width: contentWidth + 18
+                        width: contentWidth + rightPadding + leftPadding + 2
+                        horizontalAlignment: TextInput.horizontalCenter
                         validator: RegularExpressionValidator {
                             //can't use IntValidator because we need to temporarily allow blank text
-                            regularExpression: /[0-9]{0,10}/
+                            regularExpression: /[0-9]{0,9}/
                         }
 
                         property bool _isBlank: false
