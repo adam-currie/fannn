@@ -252,6 +252,7 @@ void Governor::validateNameLookups(std::function<bool (std::string)> validateCur
 
     for (auto const & [identifier, ranges] : zeroArgFuncTokens){
         if (name == identifier) {
+            //todo: replace this with check for loop of any size (like gov1 > gov2 > gov1)
             identifierErrors.push_back(Error("infinite self-reference", ranges));
         } else if (!validateSensorOrGovernor(identifier)) {
             identifierErrors.push_back(Error("no governor or sensor named '" + identifier + "'", ranges));
