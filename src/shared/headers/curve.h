@@ -27,7 +27,7 @@ namespace Fannn {
 
             //scales a reference lerp to a lerp between a and b
             static inline double lerp(double a, double b, double refStart, double refEnd, double refBetween) {
-                return lerp(a, b, (refBetween - refStart) / (refBetween - refStart));
+                return lerp(a, b, (refBetween - refStart) / (refEnd - refStart));
             }
 
             static inline double lerpXBasedOnY(const Point a, const Point b, double y) {
@@ -81,10 +81,10 @@ namespace Fannn {
             void setDomain(double minX, double maxX);
             void setRange(double minY, double maxY);
 
-            void setMinX(double minX) { setDomain(minX, maxX); }
-            void setMaxX(double maxX) { setDomain(minX, maxX); }
-            void setMinY(double minY) { setRange(minY, maxY); }
-            void setMaxY(double maxY) { setRange(minY, maxY); }
+            void setMinX(double minX);
+            void setMaxX(double maxX);
+            void setMinY(double minY);
+            void setMaxY(double maxY);
 
             double getMinX() const { return minX; }
             double getMaxX() const { return maxX; }

@@ -70,7 +70,8 @@ SpacedGridDelegate {
                 verticalAlignment: TextInput.AlignVCenter
             }
             STextField {
-                text: "0"
+                text: curve.minX
+                onEditingFinished: curve.minX = text
                 width: minMaxLayout.fieldWidth
                 spaceAboveLine: minMaxLayout.spaceAboveLine
                 leftPadding: 1
@@ -84,7 +85,8 @@ SpacedGridDelegate {
                 verticalAlignment: TextInput.AlignVCenter
             }
             STextField {
-                text: "100"
+                text: curve.maxX
+                onEditingFinished: curve.maxX = text
                 width: minMaxLayout.fieldWidth
                 spaceAboveLine: minMaxLayout.spaceAboveLine
                 leftPadding: 1
@@ -100,7 +102,8 @@ SpacedGridDelegate {
                 verticalAlignment: TextInput.AlignVCenter
             }
             STextField {
-                text: "0"
+                text: curve.minY
+                onEditingFinished: curve.minY = text
                 width: minMaxLayout.fieldWidth
                 spaceAboveLine: minMaxLayout.spaceAboveLine
                 leftPadding: 1
@@ -114,7 +117,8 @@ SpacedGridDelegate {
                 verticalAlignment: TextInput.AlignVCenter
             }
             STextField {
-                text: "100"
+                text: curve.maxY
+                onEditingFinished: curve.maxY = text
                 width: minMaxLayout.fieldWidth
                 spaceAboveLine: minMaxLayout.spaceAboveLine
                 leftPadding: 1
@@ -140,8 +144,8 @@ SpacedGridDelegate {
                     required property int index
                     required property var _point
 
-                    property real chartPointX: (_point.x * dlgChart.plotArea.width / 100) + dlgChart.plotArea.x //todo: less magic
-                    property real chartPointY: dlgChart.plotArea.height - (_point.y * dlgChart.plotArea.height / 100) + dlgChart.plotArea.y //todo: less magic
+                    property real chartPointX: (_point.x * dlgChart.plotArea.width / curve.maxX) + dlgChart.plotArea.x
+                    property real chartPointY: dlgChart.plotArea.height - (_point.y * dlgChart.plotArea.height / curve.maxY) + dlgChart.plotArea.y
 
                     radius: 9
                     width: radius * 2

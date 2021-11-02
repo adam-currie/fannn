@@ -202,3 +202,28 @@ double Curve::getY(double x) const {
     //only reached if no 2 points to lerp
     return prevPointY;
 }
+
+void Curve::setMinX(double minX) {
+    if (minX > maxX)
+        minX = maxX;
+    setDomain(minX, maxX);
+}
+
+void Curve::setMaxX(double maxX) {
+    if (minX > maxX)
+        maxX = minX;
+    setDomain(minX, maxX);
+}
+
+void Curve::setMinY(double minY) {
+    if (minY > maxY)
+        minY = maxY;
+    setRange(minY, maxY);
+}
+
+void Curve::setMaxY(double maxY) {
+    if (minY > maxY)
+        maxY = minY;
+    setRange(minY, maxY);
+}
+

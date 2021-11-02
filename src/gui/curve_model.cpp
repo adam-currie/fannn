@@ -116,5 +116,42 @@ bool CurveModel::rename(QString newName) {
     }
 }
 
+void CurveModel::setMinX(double value) {
+    if (value == minX())//todo: epsilon?
+        return;
+    beginResetModel();//todo: replace with something smarter, maybe we can easily reset just the points on one side
+    scratchCurve.setMinX(value);
+    endResetModel();
+    emit minXChanged(scratchCurve.getMinX());
+}
+
+void CurveModel::setMinY(double value) {
+    if (value == minY())//todo: epsilon?
+        return;
+    beginResetModel();//todo: replace with something smarter, maybe we can easily reset just the points on one side
+    scratchCurve.setMinY(value);
+    endResetModel();
+    emit minYChanged(scratchCurve.getMinY());
+}
+
+void CurveModel::setMaxX(double value) {
+    if (value == maxX())//todo: epsilon?
+        return;
+    beginResetModel();//todo: replace with something smarter, maybe we can easily reset just the points on one side
+    scratchCurve.setMaxX(value);
+    endResetModel();
+    emit maxXChanged(scratchCurve.getMaxX());
+}
+
+void CurveModel::setMaxY(double value) {
+    if (value == maxY())//todo: epsilon?
+        return;
+    beginResetModel();//todo: replace with something smarter, maybe we can easily reset just the points on one side
+    scratchCurve.setMaxY(value);
+    endResetModel();
+    emit maxYChanged(scratchCurve.getMaxY());
+}
+
+
 
 

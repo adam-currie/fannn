@@ -48,12 +48,10 @@ class CurveModel : public QAbstractListModel {
         double maxX() const { return scratchCurve.getMaxX(); }
         double maxY() const { return scratchCurve.getMaxY(); }
 
-        void setMinX(double value) { scratchCurve.setMinX(value); }
-        void setMinY(double value) { scratchCurve.setMinY(value); }
-        void setMaxX(double value) { scratchCurve.setMaxX(value); }
-        void setMaxY(double value) { scratchCurve.setMaxY(value); }
-
-
+        void setMinX(double value);
+        void setMinY(double value);
+        void setMaxX(double value);
+        void setMaxY(double value);
 
         Fannn::Curve const & getCurve() const { return scratchCurve; }
 
