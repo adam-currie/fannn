@@ -133,7 +133,7 @@ bool CurveModel::rename(QString newName) {
 }
 
 void CurveModel::setMinX(double value) {
-    if (value == minX())//todo: epsilon?
+    if (value == minX())
         return;
     beginResetModel();//todo: replace with something smarter, maybe we can easily reset just the points on one side
     scratchCurve.setMinX(value);
@@ -142,7 +142,7 @@ void CurveModel::setMinX(double value) {
 }
 
 void CurveModel::setMinY(double value) {
-    if (value == minY())//todo: epsilon?
+    if (value == minY())
         return;
     beginResetModel();//todo: replace with something smarter, maybe we can easily reset just the points on one side
     scratchCurve.setMinY(value);
@@ -151,7 +151,7 @@ void CurveModel::setMinY(double value) {
 }
 
 void CurveModel::setMaxX(double value) {
-    if (value == maxX())//todo: epsilon?
+    if (value == maxX())
         return;
     beginResetModel();//todo: replace with something smarter, maybe we can easily reset just the points on one side
     scratchCurve.setMaxX(value);
@@ -160,14 +160,10 @@ void CurveModel::setMaxX(double value) {
 }
 
 void CurveModel::setMaxY(double value) {
-    if (value == maxY())//todo: epsilon?
+    if (value == maxY())
         return;
     beginResetModel();//todo: replace with something smarter, maybe we can easily reset just the points on one side
     scratchCurve.setMaxY(value);
     endResetModel();
     emit maxYChanged(scratchCurve.getMaxY());
 }
-
-
-
-
