@@ -152,8 +152,8 @@ SpacedGridDelegate {
                     required property int index
                     required property var _point
 
-                    property real chartPointX: (_point.x * dlgChart.plotArea.width / curve.maxX) + dlgChart.plotArea.x
-                    property real chartPointY: dlgChart.plotArea.height - (_point.y * dlgChart.plotArea.height / curve.maxY) + dlgChart.plotArea.y
+                    property real chartPointX: ((_point.x-curve.minX) * dlgChart.plotArea.width / (curve.maxX-curve.minX)) + dlgChart.plotArea.x
+                    property real chartPointY: dlgChart.plotArea.height - ((_point.y-curve.minY) * dlgChart.plotArea.height / (curve.maxY-curve.minY)) + dlgChart.plotArea.y
 
                     radius: 9
                     width: radius * 2
