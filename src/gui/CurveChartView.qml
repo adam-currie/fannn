@@ -6,6 +6,7 @@ import Fannn
 
 ChartView {
     required property var curve
+    property int ticks: 11
 
     margins.top: 0
     margins.left: 0
@@ -28,7 +29,8 @@ ChartView {
         labelsColor: "white"//todo: not sure why Material.foreground doesn't work
         min: curve.minX
         max: curve.maxX
-        tickCount: 5
+        tickCount: ticks
+        labelsFont.bold: true
     }
 
     ValueAxis {
@@ -36,7 +38,8 @@ ChartView {
         labelsColor: "white"//todo: not sure why Material.foreground doesn't work
         min: curve.minY
         max: curve.maxY
-        tickCount: 5
+        tickCount: ticks
+        labelsFont.bold: true
     }
 
     LineSeries {

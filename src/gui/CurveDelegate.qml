@@ -283,6 +283,7 @@ SpacedGridDelegate {
             anchors.bottom: parent.bottom
             anchors.right: parent.right
             anchors.left: parent.left
+            ticks: 5
 
             MouseArea {
                 anchors.fill: parent
