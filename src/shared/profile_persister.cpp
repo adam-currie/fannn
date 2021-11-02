@@ -53,6 +53,28 @@ void serialize(nlohmann::ordered_json& j, std::vector<Governor> const & governor
     j["governors"] = list;
 }
 
+void serialize(nlohmann::ordered_json& j, std::vector<Curve> const & curves) {
+    nlohmann::json list;
+    for (auto const & c : curves) {
+        nlohmann::json pointList;
+        for (auto const & p : c.getPoints()) {
+            pointList.push_back({
+                {"x", p.x},
+                {"y", p.y}
+            });
+        }
+        list.push_back({
+            {"name", c.name},
+            {"minX", c.getMinX()},
+            {"maxX", c.getMaxX()},
+            {"minY", c.getMinY()},
+            {"maxY", c.getMaxY()},
+            {"points", pointList}
+        });
+    }
+    j["curves"] = list;
+}
+
 ProfilePersister::ProfilePersister(string name)
     : scratch({name, Profile()}) {}
 
@@ -134,6 +156,18 @@ void ProfilePersister::load() {
     for (auto const & g : j["governors"])
         scratch.profile.addGovernor(Fannn::Governor(g["name"], g["exp"]),a,b);
 
+    for (auto const & c : j["curves"]){
+        Fannn::Curve curve;
+        vector<Fannn::Curve::Point> points;
+        for (auto const & p : c["points"])
+            points.push_back({p["x"], p["y"]});
+        curve.name = c["name"];
+        curve.setDomain(c["minX"], c["maxX"]);
+        curve.setRange(c["minY"], c["maxY"]);
+        curve.setPoints(points);
+        scratch.profile.addCurve(curve);
+    }
+
     lastPersistanceSynced = scratch;
 }
 
@@ -143,6 +177,7 @@ void ProfilePersister::save() {
     j["updateIntervalMs"] = scratch.profile.getUpdateInterval();
     serialize(j, scratch.profile.getSensorAliases());
     serialize(j, scratch.profile.getGovernors());
+    serialize(j, scratch.profile.getCurves());
 
     (AtomicFileWriter(USER_CONFIG_FILE_DIR + scratch.name) << j.dump(4))
         .atomicWrite();
