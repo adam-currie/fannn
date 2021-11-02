@@ -49,10 +49,11 @@ void CurveModel::pushChanges() {
 }
 
 void CurveModel::discardChanges() {
-    bool minXDiff = scratchCurve.getMinX() == scratchCurve.getMinX();
-    bool maxXDiff = scratchCurve.getMaxX() == scratchCurve.getMaxX();
-    bool minYDiff = scratchCurve.getMinY() == scratchCurve.getMinY();
-    bool maxYDiff = scratchCurve.getMaxY() == scratchCurve.getMaxY();
+    bool minXDiff = scratchCurve.getMinX() != pushedCurve.getMinX();
+    bool maxXDiff = scratchCurve.getMaxX() != pushedCurve.getMaxX();
+    bool minYDiff = scratchCurve.getMinY() != pushedCurve.getMinY();
+    bool maxYDiff = scratchCurve.getMaxY() != pushedCurve.getMaxY();
+    bool nameDiff = scratchCurve.name != pushedCurve.name;
     beginResetModel();
     scratchCurve = pushedCurve;
     endResetModel();
@@ -60,6 +61,7 @@ void CurveModel::discardChanges() {
     if (maxXDiff) emit maxXChanged(maxX());
     if (minYDiff) emit minYChanged(minY());
     if (maxYDiff) emit maxYChanged(maxY());
+    if (nameDiff) emit nameChanged(QString::fromStdString(scratchCurve.name));
 }
 
 void CurveModel::beginMovePoint(int row) {
