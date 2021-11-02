@@ -70,7 +70,7 @@ SpacedGridDelegate {
 
             TextArea {
                 id: expTextArea
-                padding: nameField.padding
+                leftPadding: nameField.leftPadding
                 wrapMode: TextEdit.Wrap//todo: wrap on more charecters(example: sensor1+sensor2 should wrap at '+')
                 onTextChanged: governors.setExpression(index, text)
                 selectByMouse: true
@@ -91,18 +91,22 @@ SpacedGridDelegate {
         ScrollView {
             id: errorBox
             anchors.bottom: parent.bottom
-            anchors.margins: nameField.padding
             anchors.topMargin: 0
+            topPadding: -3
             width: parent.width
-            height: 26
+            height: 30
             contentWidth: availableWidth
+            contentHeight: warning.height
             Warning {
+                id: warning
+                anchors.top: parent.top
                 anchors.left: parent.left
                 anchors.right: parent.right
+                leftPadding: nameField.leftPadding
                 wrapMode: TextEdit.Wrap
                 verticalAlignment: Text.AlignVCenter
                 lineHeight: .666
-                text: errorStr
+                text: errorStr//debug errorStr
             }
         }
     }

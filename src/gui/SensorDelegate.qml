@@ -61,7 +61,7 @@ SpacedGridDelegate {
         anchors.left: parent.left
         anchors.top: aliasOrNameText.bottom
         anchors.margins: 4
-        anchors.leftMargin: aliasOrNameText.padding
+        anchors.leftMargin: aliasOrNameText.leftPadding
         text: top._alias? top.name : ""
         visible: text !== ""? true : false
         height: visible? contentHeight : 0
@@ -73,7 +73,7 @@ SpacedGridDelegate {
         anchors.top: nameText.bottom
         anchors.left: parent.left
         anchors.margins: 4
-        anchors.leftMargin: aliasOrNameText.padding
+        anchors.leftMargin: aliasOrNameText.leftPadding
         id: valueText
         color: Material.foreground
         text: "value: " + top.value
