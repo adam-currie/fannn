@@ -20,35 +20,114 @@ SpacedGridDelegate {
         height: Math.min(700, parent.height)
         x: (parent.width-width)/2
         y: (parent.height-height)/2
+        rightPadding: 40
+        leftPadding: 40
         modal: true
         standardButtons: Dialog.NoButton
 
-        SSoftValidatedField {
-            id: dlgNameField
-            validator: IdentifierValidator {}
+        Item {
+            id: dlgName
             anchors.top: parent.top
             anchors.left: parent.left
-            width: Math.max(200, contentWidth + 20)
-            text: curve.name
+            anchors.right: minMaxLayout.left
+            anchors.leftMargin: 4
+            height: dlgNameField.height
+            SSoftValidatedField {
+                id: dlgNameField
+                validator: IdentifierValidator {}
+                anchors.left: parent.left
+                anchors.top: parent.top
+                width: Math.min(Math.max(150, contentWidth + rightPadding + leftPadding + 2), parent.width)
+                text: curve.name
 
-            function set(value) {
-                if (!text)
-                    return "name cannot be empty"
-                if (!curve.rename(text))
-                    return "name already used"
-                return ""
+                function set(value) {
+                    if (!text)
+                        return "name cannot be empty"
+                    if (!curve.rename(text))
+                        return "name already used"
+                    return ""
+                }
             }
         }
-
-        Label {
+        Row {
+            id: minMaxLayout
             anchors.right: parent.right
-            text: "max y"
+            anchors.bottom: dlgName.bottom
+            anchors.rightMargin: 6
+            spacing: 5
+            property int fieldWidth: 45
+            property int spaceAboveLine: 2
+            IntValidator  {
+                id: validator
+                bottom: -9999
+                top: 9999
+            }
+            Label {
+                text: "x:"
+                height: parent.height
+                leftPadding: 14
+                horizontalAlignment: TextInput.AlignRight
+                verticalAlignment: TextInput.AlignVCenter
+            }
+            STextField {
+                text: "0"
+                width: minMaxLayout.fieldWidth
+                spaceAboveLine: minMaxLayout.spaceAboveLine
+                leftPadding: 1
+                rightPadding: 1
+                horizontalAlignment: TextInput.AlignHCenter
+                validator: validator
+            }
+            Label {
+                text: "-"
+                height: parent.height
+                verticalAlignment: TextInput.AlignVCenter
+            }
+            STextField {
+                text: "100"
+                width: minMaxLayout.fieldWidth
+                spaceAboveLine: minMaxLayout.spaceAboveLine
+                leftPadding: 1
+                rightPadding: 1
+                horizontalAlignment: TextInput.AlignHCenter
+                validator: validator
+            }
+            Label {
+                text: "y:"
+                height: parent.height
+                leftPadding: 14
+                horizontalAlignment: TextInput.AlignRight
+                verticalAlignment: TextInput.AlignVCenter
+            }
+            STextField {
+                text: "0"
+                width: minMaxLayout.fieldWidth
+                spaceAboveLine: minMaxLayout.spaceAboveLine
+                leftPadding: 1
+                rightPadding: 1
+                horizontalAlignment: TextInput.AlignHCenter
+                validator: validator
+            }
+            Label {
+                text: "-"
+                height: parent.height
+                verticalAlignment: TextInput.AlignVCenter
+            }
+            STextField {
+                text: "100"
+                width: minMaxLayout.fieldWidth
+                spaceAboveLine: minMaxLayout.spaceAboveLine
+                leftPadding: 1
+                rightPadding: 1
+                horizontalAlignment: TextInput.AlignHCenter
+                validator: validator
+            }
         }
 
         CurveChartView {
             id: dlgChart
             curve: top.curve
-            anchors.top: dlgNameField.bottom
+            anchors.top: dlgName.bottom
             anchors.bottom: parent.bottom
             anchors.right: parent.right
             anchors.left: parent.left
@@ -64,7 +143,7 @@ SpacedGridDelegate {
                     property real chartPointX: (_point.x * dlgChart.plotArea.width / 100) + dlgChart.plotArea.x //todo: less magic
                     property real chartPointY: dlgChart.plotArea.height - (_point.y * dlgChart.plotArea.height / 100) + dlgChart.plotArea.y //todo: less magic
 
-                    radius: 10
+                    radius: 9
                     width: radius * 2
                     height: radius * 2
                     color: "orange"//todo
@@ -74,8 +153,8 @@ SpacedGridDelegate {
                     Item {
                         id: handle
                         parent: dlgChart
-                        width: indicator.width
-                        height: indicator.height
+                        width: indicator.width * 1.15
+                        height: indicator.height * 1.15
 
                         Binding {
                             target: handle
@@ -200,10 +279,6 @@ SpacedGridDelegate {
             anchors.bottom: parent.bottom
             anchors.right: parent.right
             anchors.left: parent.left
-            margins.top: 0
-            margins.left: 0
-            margins.right: 0
-            margins.bottom: 0
 
             MouseArea {
                 anchors.fill: parent
