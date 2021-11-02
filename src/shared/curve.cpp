@@ -121,7 +121,8 @@ void Curve::chopTopAndBottom(vector<Point>& points) {
 }
 
 void Curve::setDomain(double minX, double maxX) {
-    if (minX > maxX) throw out_of_range("minX > maxX");
+    if (maxX - minX < MIN_SPAN)
+        maxX = minX + MIN_SPAN;
 
     bool shrinkingLeft = this->minX < minX;
     bool shrinkingRight = this->maxX > maxX;
@@ -134,7 +135,8 @@ void Curve::setDomain(double minX, double maxX) {
 }
 
 void Curve::setRange(double minY, double maxY) {
-    if (minY > maxY) throw out_of_range("minY > maxY");
+    if (maxY - minY < MIN_SPAN)
+        maxY = minY + MIN_SPAN;
 
     bool shrinkingBottom = this->minY < minY;
     bool shrinkingTop = this->maxY > maxY;
@@ -204,26 +206,26 @@ double Curve::getY(double x) const {
 }
 
 void Curve::setMinX(double minX) {
-    if (minX > maxX)
-        minX = maxX;
+    if (maxX - minX < MIN_SPAN)
+        minX = maxX - MIN_SPAN;
     setDomain(minX, maxX);
 }
 
 void Curve::setMaxX(double maxX) {
-    if (minX > maxX)
-        maxX = minX;
+    if (maxX - minX < MIN_SPAN)
+        maxX = minX + MIN_SPAN;
     setDomain(minX, maxX);
 }
 
 void Curve::setMinY(double minY) {
-    if (minY > maxY)
-        minY = maxY;
+    if (maxY - minY < MIN_SPAN)
+        minY = maxY - MIN_SPAN;
     setRange(minY, maxY);
 }
 
 void Curve::setMaxY(double maxY) {
-    if (minY > maxY)
-        maxY = minY;
+    if (maxY - minY < MIN_SPAN)
+        maxY = minY + MIN_SPAN;
     setRange(minY, maxY);
 }
 

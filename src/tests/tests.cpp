@@ -31,9 +31,6 @@ TEST_CASE("sysfs_pwm_writer_test"){
 TEST_CASE("curve_gety_test"){
     Curve c;
 
-    REQUIRE_THROWS_AS( c.setDomain(101, 100), typeof(out_of_range) );
-    REQUIRE_THROWS_AS( c.setRange(101, 100), typeof(out_of_range) );
-
     c.setPoints({
         {0,0},
         {10,5}

@@ -13,6 +13,7 @@ namespace Fannn {
                 bool operator==(const Point&) const = default;
             } Point;
 
+            static constexpr double MIN_SPAN = 1;
         private:
             double minX=0;
             double maxX=100;
