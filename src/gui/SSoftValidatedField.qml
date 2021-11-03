@@ -36,6 +36,7 @@ STextField {
             if (err) {
                 text = _prevText
             }
+            field.select(0,0)
         }
 
         _prevText = text

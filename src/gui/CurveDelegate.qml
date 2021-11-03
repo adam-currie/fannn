@@ -23,15 +23,37 @@ SpacedGridDelegate {
         rightPadding: 40
         leftPadding: 40
         modal: true
-        closePolicy: Dialog.NoAutoClose
-        standardButtons: Dialog.Ok | Dialog.Cancel
-
-        Component.onCompleted: {
-            curveEditorDlg.standardButton(Dialog.Ok).text = "Accept"
-        }
+        closePolicy: curve.needsPush ? Dialog.NoAutoClose : (Dialog.CloseOnPressOutside | Dialog.CloseOnEscape)
 
         onAccepted: curve.pushChanges()
         onRejected: curve.discardChanges()
+
+        //need to use our own buttons because DialogButtonBox doesnt work well with dynamic buttons
+        Row {
+            id: bottomButtons
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+            anchors.rightMargin: 6
+            spacing: 5
+            Button {
+                text: "Close"
+                flat: true
+                visible: !curve.needsPush
+                onClicked: curveEditorDlg.close()
+            }
+            Button {
+                text: "Cancel"
+                flat: true
+                visible: curve.needsPush
+                onClicked: curveEditorDlg.reject()
+            }
+            Button {
+                text: "Accept"
+                flat: true
+                visible: curve.needsPush
+                onClicked: curveEditorDlg.accept()
+            }
+        }
 
         Item {
             id: dlgName
@@ -49,11 +71,15 @@ SpacedGridDelegate {
                 text: curve.name
 
                 function set(value) {
-                    if (!text)
+                    if (!value) {
                         return "name cannot be empty"
-                    if (!curve.rename(text))
+                    } else if (value === curve.name) {
+                        return ""
+                    } else if (curve.rename(value)) {
+                        return ""
+                    } else {
                         return "name already used"
-                    return ""
+                    }
                 }
             }
         }
@@ -71,7 +97,7 @@ SpacedGridDelegate {
                 top: 9999
             }
             Label {
-                text: "x:"
+                text: "x:" + curve.needsPush
                 height: parent.height
                 leftPadding: 14
                 horizontalAlignment: TextInput.AlignRight
@@ -140,7 +166,7 @@ SpacedGridDelegate {
             id: dlgChart
             curve: top.curve
             anchors.top: dlgName.bottom
-            anchors.bottom: parent.bottom
+            anchors.bottom: bottomButtons.top
             anchors.right: parent.right
             anchors.left: parent.left
 
@@ -262,12 +288,16 @@ SpacedGridDelegate {
             text: curve.name
 
             function set(value) {
-                if (!text)
+                if (!value) {
                     return "name cannot be empty"
-                if (!curve.rename(text))
+                } else if (value === curve.name) {
+                    return ""
+                } else if (curve.rename(value)) {
+                    curve.pushChanges()
+                    return ""
+                } else {
                     return "name already used"
-                curve.pushChanges()
-                return ""
+                }
             }
 
             Button {

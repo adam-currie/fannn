@@ -46,6 +46,7 @@ int CurveModel::rowCount(const QModelIndex &parent) const {
 void CurveModel::pushChanges() {
     owner->pushChanges(this);
     pushedCurve = scratchCurve;
+    setNeedsPush(false);
 }
 
 void CurveModel::discardChanges() {
@@ -57,6 +58,7 @@ void CurveModel::discardChanges() {
     beginResetModel();
     scratchCurve = pushedCurve;
     endResetModel();
+    setNeedsPush(false);
     if (minXDiff) emit minXChanged(minX());
     if (maxXDiff) emit maxXChanged(maxX());
     if (minYDiff) emit minYChanged(minY());
@@ -76,14 +78,19 @@ void CurveModel::beginMovePoint(int row) {
 void CurveModel::movePoint(QPointF p) {
     if (_movingPointIndex == -1)
         throw logic_error("no move operation started, you need to call beginMovePoint first");
-    scratchCurve.updatePoint(_movingPointIndex, {p.x(), p.y()});
-    emit dataChanged(index(_movingPointIndex,0), index(_movingPointIndex,1), {PointRole});
+    if ( scratchCurve.updatePoint(_movingPointIndex, {p.x(), p.y()}) ) {
+        emit dataChanged(index(_movingPointIndex,0), index(_movingPointIndex,1), {PointRole});
+        setNeedsPush(true);
+        //not checking if needs change is false cause it's too slow,
+        //will check in end move point
+    }
 }
 
 void CurveModel::removePoint(int index) {
     beginRemoveRows(QModelIndex(), index, index);
     scratchCurve.removePoint(index);
     endRemoveRows();
+    setNeedsPush(scratchCurve != pushedCurve);
 }
 
 int CurveModel::addPoint(QPointF p) {
@@ -94,6 +101,9 @@ int CurveModel::addPoint(QPointF p) {
     beginInsertRows(QModelIndex(), newIndex, newIndex);
     scratchCurve = tempCurve;
     endInsertRows();
+
+    setNeedsPush(scratchCurve != pushedCurve);
+
     return newIndex;
 }
 
@@ -118,18 +128,25 @@ void CurveModel::endMovePoint(){
         endRemoveRows();
     }
 
+    //checking here instead of in movePoint cause it's slow
+    setNeedsPush(scratchCurve != pushedCurve);
+
     _movingPointIndex = -1;
 }
 
 bool CurveModel::rename(QString newName) {
     std::string s = newName.toStdString();
 
-    if (s == pushedCurve.name || !owner->checkNameInUse(s)) {
+    bool sameAsPushed = s == pushedCurve.name;
+    bool changing = s != scratchCurve.name &&
+                    (sameAsPushed || !owner->checkNameInUse(s));
+
+    if (changing) {
         scratchCurve.name = s;
-        return true;
-    } else {
-        return false;
+        setNeedsPush(sameAsPushed ? true : scratchCurve != pushedCurve);
     }
+
+    return changing;
 }
 
 void CurveModel::setMinX(double value) {
@@ -138,7 +155,13 @@ void CurveModel::setMinX(double value) {
     beginResetModel();//todo: replace with something smarter, maybe we can easily reset just the points on one side
     scratchCurve.setMinX(value);
     endResetModel();
-    emit minXChanged(scratchCurve.getMinX());
+
+    if (scratchCurve.getMinX() != pushedCurve.getMinX()) {
+        emit minXChanged(scratchCurve.getMinX());
+        setNeedsPush(true);
+    } else {
+        setNeedsPush(scratchCurve != pushedCurve);
+    }
 }
 
 void CurveModel::setMinY(double value) {
@@ -147,7 +170,13 @@ void CurveModel::setMinY(double value) {
     beginResetModel();//todo: replace with something smarter, maybe we can easily reset just the points on one side
     scratchCurve.setMinY(value);
     endResetModel();
-    emit minYChanged(scratchCurve.getMinY());
+
+    if (scratchCurve.getMinY() != pushedCurve.getMinY()) {
+        emit minYChanged(scratchCurve.getMinY());
+        setNeedsPush(true);
+    } else {
+        setNeedsPush(scratchCurve != pushedCurve);
+    }
 }
 
 void CurveModel::setMaxX(double value) {
@@ -156,7 +185,13 @@ void CurveModel::setMaxX(double value) {
     beginResetModel();//todo: replace with something smarter, maybe we can easily reset just the points on one side
     scratchCurve.setMaxX(value);
     endResetModel();
-    emit maxXChanged(scratchCurve.getMaxX());
+
+    if (scratchCurve.getMaxX() != pushedCurve.getMaxX()) {
+        emit maxXChanged(scratchCurve.getMaxX());
+        setNeedsPush(true);
+    } else {
+        setNeedsPush(scratchCurve != pushedCurve);
+    }
 }
 
 void CurveModel::setMaxY(double value) {
@@ -165,5 +200,11 @@ void CurveModel::setMaxY(double value) {
     beginResetModel();//todo: replace with something smarter, maybe we can easily reset just the points on one side
     scratchCurve.setMaxY(value);
     endResetModel();
-    emit maxYChanged(scratchCurve.getMaxY());
+
+    if (scratchCurve.getMaxY() != pushedCurve.getMaxY()) {
+        emit maxYChanged(scratchCurve.getMaxY());
+        setNeedsPush(true);
+    } else {
+        setNeedsPush(scratchCurve != pushedCurve);
+    }
 }

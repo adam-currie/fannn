@@ -12,6 +12,8 @@ TextField {
     rightPadding: 5
     selectByMouse: true
 
+    implicitWidth: contentWidth + rightPadding + leftPadding + 2
+
     onActiveFocusChanged: {
         if (!activeFocus) select(0,0)
     }

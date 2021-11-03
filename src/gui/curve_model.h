@@ -18,6 +18,15 @@ class CurveModel : public QAbstractListModel {
     Q_PROPERTY(qreal maxX READ maxX WRITE setMaxX NOTIFY maxXChanged)
     Q_PROPERTY(qreal maxY READ maxY WRITE setMaxY NOTIFY maxYChanged)
     Q_PROPERTY(int movingPointIndex MEMBER _movingPointIndex NOTIFY movingPointIndexChanged)
+    Q_PROPERTY(bool needsPush READ needsPush NOTIFY needsPushChanged)
+
+    bool __needsPush;
+    void setNeedsPush(bool needsPush) {
+        if (needsPush != __needsPush) {
+            __needsPush = needsPush;
+            emit needsPushChanged(needsPush);
+        }
+    }
 
     enum Roles {
         PointRole = Qt::UserRole + 1
@@ -42,7 +51,11 @@ class CurveModel : public QAbstractListModel {
             return 2;
         }
 
-        QString name() const { return QString::fromStdString(scratchCurve.name); }
+        bool needsPush() const { return __needsPush; }
+
+        QString name() const {
+            return QString::fromStdString(scratchCurve.name);
+        }
         double minX() const { return scratchCurve.getMinX(); }
         double minY() const { return scratchCurve.getMinY(); }
         double maxX() const { return scratchCurve.getMaxX(); }
@@ -73,6 +86,7 @@ class CurveModel : public QAbstractListModel {
         Q_INVOKABLE void endMovePoint();
 
     signals:
+        void needsPushChanged(bool value);
         void movingPointIndexChanged(int value);
         void nameChanged(QString value);
         void minXChanged(double value);

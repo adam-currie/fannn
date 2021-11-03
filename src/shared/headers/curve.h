@@ -10,6 +10,7 @@ namespace Fannn {
         public:
             typedef struct Point {
                 double x, y;
+                Point(double x, double y) : x(x), y(y) {}
                 bool operator==(const Point&) const = default;
             } Point;
 
@@ -97,7 +98,7 @@ namespace Fannn {
             void setPoints(std::vector<Point> const & points);
             //returns the new index of the point
             int addPoint(Point point);
-            void updatePoint(int index, Point point);
+            bool updatePoint(int index, Point point);
             void removePoints(int first, int last);
             void removePoint(int index);
 

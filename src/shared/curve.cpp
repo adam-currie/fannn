@@ -157,12 +157,18 @@ int Curve::addPoint(Point point) {
     return sortedInsert(points, point);
 }
 
-void Curve::updatePoint(int index, Point point) {
+bool Curve::updatePoint(int index, Point point) {
     point.x = clamp(point.x,
                     index>0? points[index-1].x : minX,
                     (index<points.size()-1)? points[index+1].x : maxX);
     point.y = clamp(point.y, minY, maxY);
-    points[index] = point;
+
+    if (points[index] != point) {
+        points[index] = point;
+        return true;
+    } else {
+        return false;
+    }
 }
 
 void Curve::removePoints(int first, int last) {
