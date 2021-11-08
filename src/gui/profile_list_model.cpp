@@ -26,13 +26,9 @@ int ProfileListModel::rowCount(const QModelIndex &parent) const {
 void ProfileListModel::loadProfileNames() {
     auto newNames = Fannn::ProfilePersister::getProfileNames();
     if (newNames != profileNames){
-        //need to use begin and end functions or the private signals wont fire
-        beginRemoveRows(QModelIndex(), 0, profileNames.size()-1);
-        profileNames.clear();
-        endRemoveRows();
-        beginInsertRows(QModelIndex(), 0, newNames.size()-1);
+        beginResetModel();
         profileNames = newNames;
-        endInsertRows();
+        endResetModel();
     }
 }
 
