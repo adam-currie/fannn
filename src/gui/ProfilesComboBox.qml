@@ -6,16 +6,14 @@ import Fannn
 
 ComboBox {
     id: combo
-    property var bonusWidth: 60
-    property var minWidth: 10
+    property real minWidth: 10
+    property real bonusWidth: 50
     property Item modalDlgParent: this
     property int _currentLoadedIndex: 0
 
-    popup.onAboutToHide: { minWidth = 10 }
-    width: Math.max(minWidth, contentItem.contentWidth + bonusWidth)
-
     Component.onCompleted: {
         if (count > 0) combo.model.loadProfile(currentValue)
+        combo.width = Math.max(contentItem.contentWidth, minWidth) + bonusWidth
     }
 
     function _loadCurrent() {
@@ -47,14 +45,18 @@ ComboBox {
 
     popup.onAboutToShow: {
         if (count === 0) return
-        var widest = 0
+        var widest = minWidth
         var originalCurrentIndex = currentIndex
         model.loadProfileNames()
         do {
           widest = Math.max(widest, contentItem.contentWidth)
           currentIndex = (currentIndex + 1) % count
         } while(currentIndex !== originalCurrentIndex)
-        minWidth = widest + bonusWidth
+        combo.width = widest + bonusWidth
+    }
+
+    popup.onAboutToHide: {
+        combo.width = Math.max(contentItem.contentWidth, minWidth) + bonusWidth
     }
 
     Connections {
