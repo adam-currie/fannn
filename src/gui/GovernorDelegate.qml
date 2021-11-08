@@ -79,6 +79,8 @@ SpacedGridDelegate {
                     id: errorHighlighter
                     document: expTextArea.textDocument
                 }
+
+                Component.onCompleted: errorHighlighter.formatErrors(errors)
                 Connections {
                     target: top
                     function onErrorsChanged() {
