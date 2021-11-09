@@ -7,14 +7,12 @@ Button {
     required property var model
     property string noneText: "none"
     property string textRole
-    readonly property alias currentText: control._currentText
     property int currentIndex: -1
-    property bool lostOurCurrentItemWaitingForChange: false
-
-    property string _currentText:
+    readonly property string currentText:
         (currentIndex === -1) ?
             noneText :
             delegateModel.items.get(currentIndex).model[textRole]
+
 
     id: control
     flat: true
@@ -41,10 +39,6 @@ Button {
                                    : (control.hovered ? control.Material.primaryTextColor : control.Material.hintTextColor)
     }
 
-    onCurrentIndexChanged: {
-        lostOurCurrentItemWaitingForChange = false
-    }
-
     DelegateModel {
         // just here to give us easy access to data
         id: delegateModel
@@ -59,7 +53,7 @@ Button {
         source: "qrc:/qt-project.org/imports/QtQuick/Controls/Material/images/drop-indicator.png"
     }
 
-    text: _currentText
+    text: currentText
 
     onClicked: {
         if (dropDown.closedForAtLeastOneUpdate)
