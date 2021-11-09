@@ -216,7 +216,8 @@ ApplicationWindow {
                     SpacedGridView {
                         interactive: false
                         width: parent.width
-                        minCellWidth: 200
+                        minCellWidth: 220
+                        cellHeight: 140
                         delegate: SensorDelegate {
                             sensors: sensorsModel
                         }
