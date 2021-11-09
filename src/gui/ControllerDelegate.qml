@@ -48,10 +48,16 @@ SpacedGridDelegate {
             anchors.right: parent.right //todo: Math.min(size_to_content, size_to_parent)
             anchors.topMargin: 18
             anchors.margins: 6
-
             width: Math.min(implicitWidth, parent.width - (anchors.rightMargin + anchors.rightMargin))
             model: governors
 
+            onCurrentTextChanged: {
+                if (govNameBox.currentIndex >= 0) {
+                    controllers.setGovernor(index, govNameBox.currentText);
+                } else {
+                    controllers.removeGovernor(index);
+                }
+            }
         }
     }
 }
