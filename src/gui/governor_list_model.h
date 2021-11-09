@@ -40,7 +40,7 @@ class GovernorListModel : public QAbstractListModel {
             return rolesHash;
         }
         GovernorListModel(QObject *parent = nullptr);
-        QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+        QVariant data(const QModelIndex &index, int role = NameRole) const override;
         Qt::ItemFlags flags(const QModelIndex &index) const override;
         int rowCount(const QModelIndex &parent = QModelIndex()) const override;
 
