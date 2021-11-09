@@ -8,11 +8,10 @@
 #include <map>
 #include <iomanip>
 #include <cmath>
+#include "id_builder.h"
 
 using namespace std;
 using namespace Fannn;
-
-const char IDSTR_DELIM = '\\';
 
 static atomic<LmSensorsReader*> instance(nullptr);
 
@@ -25,46 +24,6 @@ struct SensorData {
 class LmSensorsReader::Impl {
     public:
         map<string, SensorData> sensorMap = map<string, SensorData>();
-};
-
-class idStrBuilder {
-    ostringstream out;
-    char delim, escape;
-    bool hasData = false;
-    public:
-        idStrBuilder(char delim) : delim(delim) {}
-        idStrBuilder& operator<<(string s) {
-            if (s.empty())
-                return *this;
-
-            if (hasData) {
-                //add delim between strings
-                out << delim;
-            } else {
-                //no delim needed before first string, next time though
-                hasData = true;
-            }
-
-            for (auto const & c : s)
-                if (!isspace(c))
-                    out << c;
-
-            return *this;
-        }
-        idStrBuilder& operator<<(int n) {
-            static const char digits[] = {'0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'};
-
-            //convert to base 16,
-            int digitCount = (31 - __builtin_clz(n))/4 + 1;
-            string s(digitCount, 0);
-            for(int i = digitCount-1; i>=0; i--) {
-                s[i] = digits[n%16];
-                n /= 16;
-            }
-
-            return *this << s;
-        }
-        string get() { return out.str(); }
 };
 
 LmSensorsReader::LmSensorsReader() : pImpl{std::make_unique<Impl>()} {
@@ -87,7 +46,7 @@ LmSensorsReader::LmSensorsReader() : pImpl{std::make_unique<Impl>()} {
         while ((feature = sensors_get_features(chip, &nextFeature)) != 0) {
             string featureLabel = sensors_get_label(chip, feature);
             SensorData data(*chip, feature->first_subfeature);
-            idStrBuilder idBuilder(IDSTR_DELIM);
+            IdBuilder idBuilder;
             idBuilder << chip->prefix << chip->addr << featureLabel;
             pImpl->sensorMap.insert({idBuilder.get(), data});//todo: deal with dups
             //debug

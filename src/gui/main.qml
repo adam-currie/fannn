@@ -58,6 +58,11 @@ ApplicationWindow {
         profile: profilesModel.currentProfile
     }
 
+    ControllerListModel {
+        id: controllersModel
+        profile: profilesModel.currentProfile
+    }
+
     Settings {
         id: settings
     }
@@ -271,6 +276,23 @@ ApplicationWindow {
                             x: y
                             onClicked: governorsModel.add()
                         }
+                    }
+                }
+                Collapsible {
+                    width: parent.width
+                    title: "Controllers"
+                    SpacedGridView {
+                        id: controllerGrid
+                        interactive: false
+                        width: parent.width
+                        minCellWidth: 250
+                        cellHeight: 165
+                        delegate: ControllerDelegate {
+                            controllers: controllersModel
+                            governors: governorsModel
+                            everythingItem: mainPage
+                        }
+                        model: controllersModel
                     }
                 }
             }

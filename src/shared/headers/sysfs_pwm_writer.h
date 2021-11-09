@@ -1,14 +1,18 @@
 #pragma once
 
 #include "i_device_writer.h"
+#include <vector>
 
 namespace Fannn {
 
-    class SysfsPwmWriter : IDeviceWriter{
+    class SysfsPwmWriter : public IDeviceWriter{
+        std::vector<std::string> ids;
         public:
             SysfsPwmWriter();
-            std::vector<std::string> getAll() override;
-            void setValue(std::string deviceId, int value) override;
+            std::vector<std::string> const & getAll() const override {
+                return ids;
+            }
+            void setValue(std::string deviceId, double value) override;
     };
     
 }

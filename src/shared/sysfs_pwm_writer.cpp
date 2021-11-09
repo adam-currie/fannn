@@ -5,7 +5,7 @@
 #include <filesystem>
 #include <regex>
 
-#define HWMON_ROOT "/sys"
+#define HWMON_ROOT "/sys/devices/platform"
 
 using namespace std;
 using namespace Fannn;
@@ -17,9 +17,19 @@ using perms = std::filesystem::perms;
 
 const regex PWM_REGEX("pwm[0-9]+");
 
-SysfsPwmWriter::SysfsPwmWriter(){}
+SysfsPwmWriter::SysfsPwmWriter(){
+    for(directory_entry entry : recursive_directory_iterator(HWMON_ROOT, directory_options::skip_permission_denied)){
+        string fileStr = entry.path().filename();
+        if(
+            regex_match(fileStr, PWM_REGEX) && //regex first was fastest in a quick/dirty test
+            !entry.is_directory() &&
+            (entry.status().permissions() & perms::owner_write) != perms::none){
+                ids.push_back(entry.path());
+        }
+    }
+}
 
-void SysfsPwmWriter::setValue(string deviceId, int value){
+void SysfsPwmWriter::setValue(string deviceId, double value){
     /*
         todo: might need to enable pwm here and then reset to the original value in a destructor, see:
         https://github.com/lm-sensors/lm-sensors/blob/master/prog/pwm/fancontrol
@@ -27,20 +37,4 @@ void SysfsPwmWriter::setValue(string deviceId, int value){
    ofstream out(deviceId, std::ofstream::trunc);
    out << value;
    out.close();
-}
-
-vector<string> SysfsPwmWriter::getAll(){
-    vector<string> all = vector<string>();
-
-    for(directory_entry entry : recursive_directory_iterator(HWMON_ROOT, directory_options::skip_permission_denied)){
-        string fileStr = entry.path().filename(); 
-        if(
-            regex_match(fileStr, PWM_REGEX) && //regex first was fastest in a quick/dirty test
-            !entry.is_directory() &&
-            (entry.status().permissions() & perms::owner_write) != perms::none){
-                all.push_back(fileStr);
-        }
-    }
-
-    return all;
 }

@@ -9,8 +9,10 @@ add_library(fannn-shared SHARED
     profile_engine.cpp
     profile_persister.cpp
     composite_sensor_reader.cpp
+    composite_device_writer.cpp
     profile.cpp
     curve.cpp
+    id_builder.cpp
 )
 
 set_property(TARGET fannn-shared PROPERTY POSITION_INDEPENDENT_CODE ON)
