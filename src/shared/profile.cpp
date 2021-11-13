@@ -3,10 +3,18 @@
 using namespace Fannn;
 using namespace std;
 
-string Profile::getAliasForSensor(std::string sensorId) {
+string Profile::getAliasForSensor(std::string sensorId) const {
     for (auto const & a : sensorAliases) {
         if (a.id == sensorId)
             return a.alias;
+    }
+    return {};
+}
+
+string Profile::getGovernorForController(std::string controllerId) const {
+    for (auto const & c : controllers) {
+        if (c.id == controllerId)
+            return c.governorName;
     }
     return {};
 }
@@ -22,17 +30,28 @@ string Profile::removeAliasForSensor(std::string sensorId) {
 }
 
 bool Profile::hasIssues() const {
-    //check gov issues
+    //check governors
     for (const Fannn::Governor & g : governors)
         if (!g.getErrors().empty())
             return true;
 
-    //todo: more issues
+    //check controllers
+    for (const Controller & c : controllers) {
+        bool found = false;
+        for (const Governor & g : governors) {
+            if (g.name == c.governorName) {
+                found = true;
+                break;
+            }
+        }
+        if (!found)
+            return true;
+    }
 
     return false;
 }
 
-bool Profile::addOrUpdateSensorAlias(std::string sensorId, std::string alias, bool& govCollision, bool& aliasCollision) {
+bool Profile::setSensorAlias(std::string sensorId, std::string alias, bool& govCollision, bool& aliasCollision) {
     govCollision = aliasCollision = false;
 
     if (alias == "")//todo: check for illegal chars
@@ -176,5 +195,31 @@ bool Profile::updateCurve(int index, Curve newCurve, bool& nameCollision) {
 
     curves[index] = newCurve;
     return true;
+}
+
+bool Profile::setGovernorForController(std::string controllerId, std::string governorName){
+    for (int i=0; i<controllers.size(); ++i){
+        auto c = controllers[i];
+        if (c.id == controllerId) {
+            if (c.governorName == governorName)
+                return false;
+            c.governorName = governorName;
+            controllers[i] = c;
+            return true;
+        }
+    }
+
+    controllers.push_back({controllerId, governorName});
+    return true;
+}
+
+bool Profile::removeController(std::string controllerId){
+    for (auto it=controllers.begin(); it != controllers.end(); ++it) {
+        if (it->id == controllerId) {
+            controllers.erase(it);
+            return true;
+        }
+    }
+    return false;
 }
 

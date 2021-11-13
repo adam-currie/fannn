@@ -1,12 +1,14 @@
 #include "profile_model.h"
 #include "profile_persister.h"
 #include "composite_sensor_reader.h"
+#include "composite_device_writer.h"
 #include <string>
 #include <assert.h>
 
 using namespace std;
 
 using Fannn::CompositeSensorReader;
+using Fannn::CompositeDeviceWriter;
 
 ProfileModel::ProfileModel(QObject *parent, Fannn::ProfilePersister persister)
     : QAbstractItemModel(parent), persister(persister) {
@@ -56,7 +58,7 @@ ProfileModel::SensorAliasOrGovNameCollision ProfileModel::setSensorAlias(int ind
     bool govCollision, aliasCollision;
     bool success = persister
             .profile()
-            .addOrUpdateSensorAlias(
+            .setSensorAlias(
                 id,
                 alias.toStdString(),
                 govCollision,
@@ -69,6 +71,32 @@ ProfileModel::SensorAliasOrGovNameCollision ProfileModel::setSensorAlias(int ind
     } else {
         return govCollision ? CollidesWithGovernor : CollidesWithSensorAlias;
     }
+}
+
+bool ProfileModel::setGovernorForController(int index, string governorName) {
+    string id = CompositeDeviceWriter::instance().getAll().at(index);
+
+    bool success = persister
+            .profile()
+            .setGovernorForController(id, governorName);
+
+    if (success)
+        setUnsavedChanges(persister.unsavedChanges());
+
+    return success;
+}
+
+bool ProfileModel::removeController(int index) {
+    string id = CompositeDeviceWriter::instance().getAll().at(index);
+
+    bool success = persister
+            .profile()
+            .removeController(id);
+
+    if (success)
+        setUnsavedChanges(persister.unsavedChanges());
+
+    return success;
 }
 
 string ProfileModel::removeSensorAlias(int index) {

@@ -77,6 +77,10 @@ class ProfileModel : public QAbstractItemModel {
          */
         bool updateCurve(int index, Fannn::Curve curve);
 
+        //FOR CONTROLLERS MODEL todo: limit access somehow
+        bool setGovernorForController(int index, std::string governorName);
+        bool removeController(int index);
+
 
     signals:
         void updateIntervalMsChanged(int);

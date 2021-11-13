@@ -31,6 +31,18 @@ void ensureDirectoryStructure(string path){
         filesystem::create_directories(parent);
 }
 
+void serialize(nlohmann::ordered_json& j, vector<Profile::Controller> const & controllers) {
+    nlohmann::json list;
+    for (auto const & a : controllers) {
+        list.push_back({
+            {"id", a.id},
+            {"governor", a.governorName}
+        });
+    }
+    j["controllers"] = list;
+}
+
+
 void serialize(nlohmann::ordered_json& j, vector<Profile::Alias> const & aliases) {
     nlohmann::json list;
     for (auto const & a : aliases) {
@@ -150,7 +162,10 @@ void ProfilePersister::load() {
     scratch.profile.setUpdateInterval(j["updateIntervalMs"]);
 
     for (auto const & s : j["sensors"])
-        scratch.profile.addOrUpdateSensorAlias(s["id"], s["alias"]);
+        scratch.profile.setSensorAlias(s["id"], s["alias"]);
+
+    for (auto const & s : j["controllers"])
+        scratch.profile.setGovernorForController(s["id"], s["governor"]);
 
     bool a,b;//todo
     for (auto const & g : j["governors"])
@@ -178,6 +193,7 @@ void ProfilePersister::save() {
     serialize(j, scratch.profile.getSensorAliases());
     serialize(j, scratch.profile.getGovernors());
     serialize(j, scratch.profile.getCurves());
+    serialize(j, scratch.profile.getControllers());
 
     (AtomicFileWriter(USER_CONFIG_FILE_DIR + scratch.name) << j.dump(4))
         .atomicWrite();

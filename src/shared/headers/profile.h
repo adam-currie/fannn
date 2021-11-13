@@ -15,11 +15,17 @@ namespace Fannn {
                 bool operator==(const Alias&) const = default;
             } Alias;
 
+            typedef struct Controller {
+                std::string id, governorName;
+                bool operator==(const Controller&) const = default;
+            } Controller;
+
         private:
             int updateIntervalMs = 2000;
             std::vector<Governor> governors;
             std::vector<Curve> curves;
             std::vector<Alias> sensorAliases;
+            std::vector<Controller> controllers;
 
         public:
             bool operator==(const Profile&) const = default;
@@ -32,8 +38,9 @@ namespace Fannn {
             const std::vector<Governor>& getGovernors() const { return governors; }
             const std::vector<Curve>& getCurves() const { return curves; }
             const std::vector<Alias>& getSensorAliases() const { return sensorAliases; }
+            const std::vector<Controller>& getControllers() const { return controllers; }
 
-            std::string getAliasForSensor(std::string sensorId);
+            std::string getAliasForSensor(std::string sensorId) const;
             std::string removeAliasForSensor(std::string sensorId);
 
             bool hasIssues() const;
@@ -42,15 +49,15 @@ namespace Fannn {
              * @brief adds or updates the alias for a sensor, unless the alias is already used for a sensor alias or governor name
              * @return true if successfully added or updated, or if already set
              */
-            bool addOrUpdateSensorAlias(std::string sensorId, std::string alias, bool& govCollision, bool& aliasCollision);
+            bool setSensorAlias(std::string sensorId, std::string alias, bool& govCollision, bool& aliasCollision);
 
             /**
              * @brief adds or updates the alias for a sensor, unless the alias is already used for a sensor alias or governor name
              * @return true if successfully added or updated, or if already set
              */
-            bool addOrUpdateSensorAlias(std::string sensorId, std::string alias) {
+            bool setSensorAlias(std::string sensorId, std::string alias) {
                 bool a,b;
-                return addOrUpdateSensorAlias(sensorId, alias, a,b);
+                return setSensorAlias(sensorId, alias, a,b);
             }
 
             bool addGovernor(Governor gov, bool& govCollision, bool& sensorAliasCollision);
@@ -67,6 +74,19 @@ namespace Fannn {
              * @return true only if changes occur
              */
             bool updateCurve(int index, Curve curve, bool& nameCollision);
+
+            /**
+             * @brief setGovernorForController
+             * @return false if already set
+             */
+            bool setGovernorForController(std::string controllerId, std::string governorName);
+            /**
+             * @brief removeController
+             * @return true on success, false if nothing to remove
+             */
+            bool removeController(std::string controllerId);
+
+            std::string getGovernorForController(std::string controllerId) const;
 
     };
 }

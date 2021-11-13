@@ -289,8 +289,6 @@ ApplicationWindow {
                         cellHeight: 165
                         delegate: ControllerDelegate {
                             controllers: controllersModel
-                            governors: governorsModel
-                            everythingItem: mainPage
                         }
                         model: controllersModel
                     }
