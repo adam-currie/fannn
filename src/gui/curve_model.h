@@ -37,7 +37,7 @@ class CurveModel : public QAbstractListModel {
     };
 
     Fannn::Curve scratchCurve,pushedCurve;
-    CurveListModel* owner;
+    CurveListModel* owner = nullptr;
 
     int _movingPointIndex = -1;
 

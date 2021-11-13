@@ -13,7 +13,7 @@ class CurveListModel : public QAbstractListModel {
     QML_ELEMENT
 
     Q_PROPERTY(ProfileModel* profile READ profileModel WRITE setProfileModel NOTIFY profileChanged)
-    ProfileModel* _profileModel;
+    ProfileModel* _profileModel = nullptr;
 
     enum Roles {
         CurveRole = Qt::UserRole + 1
