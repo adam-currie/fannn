@@ -21,6 +21,10 @@ ComboBox {
         _currentLoadedIndex = currentIndex
     }
 
+    function _sizeToContent() {
+        combo.width = Math.max(contentItem.contentWidth, minWidth) + bonusWidth
+    }
+
     UnsavedChangesDialog {
         id: switchConfirmationDlg
         parent: modalDlgParent
@@ -55,14 +59,13 @@ ComboBox {
         combo.width = widest + bonusWidth
     }
 
-    popup.onAboutToHide: {
-        combo.width = Math.max(contentItem.contentWidth, minWidth) + bonusWidth
-    }
+    popup.onAboutToHide: _sizeToContent()
 
     Connections {
         target: combo.model
         function onCurrentProfileChanged(p) {
             combo.currentIndex = combo.model.indexOf(p.name)
+            _sizeToContent()
         }
     }
 

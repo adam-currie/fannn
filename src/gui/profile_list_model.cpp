@@ -43,9 +43,12 @@ void ProfileListModel::createAndSwitchTo() {
     std::string newName;
     int i = 0;
 
+    //we want this to be up to date
+    auto latestProfileNames = Fannn::ProfilePersister::getProfileNames();
+
 tryNextName:
     newName = "profile" + std::to_string(++i);
-    for (const std::string& name : profileNames)
+    for (const std::string& name : latestProfileNames)
         if (name == newName)
             goto tryNextName;
 
