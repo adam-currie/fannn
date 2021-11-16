@@ -84,7 +84,7 @@ void AtomicFileWriter::atomicWrite(){
     if(fflush(pImpl->tmpFp))
         throw runtime_error(string("failed to flush temporary file to the filesystem. errno:") + to_string(errno));
 
-    //need to hard flush incase the system crashes after replacing the target file
+    //need to hard flush incase the system crashes after the target file
     //is replaced with our temp file but before our temp file contents are are physically written to disk
     if (fsync(fileno(pImpl->tmpFp)))
         throw runtime_error(string("failed to flush temporary file to disk. errno:") + to_string(errno)); 
