@@ -4,8 +4,8 @@
 #include "atomic_file_writer.h"
 #include "json.hpp"
 
-#define USER_CONFIG_FILE_DIR "config/"
-#define ACTIVE_PROFILE_NAME_PATH USER_CONFIG_FILE_DIR "active-profile"
+#define PROFILES_DIR "config/profiles/"
+#define ACTIVE_PROFILE_NAME_PATH "config/active-profile"
 
 using namespace std;
 using namespace Fannn;
@@ -91,7 +91,7 @@ ProfilePersister::ProfilePersister(string name)
     : scratch({name, Profile()}) {}
 
 const vector<string> ProfilePersister::getProfileNames(){
-    ensureDirectoryStructure(USER_CONFIG_FILE_DIR);
+    ensureDirectoryStructure(PROFILES_DIR);
     vector<string> names;
 
     auto sortedInsert = [&](string s){
@@ -103,7 +103,7 @@ const vector<string> ProfilePersister::getProfileNames(){
         names.push_back(s);
     };
 
-    for (const auto & entry : filesystem::directory_iterator(USER_CONFIG_FILE_DIR))
+    for (const auto & entry : filesystem::directory_iterator(PROFILES_DIR))
         sortedInsert(entry.path().filename());
 
     return names;
@@ -112,11 +112,15 @@ const vector<string> ProfilePersister::getProfileNames(){
 string ProfilePersister::getActiveProfile() {
     string indexPath(ACTIVE_PROFILE_NAME_PATH);
     ensureDirectoryStructure(indexPath);
+    fstream(indexPath, fstream::out).close();//create if doesnt exist
     ifstream fs (indexPath);
-    string activeProfileName;
+    string activeProfileName = "";
 
     if (fs.is_open()){
-        if(!getline(fs, activeProfileName)){
+        if(
+            !getline(fs, activeProfileName) &&
+            !fs.eof()) // not an error if the file is just empty
+        {
             throw runtime_error("failed to load active profile name, could not read profile name from:'" + indexPath + "'");
         }
     }else{
@@ -148,7 +152,7 @@ ProfilePersister ProfilePersister::loadActiveProfile() {
 }
 
 void ProfilePersister::load() {
-    string path(USER_CONFIG_FILE_DIR+scratch.name);
+    string path(PROFILES_DIR+scratch.name);
 
     string fileContents;
     try {
@@ -195,7 +199,7 @@ void ProfilePersister::save() {
     serialize(j, scratch.profile.getCurves());
     serialize(j, scratch.profile.getControllers());
 
-    (AtomicFileWriter(USER_CONFIG_FILE_DIR + scratch.name) << j.dump(4))
+    (AtomicFileWriter(PROFILES_DIR + scratch.name) << j.dump(4))
         .atomicWrite();
 
     lastPersistanceSynced = scratch;
