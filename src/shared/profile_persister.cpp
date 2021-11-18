@@ -11,24 +11,104 @@ using namespace std;
 using namespace Fannn;
 using LoadError = ProfilePersister::LoadError;
 
-string readFile(string path) {
-    ifstream fs(path, std::ios::in | std::ios::binary);
-    if(!fs) throw runtime_error("failed to open file");
-
-    std::string contents;
-    fs.seekg(0, std::ios::end);
-    contents.resize(fs.tellg());
-    fs.seekg(0, std::ios::beg);
-    fs.read(&contents[0], contents.size());
-    fs.close();
-    
-    return(contents);
-}
-
-void ensureDirectoryStructure(string path){
+static void ensureDirectoryStructure(string path) {
     auto parent = filesystem::path(path).parent_path();
     if (!parent.empty())
         filesystem::create_directories(parent);
+}
+
+static bool isBlank(string s) {
+    for (const char & c : s)
+        if (!isspace(c))
+            return false;
+    return true;
+}
+
+bool ProfilePersister::isValidProfileName(string name) {
+    if (name.empty())
+        return false;
+
+    //todo: check if this is a legal filename, not a path, just a name
+    return true;
+}
+
+const vector<string> ProfilePersister::getProfileNames() {
+    ensureDirectoryStructure(PROFILES_DIR);
+    vector<string> names;
+
+    auto sortedInsert = [&](string s){
+        for(auto i = names.begin(); i != names.end(); ++i)
+            if (*i > s) {
+                names.insert(i, s);
+                return;
+            }
+        names.push_back(s);
+    };
+
+    for (const auto & entry : filesystem::directory_iterator(PROFILES_DIR))
+        sortedInsert(entry.path().filename());
+
+    if (names.empty())
+        names.push_back("profile1");
+
+    return names;
+}
+
+string ProfilePersister::getActiveProfileName() {
+    string indexPath(ACTIVE_PROFILE_NAME_PATH);
+    ensureDirectoryStructure(indexPath);
+    fstream(indexPath, fstream::app).close();//create if doesnt exist
+    ifstream fs (indexPath);
+    string activeProfileName = "";
+
+    if (fs.is_open()) {
+        if(
+            !getline(fs, activeProfileName) &&
+            !fs.eof()) // not an error if the file is just empty
+        {
+            throw runtime_error("failed to load active profile name, could not read profile name from:'" + indexPath + "'");
+        }
+    } else {
+        throw runtime_error("failed to load active profile name, could not open:'" + indexPath + "'");
+    }
+
+    if (isBlank(activeProfileName)) {
+        //if its just blank this isn't user error, just use the first profile
+        activeProfileName = getProfileNames()[0];
+        setActiveProfileName(activeProfileName);
+    } else if (!isValidProfileName(activeProfileName)) {
+        //if theres some weird stuff in here, probably the user did something wrong, we don't want invisible errors
+        throw runtime_error("active profile name " + activeProfileName + " is invalid");
+    }
+
+    return activeProfileName;
+}
+
+void ProfilePersister::setActiveProfileName(string name) {
+    (AtomicFileWriter(ACTIVE_PROFILE_NAME_PATH) << name)
+        .atomicWrite();
+}
+
+string readFile(string path) {
+    ifstream fs(path, std::ios::in | std::ios::binary);
+
+    if (!fs)
+        throw LoadError(path);
+
+    std::string contents;
+
+    if (!fs.seekg(0, std::ios::end))
+        throw LoadError(path);
+
+    contents.resize(fs.tellg());
+
+    if (!fs.seekg(0, std::ios::beg))
+        throw LoadError(path);
+
+    if (!fs.read(&contents[0], contents.size()))
+        throw LoadError(path);
+    
+    return(contents);
 }
 
 void serialize(nlohmann::ordered_json& j, vector<Profile::Controller> const & controllers) {
@@ -90,80 +170,29 @@ void serialize(nlohmann::ordered_json& j, std::vector<Curve> const & curves) {
 ProfilePersister::ProfilePersister(string name)
     : scratch({name, Profile()}) {}
 
-const vector<string> ProfilePersister::getProfileNames(){
-    ensureDirectoryStructure(PROFILES_DIR);
-    vector<string> names;
-
-    auto sortedInsert = [&](string s){
-        for(auto i = names.begin(); i != names.end(); ++i)
-            if (*i > s) {
-                names.insert(i, s);
-                return;
-            }
-        names.push_back(s);
-    };
-
-    for (const auto & entry : filesystem::directory_iterator(PROFILES_DIR))
-        sortedInsert(entry.path().filename());
-
-    return names;
-}
-
-string ProfilePersister::getActiveProfile() {
-    string indexPath(ACTIVE_PROFILE_NAME_PATH);
-    ensureDirectoryStructure(indexPath);
-    fstream(indexPath, fstream::out).close();//create if doesnt exist
-    ifstream fs (indexPath);
-    string activeProfileName = "";
-
-    if (fs.is_open()){
-        if(
-            !getline(fs, activeProfileName) &&
-            !fs.eof()) // not an error if the file is just empty
-        {
-            throw runtime_error("failed to load active profile name, could not read profile name from:'" + indexPath + "'");
-        }
-    }else{
-        throw runtime_error("failed to load active profile name, could not open:'" + indexPath + "'");
-    }
-
-    return activeProfileName;
-}
-
-void ProfilePersister::setActiveProfile(string name) {
-    (AtomicFileWriter(ACTIVE_PROFILE_NAME_PATH) << name)
-        .atomicWrite();
-}
-
-ProfilePersister ProfilePersister::loadActiveProfile() {
-    string prevAttempt = "";
-    string active; 
-
-    /* don't keep trying with the same active profile path, however if it has changed then
-     * that's probably the problem(active profile renamed, or changed and old one deleted) so try again */
-    while(prevAttempt != (active = getActiveProfile())){
-        try{
-            ProfilePersister p(active);
-            p.load();
-            return p;
-        }catch(LoadError){}
-    }
-    throw LoadError(active, "failed to load active profile:'" + active + "', probably the file has been deleted");
-}
-
 void ProfilePersister::load() {
     string path(PROFILES_DIR+scratch.name);
 
     string fileContents;
     try {
         fileContents = readFile(path);
-    } catch (runtime_error) {
-        throw LoadError(scratch.name);
+    } catch (LoadError ex) {
+        fileContents = "";
+        if (ex.errnoSnapshot == ENOENT) {
+            //file just doesn't exist, this is fine
+            //create to make it less likely someone tries to use the same path
+            fstream(path, fstream::app);
+        } else {
+            //todo: more specific error
+            throw ex;
+        }
     }
 
-    nlohmann::json j = nlohmann::json::parse(fileContents);
+    nlohmann::json j = nlohmann::json::parse(
+        isBlank(fileContents)? "{}" : fileContents
+    );
 
-    scratch.profile.setUpdateInterval(j["updateIntervalMs"]);
+    scratch.profile.setUpdateInterval(j.value("updateIntervalMs", 2000));
 
     for (auto const & s : j["sensors"])
         scratch.profile.setSensorAlias(s["id"], s["alias"]);

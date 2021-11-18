@@ -3,8 +3,20 @@
 #include <stdexcept>
 #include <string>
 
+using std::string;
+
 ProfileListModel::ProfileListModel(QObject *parent) : QAbstractListModel(parent) {
-    profileNames = Fannn::ProfilePersister::getProfileNames();
+    auto persister = Fannn::ProfilePersister(Fannn::ProfilePersister::getActiveProfileName());
+    persister.load();
+    setCurrentProfile(new ProfileModel(this, persister));
+}
+void ProfileListModel::setCurrentProfile(ProfileModel *value) {
+    if(_currentProfile != value){
+        //todo: delete old profile model?
+        _currentProfile = value;
+        emit currentProfileChanged(value);
+        loadProfileNames();
+    }
 }
 
 QVariant ProfileListModel::data(const QModelIndex &index, int role) const {
@@ -25,7 +37,21 @@ int ProfileListModel::rowCount(const QModelIndex &parent) const {
 
 void ProfileListModel::loadProfileNames() {
     auto newNames = Fannn::ProfilePersister::getProfileNames();
-    if (newNames != profileNames){
+
+    if (_currentProfile) {
+        //put at front
+        //and make sure it's on the list even if not read from disk, cause we can just save it anyway
+        string curName = _currentProfile->name().toStdString();
+        for (auto iter = newNames.begin(); iter != newNames.end(); ++iter) {
+            if (*iter == curName) {
+                newNames.erase(iter);
+                break;
+            }
+        }
+        newNames.insert(newNames.begin(), curName);
+    }
+
+    if (newNames != profileNames) {
         beginResetModel();
         profileNames = newNames;
         endResetModel();
@@ -40,7 +66,7 @@ int ProfileListModel::indexOf(QString profileName) {
 }
 
 void ProfileListModel::createAndSwitchTo() {
-    std::string newName;
+    string newName;
     int i = 0;
 
     //we want this to be up to date
@@ -48,13 +74,12 @@ void ProfileListModel::createAndSwitchTo() {
 
 tryNextName:
     newName = "profile" + std::to_string(++i);
-    for (const std::string& name : latestProfileNames)
+    for (const string& name : latestProfileNames)
         if (name == newName)
             goto tryNextName;
 
     Fannn::ProfilePersister pp(newName);
     pp.save(); //need to mark our territory
-    loadProfileNames();
     setCurrentProfile(new ProfileModel(this, pp));
 }
 
@@ -62,4 +87,18 @@ void ProfileListModel::loadProfile(QString name) {
     Fannn::ProfilePersister persister(name.toStdString());
     persister.load();//todo: LoadError
     setCurrentProfile(new ProfileModel(this, persister));
+}
+
+void ProfileListModel::setActiveProfileName(QString profileName) {
+    string newName = profileName.toStdString();
+    string oldName = Fannn::ProfilePersister::getActiveProfileName();
+
+    if (newName != oldName) {
+        Fannn::ProfilePersister::setActiveProfileName(newName);
+        emit activeProfileNameChanged(QString::fromStdString(newName));
+    }
+}
+
+QString ProfileListModel::activeProfileName() const {
+    return QString::fromStdString(Fannn::ProfilePersister::getActiveProfileName());
 }

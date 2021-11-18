@@ -9,14 +9,10 @@ class ProfileListModel : public QAbstractListModel {
     QML_ELEMENT
 
     Q_PROPERTY(ProfileModel* currentProfile READ currentProfile NOTIFY currentProfileChanged)
-    ProfileModel* _currentProfile = nullptr;//
-    void setCurrentProfile(ProfileModel* value){
-        if(_currentProfile != value){
-            //todo: delete old profile model?
-            _currentProfile = value;
-            emit currentProfileChanged(value);
-        }
-    }
+    ProfileModel* _currentProfile = nullptr;
+    void setCurrentProfile(ProfileModel* value);
+
+    Q_PROPERTY(QString activeProfileName READ activeProfileName WRITE setActiveProfileName NOTIFY activeProfileNameChanged)
 
     std::vector<std::string> profileNames;
 
@@ -37,10 +33,14 @@ class ProfileListModel : public QAbstractListModel {
         Q_INVOKABLE int indexOf(QString profileName);//todo: try string
         Q_INVOKABLE void createAndSwitchTo();
 
-        ProfileModel* currentProfile() { return _currentProfile; }
+        ProfileModel* currentProfile() const { return _currentProfile; }
+        QString activeProfileName() const;
+
+        void setActiveProfileName(QString profileName);
 
     signals:
         void currentProfileChanged(ProfileModel* value);
+        void activeProfileNameChanged(QString profileName);
 
     public slots:
         void loadProfile(QString name);

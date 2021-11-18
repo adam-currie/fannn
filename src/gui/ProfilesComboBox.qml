@@ -6,24 +6,9 @@ import Fannn
 
 ComboBox {
     id: combo
-    property real minWidth: 10
-    property real bonusWidth: 50
     property Item modalDlgParent: this
-    property int _currentLoadedIndex: 0
 
-    Component.onCompleted: {
-        if (count > 0) combo.model.loadProfile(currentValue)
-        combo.width = Math.max(contentItem.contentWidth, minWidth) + bonusWidth
-    }
-
-    function _loadCurrent() {
-        model.loadProfile(currentValue)
-        _currentLoadedIndex = currentIndex
-    }
-
-    function _sizeToContent() {
-        combo.width = Math.max(contentItem.contentWidth, minWidth) + bonusWidth
-    }
+    implicitContentWidthPolicy: ComboBox.WidestText
 
     UnsavedChangesDialog {
         id: switchConfirmationDlg
@@ -31,10 +16,10 @@ ComboBox {
         profileModel: model.currentProfile
         Connections {
             target: switchConfirmationDlg
-            function onSaved() { _loadCurrent() }
-            function onDiscarded() { _loadCurrent() }
+            function onSaved() { model.loadProfile(currentValue) }
+            function onDiscarded() { model.loadProfile(currentValue) }
             function onCanceled() {
-                combo.currentIndex = _currentLoadedIndex
+                //todo: check model combo.currentIndex = _currentLoadedIndex
             }
         }
     }
@@ -44,29 +29,25 @@ ComboBox {
 
     onActivated: {
         var openedDlg = switchConfirmationDlg.openIfUnsaved()
-        if (!openedDlg) _loadCurrent()
+        if (!openedDlg) model.loadProfile(currentValue)
     }
 
-    popup.onAboutToShow: {
-        if (count === 0) return
-        var widest = minWidth
-        var originalCurrentIndex = currentIndex
-        model.loadProfileNames()
-        do {
-          widest = Math.max(widest, contentItem.contentWidth)
-          currentIndex = (currentIndex + 1) % count
-        } while(currentIndex !== originalCurrentIndex)
-        combo.width = widest + bonusWidth
-    }
-
-    popup.onAboutToHide: _sizeToContent()
+    popup.onAboutToShow: model.loadProfileNames()
 
     Connections {
-        target: combo.model
-        function onCurrentProfileChanged(p) {
-            combo.currentIndex = combo.model.indexOf(p.name)
-            _sizeToContent()
+        target: combo.delegateModel
+        function onModelUpdated() {
+            combo.currentIndex = 0
         }
+    }
+
+    //todo: favorite button
+    delegate: MenuItem {
+        width: ListView.view.width
+        text: combo.textRole ? (Array.isArray(combo.model) ? modelData[combo.textRole] : model[combo.textRole]) : modelData
+        Material.foreground: combo.currentIndex === index ? ListView.view.contentItem.Material.accent : ListView.view.contentItem.Material.foreground
+        highlighted: combo.highlightedIndex === index
+        hoverEnabled: combo.hoverEnabled
     }
 
 }

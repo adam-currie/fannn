@@ -129,16 +129,26 @@ ApplicationWindow {
                 }
 
                 icon.name: "list-add-symbolic"
-                anchors {
-                    left: bongoBox.right
-                    leftMargin: -6
-                }
+                anchors.left: bongoBox.right
+                anchors.leftMargin: -6
                 radius: 0
                 flat: true
                 onClicked: {
                     var openedDlg = confirmationDialog.openIfUnsaved()
                     if (!openedDlg) addProfile()
                 }
+            }
+
+            RoundButton {
+                id: favButton
+                icon.name: (profilesModel?.activeProfileName && profilesModel.activeProfileName === profilesModel?.currentProfile?.name) ?
+                               "starred-symbolic" :
+                               "non-starred-symbolic"
+                anchors.left: addButton.right
+                anchors.leftMargin: -5
+                radius: 0
+                flat: true
+                onClicked: profilesModel.activeProfileName = profilesModel.currentProfile.name
             }
 
             ToolButton {

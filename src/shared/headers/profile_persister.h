@@ -20,22 +20,25 @@ namespace Fannn {
         NamedProfile scratch;
 
         public:
+            //todo: better errors
             class LoadError : std::runtime_error {
                 public:
                     std::string const name;
+                    int errnoSnapshot;
                     LoadError(std::string name, std::optional<std::string> msg = std::optional<std::string>())
-                    : std::runtime_error(msg.value_or("failed to load profile:'" + name + "'")), name(name) {}
+                          : std::runtime_error(msg.value_or("failed to load profile:'" + name + "'")),
+                            name(name),
+                            errnoSnapshot(errno) {}
             };
 
-            static std::string getActiveProfile();
-            static void setActiveProfile(std::string name);
+            static bool isValidProfileName(std::string name);
+            static std::string getActiveProfileName();
+            static void setActiveProfileName(std::string name);
 
             /**
-             * @brief loads the active profile
-             * @throws LoadError if the profile cannot be loaded, probably because the the file has been deleted
+             * @brief getProfileNames
+             * @return list of profile names, this is never empty, if there are no profiles, i'll make you one dw
              */
-            static ProfilePersister loadActiveProfile();
-
             static const std::vector<std::string> getProfileNames();
 
             ProfilePersister(std::string name);
@@ -48,7 +51,9 @@ namespace Fannn {
 
             void save(); 
 
-            bool unsavedChanges() const { return scratch != lastPersistanceSynced; }
+            bool unsavedChanges() const {
+                return scratch != lastPersistanceSynced;
+            }
 
             Profile& profile() { return scratch.profile; }
             Profile const & constProfile() const { return scratch.profile; }
