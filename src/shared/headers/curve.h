@@ -56,11 +56,15 @@ namespace Fannn {
                     sortedInsert(sorted, points[i]);
             }
 
+            //returns the number of items erased
             template<typename T>
-            inline void eraseIfValidRange(std::vector<T>& v, size_t from, size_t to) {
-                if (from >= to) 
-                    return;
-                v.erase(v.begin() + from, v.begin() + to);
+            inline size_t eraseIfValidRange(std::vector<T>& v, size_t from, size_t to) {
+                if (from < to) {
+                    v.erase(v.begin() + from, v.begin() + to);
+                    return to - from;
+                } else {
+                    return 0;
+                }
             }
 
             void chopLeft(std::vector<Point>& points);

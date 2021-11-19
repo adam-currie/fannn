@@ -42,11 +42,11 @@ TEST_CASE("curve_gety_test"){
         {2,2}
     });
 
-    c.setDomain(420,420);
+    c.setDomain(420,421);
     c.setRange(666,666);
 
     REQUIRE_THROWS_AS( c.getY(419), typeof(out_of_range) );
-    REQUIRE_THROWS_AS( c.getY(421), typeof(out_of_range) );
+    REQUIRE_THROWS_AS( c.getY(422), typeof(out_of_range) );
     REQUIRE(c.getY(420) == 666);
 
     uniform_real_distribution<double> r(-1000,1000);
@@ -58,8 +58,14 @@ TEST_CASE("curve_gety_test"){
         points.push_back(p);
     }
     c.setPoints(points);
+    
+    for (const auto & p : c.getPoints()) {
+        REQUIRE(p.x >= c.getMinX());
+        REQUIRE(p.x <= c.getMaxX());
+        REQUIRE(p.y >= c.getMinY());
+        REQUIRE(p.y <= c.getMaxY());
+    }
 
-    REQUIRE(c.getPoints().size() == 1);
     REQUIRE(c.getPoints()[0] == Curve::Point(420, 666));
     REQUIRE(c.getY(420) == 666);
 }

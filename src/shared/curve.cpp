@@ -67,10 +67,13 @@ void Curve::chopTopAndBottom(vector<Point>& points) {
             //TRUNCATE RANGE BELOW minY
 
             int from = i;
-            while (++i < points.size() && points[i].y < minY);
-            int to = i-1;
+            while (i < points.size() && points[i+1].y < minY) ++i;
+            int to = i;
 
-            eraseIfValidRange(points, from+1, to);
+            //erase everything in between from and to, if there is anything in between
+            int numErased = eraseIfValidRange(points, from+1, to);
+            to -= numErased;
+            i -= numErased;
 
             bool atBegining = from == 0;
             bool atEnd = to == points.size()-1;
@@ -93,11 +96,13 @@ void Curve::chopTopAndBottom(vector<Point>& points) {
             //TRUNCATE RANGE ABOVE maxY
 
             int from = i;
-            while (++i < points.size() && points[i].y > maxY);
-            int to = i-1;
+            while (i < points.size() && points[i+1].y > maxY) ++i;
+            int to = i;
 
-            eraseIfValidRange(points, from+1, to);
-            if (to > from) to = from + 1;//account for erase
+            //erase everything in between from and to, if there is anything in between
+            int numErased = eraseIfValidRange(points, from+1, to);
+            to -= numErased;
+            i -= numErased;
 
             bool atBegining = from == 0;
             bool atEnd = to == points.size()-1;
@@ -184,6 +189,7 @@ void Curve::setPoints(vector<Point> const & points) {
     } else {
         sortPoints(sorted, points);
     }
+
     chopPoints(sorted);
     this->points = sorted;
 }
