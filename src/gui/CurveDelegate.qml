@@ -97,7 +97,7 @@ SpacedGridDelegate {
                 top: 9999
             }
             Label {
-                text: "x:" + curve.needsPush
+                text: "x"
                 height: parent.height
                 leftPadding: 14
                 horizontalAlignment: TextInput.AlignRight

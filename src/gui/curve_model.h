@@ -6,7 +6,7 @@
 #include "curve.h"
 #include "curve_list_model.h"
 
-class CurveListModel;//debug
+class CurveListModel;
 
 class CurveModel : public QAbstractListModel {
     Q_OBJECT
