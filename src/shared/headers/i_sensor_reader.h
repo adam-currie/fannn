@@ -8,13 +8,28 @@ namespace Fannn {
 
     class ISensorReader {
         public:
-            virtual bool hasSensor(std::string sensor) const = 0;
-            virtual std::vector<std::string> getAll() const = 0;
-            virtual double getValue(std::string sensorId) const = 0;
-        protected:
-            void throwSensorNotFound(std::string sensorId) const {
-                throw std::out_of_range("'" + sensorId + "' is not a valid sensor");
-            }
+            /**
+             * @brief   gets the available sensors
+             * 
+             * @note    this function won't be called by the daemon under normal operation.
+             * @return  std::vector<std::string> the sensor ids
+             */
+            virtual std::vector<std::string> const getAll() = 0;
+
+            /**
+             * @brief   rescans for sensors
+             * 
+             * @note    can be a no-op.
+             */
+            virtual void rescan() = 0;
+
+            /**
+             * @brief   reads the value of a sensor
+             * 
+             * @param   sensorId the sensors id
+             * @return  the value or NaN if a valid sensor with that id is not available
+             */
+            virtual double read(std::string sensorId) = 0;
     };
 
 }

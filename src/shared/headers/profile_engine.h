@@ -1,22 +1,30 @@
 #pragma once
 
 #include "i_device_writer.h"
-#include "i_sensor_reader.h"
 #include "profile.h"
+#include "profile_governor_exec_context.h"
 #include <memory>
 
 namespace Fannn {
         
     class ProfileEngine {
         private:
-            const Profile profile;
-            const std::shared_ptr<const IDeviceWriter> deviceWriter;
-            const std::shared_ptr<const ISensorReader> sensorReader;
+            typedef struct ControllerWithIndexedGov {
+                std::string id;
+                size_t govIndex;
+            } ControllerWithIndexedGov;
+
+            Profile profile;
+            ProfileGovernorExecContext context;
+            std::vector<ControllerWithIndexedGov> controllers;
+            IDeviceWriter& deviceWriter;
+            bool pendingRescan = false;
         public:
-            ProfileEngine(
-                Profile profile, 
-                const std::shared_ptr<const IDeviceWriter> deviceWriter, 
-                const std::shared_ptr<const ISensorReader> sensorReader);
+            ProfileEngine (Profile profile, IDeviceWriter& deviceWriter, ISensorReader& sensorReader);
+
+            //if we allow any copying we need to make sure we aren't using the old pointer to the profile from the other engine!
+            ProfileEngine(ProfileEngine &) = delete;
+
             void runOnce();
     };
 

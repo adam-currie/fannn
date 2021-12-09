@@ -32,6 +32,15 @@ namespace Fannn {
             };
 
             static bool isValidProfileName(std::string name);
+
+            /**
+             * @brief   Get the Active Profile Name object
+             * @throws  LoadError failed to load the profile name
+             * @note    if the file meant to contain this name doesn't exist or is blank,
+             *          that's not an error and it will default to the first profile
+             *          it's only an error if it can't access or create it on disk
+             * @return  the profile name
+             */
             static std::string getActiveProfileName();
             static void setActiveProfileName(std::string name);
 
@@ -56,7 +65,7 @@ namespace Fannn {
             }
 
             Profile& profile() { return scratch.profile; }
-            Profile const & constProfile() const { return scratch.profile; }
+            Profile const & profile() const { return scratch.profile; }
 
             void setName(std::string name) { scratch.name = name; }
             

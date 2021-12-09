@@ -9,7 +9,7 @@ bool contains(vector<T> v, T t){
     return find(v.begin(), v.end(), t) != v.end();
 }
 
-Tokenizer::Tokenizer(string str, vector<char> excludedDelims, vector<char> includedDelims)
+Tokenizer::Tokenizer(string str, vector<char> const & excludedDelims, vector<char> const & includedDelims)
   : str(str) {
 
     int i = 0;

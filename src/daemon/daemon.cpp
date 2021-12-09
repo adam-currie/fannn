@@ -5,18 +5,33 @@
 #include <signal.h>
 #include "governor.h"
 #include "profile_engine.h"
+#include "profile_persister.h"
+#include "composite_device_writer.h"
+#include "composite_sensor_reader.h"
 #include "min_interval_stepper.h"
 
 using namespace std;
 using namespace Fannn;
 
+//SIGNAL FLAGS
 bool terminating = false;
 bool needsReload = false;
+
 MinIntervalStepper stepper;
+optional<ProfileEngine> engine;
 
 void load() {
-    stepper = MinIntervalStepper(2000);//todo: replace with real interval
-    //todo
+    //todo: log exception and retry? maybe the system will do this for me?
+    ProfilePersister active(ProfilePersister::getActiveProfileName());
+    active.load();
+
+    engine.emplace(
+        active.profile(), 
+        CompositeDeviceWriter::instance(), 
+        CompositeSensorReader::instance()
+    );
+
+    stepper = MinIntervalStepper(active.profile().getUpdateInterval());
 }
 
 void initSignalHandlers() {
@@ -48,8 +63,9 @@ int main() {
             needsReload = false;
         }
 
-        //todo the stuff
-        cout << "doing stuff" << endl;//debug
+        engine->runOnce();
+
+        cout << endl << endl << "MAIN LOOP ITERATION" << endl << endl << endl;//debug 
 
         while(
             !terminating &&

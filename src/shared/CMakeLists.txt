@@ -13,6 +13,8 @@ add_library(fannn-shared SHARED
     profile.cpp
     curve.cpp
     id_builder.cpp
+    profile_governor_exec_context.cpp
+    expression.cpp
 )
 
 set_property(TARGET fannn-shared PROPERTY POSITION_INDEPENDENT_CODE ON)

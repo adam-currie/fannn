@@ -22,13 +22,13 @@ QVariant SensorListModel::data(const QModelIndex &index, int role) const {
         case AliasRole: {
             if (!_profileModel)
                 return QVariant();
-            Fannn::Profile p = _profileModel->constProfile();
+            Fannn::Profile p = _profileModel->profile();
             std::string name = reader.getAll()[index.row()];//todo: SLOW, DUMB
             std::string alias = p.getAliasForSensor(name);
             return QString::fromStdString(alias);
         }
         case ValueRole:
-            return QVariant{reader.getValue(reader.getAll()[index.row()])}.toString();//todo: SLOWER, DUMBER
+            return QVariant{reader.read(reader.getAll()[index.row()])}.toString();//todo: SLOWER, DUMBER
         default:
             return QVariant();
     }

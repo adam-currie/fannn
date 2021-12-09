@@ -16,18 +16,6 @@
 using namespace std;
 using namespace Fannn;
 
-TEST_CASE("sensors_get_all_test"){
-    for(string str : LmSensorsReader().getAll()){
-        cout << str << endl;
-    }
-}
-
-TEST_CASE("sysfs_pwm_writer_test"){
-    auto writer = SysfsPwmWriter();
-    auto devices = writer.getAll();
-    writer.setValue("/sys/devices/platform/nct6687.2592/hwmon/hwmon4/pwm1", 50);
-}
-
 TEST_CASE("curve_gety_test"){
     Curve c;
 
@@ -45,8 +33,6 @@ TEST_CASE("curve_gety_test"){
     c.setDomain(420,421);
     c.setRange(666,666);
 
-    REQUIRE_THROWS_AS( c.getY(419), typeof(out_of_range) );
-    REQUIRE_THROWS_AS( c.getY(422), typeof(out_of_range) );
     REQUIRE(c.getY(420) == 666);
 
     uniform_real_distribution<double> r(-1000,1000);
@@ -72,66 +58,60 @@ TEST_CASE("curve_gety_test"){
 
 TEST_CASE("tokenizer_test"){
     Tokenizer tokenizer(" 1+2 -3+value - 420 ", {' '}, {'+','-'});
-    REQUIRE(tokenizer.getTokens() == vector<string>({"1","+","2","-","3","+","value","-","420"}));
+    REQUIRE(
+            tokenizer.getTokens() == 
+            vector<string>({"1","+","2","-","3","+","value","-","420"})
+    );
 }
 
-TEST_CASE("governor_test"){
-    auto readCurve = [](string name){
-        Curve curve1;
-        curve1.setPoints({{0,0},{100,50}});
-        if (name == "curve1") {
-            return [=](double x){ return curve1.getY(x); };
-        }else{
-            throw runtime_error("thats not a curve!");
-        }
-    };
-
-    //fake sensor values that increment each time they are read, starting at 10
-    class : public ISensorReader { public:
+TEST_CASE("governor_test"){    
+    //has fake sensor values that increment each time they are read, starting at 10
+    class : public Expression::INamedFuncContext { public:
         string prefix = "sensor";
         mutable vector<double> values = vector<double>(8, 10);
-        vector<string> getAll() const override {
-            vector<string> all(values.size());
-            for(int i=0; i<all.size(); i++) all[i] = i;
-            return all;
+        map<string,Governor> govMap;
+
+        double readSensor(const string& id) const {
+            try {
+                int i = stoi(id.substr(prefix.size()));
+                return (i >= 0 && i < values.size()) ?
+                        values[i]++ :
+                        numeric_limits<double>::quiet_NaN();
+            } catch (...) {
+                return numeric_limits<double>::quiet_NaN();
+            }
         }
-        double getValue(string id) const override {
-            if (!hasSensor(id)) throw runtime_error("that aint no sensor");
-            id = id.substr(prefix.size());
-            return values[stoi(id)]++;
+        double lookupAndExec(const std::string& id, std::string & errMsg) const override {
+            double value;  
+            try{
+                value = govMap.at(id).constExec(*this);
+            }catch(out_of_range){
+                value = readSensor(id);
+                if (isnan(value))
+                    errMsg = "sensor/governor not found";
+            }
+            return value;
         }
-        bool hasSensor(string id) const override {
-            return (id.rfind(prefix, 0) == 0);
+        double lookupAndExec(const std::string& id, std::string & errMsg, double arg) const override {
+            static const Curve curve1("curve1",{{0,0},{100,50}});
+            return (id == "curve1") ?
+                curve1.getY(arg) : 
+                numeric_limits<double>::quiet_NaN();
         }
-    } reader;
+    } context;
 
-    map<string,Governor> govMap;
+    Governor gov1("gov1", "curve1 sensor1");
+    context.govMap.insert({gov1.name, gov1});
 
-    auto readSensorOrGov = [&](string id){ 
-        try{
-            return govMap.at(id).exec();
-        }catch(out_of_range){
-            return reader.getValue(id); 
-        }
-    };
+    Governor gov2(
+            "gov2",
+            " curve1(gov1     +sensor2 * 2)^2 ^ 3  -2      ");
+    context.govMap.insert({gov2.name, gov2});
 
-    Governor gov1;
-    gov1.setExpression("curve1 sensor1");
-    gov1.readCurve = readCurve;
-    gov1.readSensorOrGovernor = readSensorOrGov;
-    govMap.insert({"gov1", gov1});
+    REQUIRE(gov1.exec(context) == 5);
+    REQUIRE(gov1.exec(context) == 5.5);
+    REQUIRE(gov1.exec(context) == 6);
+    REQUIRE(gov1.exec(context) == 6.5);
 
-    Governor gov2;
-    gov2.setExpression(
-        " curve1(gov1     +sensor2 * 2)^2 ^ 3  -2      ");
-    gov2.readCurve = readCurve;
-    gov2.readSensorOrGovernor = readSensorOrGov;
-    govMap.insert({"gov2", gov2});
-
-    REQUIRE(gov1.exec() == 5);
-    REQUIRE(gov1.exec() == 5.5);
-    REQUIRE(gov1.exec() == 6);
-    REQUIRE(gov1.exec() == 6.5);
-
-    REQUIRE(fabs(gov2.exec() - 1103240374.88) < .01);
+    REQUIRE(fabs(gov2.exec(context) - 1103240374.88) < .01);
 }

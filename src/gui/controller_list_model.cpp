@@ -21,7 +21,7 @@ QVariant ControllerListModel::data(const QModelIndex &index, int role) const {
             QList<QString> choices = {"none"};
 
             if (_profileModel)
-                for (const auto & gov : _profileModel->constProfile().getGovernors())
+                for (const auto & gov : _profileModel->profile().getGovernors())
                     choices.append(QString::fromStdString(gov.name));
 
             return choices;
@@ -31,12 +31,12 @@ QVariant ControllerListModel::data(const QModelIndex &index, int role) const {
                 return 0;
 
             string id = CompositeDeviceWriter::instance().getAll()[index.row()];
-            string govName =
-                    _profileModel ?
-                            _profileModel->constProfile().getGovernorForController(id)
-                            : "";
+            string govName = "";
+            for (const auto & c : _profileModel->profile().getControllers())
+                if (c.id == id)
+                    govName = c.governorName;
 
-            const auto & govs = _profileModel->constProfile().getGovernors();
+            const auto & govs = _profileModel->profile().getGovernors();
 
             for (int i=0; i<govs.size(); ++i)
                 if (govs[i].name == govName)
@@ -91,7 +91,7 @@ void ControllerListModel::setGovernor(int row, int governorIndex){
     if (governorIndex == 0) {
         _profileModel->removeController(row);
     } else {
-        string govName = _profileModel->constProfile().getGovernors()[governorIndex-1].name;
+        string govName = _profileModel->profile().getGovernors()[governorIndex-1].name;
         _profileModel->setGovernorForController(row, govName);
     }
 
@@ -103,7 +103,7 @@ int ControllerListModel::indexOfGovernor(QString governorName) {
         return -1;
 
     std::string nameStr = governorName.toStdString();
-    const auto & govs = _profileModel->constProfile().getGovernors();
+    const auto & govs = _profileModel->profile().getGovernors();
     for (int i=0; i<govs.size(); ++i) {
         if (govs[i].name == nameStr) {
             return i;

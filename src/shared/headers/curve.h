@@ -81,6 +81,9 @@ namespace Fannn {
             std::string name;
 
             Curve(std::string name = "") : name(name) {}
+            Curve(std::string name, std::vector<Point> const & points) : name(name) {
+                setPoints(points);
+            }
 
             bool operator==(const Curve&) const = default;
 

@@ -5,6 +5,8 @@
 #include "profile_model.h"
 #include "sensor_list_model.h"
 #include "q_governor_error.h"
+#include "profile_governor_exec_context.h"
+#include "composite_sensor_reader.h"
 
 class GovernorListModel : public QAbstractListModel {
     Q_OBJECT
@@ -12,15 +14,6 @@ class GovernorListModel : public QAbstractListModel {
 
     Q_PROPERTY(ProfileModel* profile READ profileModel WRITE setProfileModel NOTIFY profileChanged)
     ProfileModel* _profileModel;
-
-    inline std::vector<Fannn::Governor> const & governors() const {
-        return _profileModel->constProfile().getGovernors();
-    }
-
-    void validateGovNameLookups(Fannn::Governor& gov);
-    void validateAllGovNameLookups();
-
-    std::vector<QMetaObject::Connection> profileConnections;
 
     enum Roles {
         NameRole = Qt::UserRole + 1,
@@ -34,6 +27,11 @@ class GovernorListModel : public QAbstractListModel {
         {ErrorsRole, "errors"},
         {ErrorStrRole, "errorStr"}
     };
+
+    std::vector<QMetaObject::Connection> profileConnections;
+    Fannn::ProfileGovernorExecContext context = Fannn::ProfileGovernorExecContext(Fannn::CompositeSensorReader::instance(), nullptr);
+
+    void execAllAndPushToProfile();
 
     public:
         QHash<int, QByteArray> roleNames() const override {

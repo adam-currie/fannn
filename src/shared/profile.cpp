@@ -11,14 +11,6 @@ string Profile::getAliasForSensor(std::string sensorId) const {
     return {};
 }
 
-string Profile::getGovernorForController(std::string controllerId) const {
-    for (auto const & c : controllers) {
-        if (c.id == controllerId)
-            return c.governorName;
-    }
-    return {};
-}
-
 string Profile::removeAliasForSensor(std::string sensorId) {
     for (auto iter=sensorAliases.begin(); iter!=sensorAliases.end(); iter++) {
         if (iter->id == sensorId) {
@@ -127,7 +119,7 @@ bool Profile::updateGovernor(int index, Governor newGov, bool& govCollision, boo
 
     if (oldGov == newGov &&
         oldGov.getErrors() == newGov.getErrors())
-        return true;//already set
+        return false;//already set
 
     //check for name collisions
     if (oldGov.name != newGov.name) {
@@ -222,4 +214,3 @@ bool Profile::removeController(std::string controllerId){
     }
     return false;
 }
-

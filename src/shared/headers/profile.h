@@ -40,8 +40,17 @@ namespace Fannn {
             const std::vector<Alias>& getSensorAliases() const { return sensorAliases; }
             const std::vector<Controller>& getControllers() const { return controllers; }
 
+            size_t governorCount() const { return governors.size(); }
+            Governor& governorAt(size_t index) { return governors[index]; }
+            Governor const * getGovernor(const std::string & name) {
+                for (auto & g : governors) 
+                    if (g.name == name) return &g;
+                return nullptr;
+            }
+ 
             std::string getAliasForSensor(std::string sensorId) const;
             std::string removeAliasForSensor(std::string sensorId);
+
 
             bool hasIssues() const;
 
@@ -61,6 +70,13 @@ namespace Fannn {
             }
 
             bool addGovernor(Governor gov, bool& govCollision, bool& sensorAliasCollision);
+
+            /**
+             * @brief   updates the governor if it is different, and it's name doesn't collide
+             *
+             * @note    governors with different errors count as different governors in this context
+             * @return  true if the governor was actually changed, false if not
+             */
             bool updateGovernor(int index, Governor gov, bool& govCollision, bool& sensorAliasCollision);
             void removeGovernor(int index);
 
@@ -85,8 +101,6 @@ namespace Fannn {
              * @return true on success, false if nothing to remove
              */
             bool removeController(std::string controllerId);
-
-            std::string getGovernorForController(std::string controllerId) const;
 
     };
 }

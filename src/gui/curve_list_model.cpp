@@ -23,7 +23,7 @@ void CurveListModel::addCurveHereNotInProfile(Fannn::Curve c) {
 }
 
 bool CurveListModel::checkNameInUse(std::string name) {
-    for (auto c : _profileModel->constProfile().getCurves())
+    for (auto c : _profileModel->profile().getCurves())
         if (c.name == name)
             return true;
     return false;
@@ -52,7 +52,7 @@ void CurveListModel::setProfileModel(ProfileModel* value) {
     curveModels.clear();
 
     if (value) {
-        for (auto c : _profileModel->constProfile().getCurves())
+        for (auto c : _profileModel->profile().getCurves())
             addCurveHereNotInProfile(c);
     }
 

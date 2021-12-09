@@ -7,12 +7,27 @@ namespace Fannn {
 
     class SysfsPwmWriter : public IDeviceWriter{
         std::vector<std::string> ids;
+
+        SysfsPwmWriter();
+        SysfsPwmWriter(SysfsPwmWriter const&) = delete;
+        void operator=(SysfsPwmWriter const&) = delete;
+
         public:
-            SysfsPwmWriter();
-            std::vector<std::string> const & getAll() const override {
+            
+            std::vector<std::string> const & getAll() override {
                 return ids;
             }
-            void setValue(std::string deviceId, double value) override;
+
+            bool write(std::string deviceId, double value) override;
+
+            void rescan() override {
+                //todo
+            }
+
+            static SysfsPwmWriter& instance() {
+                static auto instance = SysfsPwmWriter();
+                return instance;
+            }
     };
     
 }

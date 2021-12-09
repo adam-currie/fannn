@@ -29,12 +29,18 @@ SysfsPwmWriter::SysfsPwmWriter(){
     }
 }
 
-void SysfsPwmWriter::setValue(string deviceId, double value){
+bool SysfsPwmWriter::write(string deviceId, double value){
+    return true;//debug
+
     /*
         todo: might need to enable pwm here and then reset to the original value in a destructor, see:
         https://github.com/lm-sensors/lm-sensors/blob/master/prog/pwm/fancontrol
     */
    ofstream out(deviceId, std::ofstream::trunc);
-   out << value;
-   out.close();
+   if (out) {
+       out << value;
+       return true;
+   } else {
+       return false;
+   }
 }

@@ -8,12 +8,29 @@ namespace Fannn {
         
     class IDeviceWriter {
         public:
-            virtual std::vector<std::string> const & getAll() const = 0;
-            virtual void setValue(std::string deviceId, double value) = 0;
-        protected:
-            void throwDeviceNotFound(std::string writerId) const {
-                throw std::out_of_range("'" + writerId + "' is not a valid device");
-            }
+            /**
+             * @brief   gets the available device outputs
+             * 
+             * @note    this function won't be called by the daemon under normal operation.
+             * @return  std::vector<std::string> the device ids
+             */
+            virtual std::vector<std::string> const & getAll() = 0;
+
+            /**
+             * @brief   rescans for device outputs
+             * 
+             * @note    can be a no-op.
+             */
+            virtual void rescan() = 0;
+
+            /**
+             * @brief   sets the value of a device
+             * 
+             * @param   deviceId 
+             * @param   value 
+             * @return  true if the device was set, false if it's not a valid accessible device
+             */
+            virtual bool write(std::string deviceId, double value) = 0;
     };
 
 }

@@ -7,19 +7,23 @@
 namespace Fannn {
 
     class CompositeDeviceWriter : public IDeviceWriter {
-        std::vector<std::unique_ptr<IDeviceWriter>> writers;
+        std::vector<IDeviceWriter*> writers;
         std::vector<std::string> allIDs;
 
         CompositeDeviceWriter();
-        CompositeDeviceWriter(CompositeDeviceWriter const&);
-        void operator=(CompositeDeviceWriter const&);
+        
+        CompositeDeviceWriter(CompositeDeviceWriter const &) = delete;
+        CompositeDeviceWriter(CompositeDeviceWriter const &&) = delete;
+        void operator=(CompositeDeviceWriter const &) = delete;
+        void operator=(CompositeDeviceWriter const &&) = delete;
 
         public:
-            std::vector<std::string> const & getAll() const override;
-            void setValue(std::string controllerId, double value) override;
+            std::vector<std::string> const & getAll() override;
+            bool write(std::string controllerId, double value) override;
+            void rescan() override {}//todo
 
             static CompositeDeviceWriter& instance() {
-                static CompositeDeviceWriter instance;
+                static auto instance = CompositeDeviceWriter();
                 return instance;
             }
     };

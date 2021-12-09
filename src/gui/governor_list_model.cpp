@@ -4,28 +4,10 @@
 
 GovernorListModel::GovernorListModel(QObject *parent) : QAbstractListModel(parent) {}
 
-void GovernorListModel::validateGovNameLookups(Fannn::Governor& gov) {
-    gov.validateNameLookups(
-        [this] (std::string s) {
-            for (auto const & c : _profileModel->constProfile().getCurves())
-                if (c.name == s)
-                    return true;
-            return false;
-        },
-        [this] (std::string s) {
-            for (auto const & g : governors())
-                if (g.name == s)
-                    return true;
-            return _profileModel->hasSensor(s);
-        }
-    );
-}
-
-void GovernorListModel::validateAllGovNameLookups() {
-    const auto & govs = governors();
-    for (int i = 0; i < govs.size(); ++i) {
-        auto g = govs.at(i);
-        validateGovNameLookups(g);
+void GovernorListModel::execAllAndPushToProfile() {
+    for (int i = 0; i < _profileModel->profile().governorCount(); ++i) {
+        auto & g = _profileModel->profile().governorAt(i);
+        g.exec(context);
         _profileModel->updateGovernor(i, g);
     }
 }
@@ -36,24 +18,25 @@ void GovernorListModel::setProfileModel(ProfileModel* value) {
     beginResetModel();
 
     _profileModel = value;
+    context.profile = &value->profile();
 
     for (auto& c : profileConnections)
         disconnect(c);
     profileConnections.clear();
 
     if (value) {
-        validateAllGovNameLookups();
-
-        auto validateNameLookUpsAndSignal = [this] () {
-            validateAllGovNameLookups();
+        execAllAndPushToProfile();
+        //todo: check how old code was updating when other govs changed, dont think we did it through profile connections
+        auto updateAllAndSignal = [this] () {
+            execAllAndPushToProfile();
             emit dataChanged(index(0,0), index(rowCount()-1,0), {ErrorsRole, ErrorStrRole});
         };
 
         profileConnections.push_back(connect(
-            value, &ProfileModel::aliasesChanged, validateNameLookUpsAndSignal
+            value, &ProfileModel::aliasesChanged, updateAllAndSignal
         ));
         profileConnections.push_back(connect(
-            value, &ProfileModel::curvesChanged, validateNameLookUpsAndSignal
+            value, &ProfileModel::curvesChanged, updateAllAndSignal
         ));
     }
 
@@ -67,11 +50,11 @@ QVariant GovernorListModel::data(const QModelIndex &index, int role) const {
 
     switch (role) {
         case NameRole:
-            return QString::fromStdString(governors().at(index.row()).name);
+            return QString::fromStdString(_profileModel->profile().governorAt(index.row()).name);
         case ExpressionRole:
-            return QString::fromStdString(governors().at(index.row()).getExpressionStr());
+            return QString::fromStdString(_profileModel->profile().governorAt(index.row()).getExpressionStr());
         case ErrorsRole: {
-            Fannn::Governor const & gov = governors().at(index.row());
+            Fannn::Governor const & gov = _profileModel->profile().governorAt(index.row());
 
             QVariantList errors;
             for (const auto & error : gov.getErrors()) {
@@ -83,7 +66,7 @@ QVariant GovernorListModel::data(const QModelIndex &index, int role) const {
             return errors;
         }
         case ErrorStrRole: {
-            Fannn::Governor const & gov = governors().at(index.row());
+            Fannn::Governor const & gov = _profileModel->profile().governorAt(index.row());
             auto errors = gov.getErrors();
             int size = errors.size();
 
@@ -114,7 +97,7 @@ Qt::ItemFlags GovernorListModel::flags(const QModelIndex &index) const {
 }
 
 int GovernorListModel::rowCount(const QModelIndex &parent) const {
-    return _profileModel ? governors().size() : 0;
+    return _profileModel ? _profileModel->profile().governorCount() : 0;
 }
 
 void GovernorListModel::add() {
@@ -123,10 +106,10 @@ void GovernorListModel::add() {
 
 tryNextName:
     name = "governor" + std::to_string(++i);
-    for (auto const & g : governors())
+    for (auto const & g : _profileModel->profile().getGovernors())
         if (g.name == name)
             goto tryNextName;
-    for (auto const & sa : _profileModel->constProfile().getSensorAliases())
+    for (auto const & sa : _profileModel->profile().getSensorAliases())
         if (sa.alias == name)
             goto tryNextName;
 
@@ -135,7 +118,7 @@ tryNextName:
     _profileModel->addGovernor(Fannn::Governor(name, ""));
     endInsertRows();
 
-    validateAllGovNameLookups();
+    execAllAndPushToProfile();
     emit dataChanged(index(0,0), index(rowCount()-1,0), {ErrorsRole, ErrorStrRole});
 }
 
@@ -147,7 +130,7 @@ void GovernorListModel::remove(int row) {
 }
 
 ProfileModel::SensorAliasOrGovNameCollision GovernorListModel::rename(int row, QString newName) {
-    Fannn::Governor gov = governors()[row];
+    Fannn::Governor gov = _profileModel->profile().governorAt(row);
     std::string nameStr = newName.toStdString();
 
     if (nameStr == gov.name)
@@ -157,24 +140,33 @@ ProfileModel::SensorAliasOrGovNameCollision GovernorListModel::rename(int row, Q
 
     auto result = _profileModel->updateGovernor(row, gov);
 
-    if (result == ProfileModel::NoCollision){
-        validateAllGovNameLookups();
+    if (result == ProfileModel::NoCollision) {
+        execAllAndPushToProfile();
         emit dataChanged(index(0,0), index(rowCount()-1,0), {ErrorsRole, ErrorStrRole});
         emit dataChanged(index(row,0), index(row,0), {NameRole});
     }
+
+    //todo: rn this isnt needed because but it's better to be safe, remove in some future build for perf?
+    emit dataChanged(index(row,0), index(row,0), {NameRole});
 
     return result;
 }
 
 void GovernorListModel::setExpression(int row, QString exp) {
-    Fannn::Governor gov = governors()[row];
+    Fannn::Governor const & gov = _profileModel->profile().governorAt(row);
 
     if (gov.getExpressionStr() == exp.toStdString())
         return;
 
-    gov.setExpression(exp.toStdString());
-    validateGovNameLookups(gov);
+    _profileModel->updateGovernor(
+            row,
+            Fannn::Governor(gov.name, exp.toStdString())
+    );
 
-    _profileModel->updateGovernor(row, gov);
-    emit dataChanged(index(row,0), index(row,0), {ErrorsRole, ErrorStrRole});
+    //todo: rn this isnt needed but it's better to be safe, remove in some future build for perf?
+    emit dataChanged(index(row,0), index(row,0), {ExpressionRole});
+
+    //need to update re-execute all because they might reference this governor
+    execAllAndPushToProfile();
+    emit dataChanged(index(0,0), index(rowCount()-1,0), {ErrorsRole, ErrorStrRole});
 }

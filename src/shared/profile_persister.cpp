@@ -57,7 +57,7 @@ const vector<string> ProfilePersister::getProfileNames() {
 string ProfilePersister::getActiveProfileName() {
     string indexPath(ACTIVE_PROFILE_NAME_PATH);
     ensureDirectoryStructure(indexPath);
-    fstream(indexPath, fstream::app).close();//create if doesnt exist
+    fstream(indexPath, fstream::app).close();//create if doesn't exist
     ifstream fs (indexPath);
     string activeProfileName = "";
 
@@ -66,10 +66,10 @@ string ProfilePersister::getActiveProfileName() {
             !getline(fs, activeProfileName) &&
             !fs.eof()) // not an error if the file is just empty
         {
-            throw runtime_error("failed to load active profile name, could not read profile name from:'" + indexPath + "'");
+            throw LoadError(indexPath, "failed to load active profile name, could not read profile name from:'" + indexPath + "'");
         }
     } else {
-        throw runtime_error("failed to load active profile name, could not open:'" + indexPath + "'");
+        throw LoadError(indexPath, "failed to load active profile name, could not open:'" + indexPath + "'");
     }
 
     if (isBlank(activeProfileName)) {
@@ -78,7 +78,7 @@ string ProfilePersister::getActiveProfileName() {
         setActiveProfileName(activeProfileName);
     } else if (!isValidProfileName(activeProfileName)) {
         //if theres some weird stuff in here, probably the user did something wrong, we don't want invisible errors
-        throw runtime_error("active profile name " + activeProfileName + " is invalid");
+        throw LoadError(activeProfileName, "active profile name " + activeProfileName + " is invalid");
     }
 
     return activeProfileName;

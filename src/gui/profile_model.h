@@ -43,7 +43,8 @@ class ProfileModel : public QAbstractItemModel {
             return QModelIndex();
         }
 
-        Fannn::Profile const & constProfile() const { return persister.constProfile(); }
+        Fannn::Profile const & profile() const { return persister.profile(); }
+        Fannn::Profile & profile() { return persister.profile(); }
 
         int updateIntervalMs() const;
         void setUpdateIntervalMs(int);
@@ -64,7 +65,7 @@ class ProfileModel : public QAbstractItemModel {
         std::string removeSensorAlias(int index);
 
         //FOR GOVERNORS MODEL todo: limit access somehow
-        SensorAliasOrGovNameCollision updateGovernor(int index, Fannn::Governor gov);
+        SensorAliasOrGovNameCollision updateGovernor(int index, Fannn::Governor const & gov);
         void addGovernor(Fannn::Governor gov);
         void removeGovernor(int index);
 

@@ -18,10 +18,15 @@ namespace Fannn {
              * @param excludedDelims deliminators that are not tokenized
              * @param includedDelims deliminators that are also included in the list of tokens
              */
-            Tokenizer(std::string str, std::vector<char> excludedDelims, std::vector<char> includedDelims);
+            Tokenizer(std::string str, std::vector<char> const & excludedDelims, std::vector<char> const & includedDelims);
 
             std::vector<std::string> const & getTokens() const { return tokens; }
             std::string getStr() { return str; }
+            std::string operator[](size_t index) { return tokens[index]; }
+
+            size_t count() const {
+                return tokens.size();
+            }
 
             /**
              * @brief finds a token in it's original position in the input string

@@ -16,7 +16,7 @@ ProfileModel::ProfileModel(QObject *parent, Fannn::ProfilePersister persister)
 }
 
 int ProfileModel::updateIntervalMs() const {
-    return persister.constProfile().getUpdateInterval();
+    return persister.profile().getUpdateInterval();
 }
 
 void ProfileModel::setUpdateIntervalMs(int value) {
@@ -32,18 +32,7 @@ QString ProfileModel::name() {
 }
 
 bool ProfileModel::hasIssues() {
-    return constProfile().hasIssues();
-}
-
-bool ProfileModel::hasSensor(string idOrAlias) const {
-    for (auto const & sa : constProfile().getSensorAliases()) {
-        if (idOrAlias == sa.alias){
-            if (CompositeSensorReader::instance().hasSensor(sa.id))
-                return true;
-            break;
-        }
-    }
-    return CompositeSensorReader::instance().hasSensor(idOrAlias);
+    return profile().hasIssues();
 }
 
 void ProfileModel::save() {
@@ -112,9 +101,9 @@ string ProfileModel::removeSensorAlias(int index) {
     return removedAlias;
 }
 
-ProfileModel::SensorAliasOrGovNameCollision ProfileModel::updateGovernor(int index, Fannn::Governor gov) {
+ProfileModel::SensorAliasOrGovNameCollision ProfileModel::updateGovernor(int index, Fannn::Governor const & gov) {
     bool govCollision, aliasCollision;
-    bool success = persister
+    bool changed = persister
             .profile()
             .updateGovernor(
                 index,
@@ -122,12 +111,17 @@ ProfileModel::SensorAliasOrGovNameCollision ProfileModel::updateGovernor(int ind
                 govCollision,
                 aliasCollision);
 
-    if (success) {
+    if (changed) {
         emit governorsChanged();
         setUnsavedChanges(persister.unsavedChanges());
-        return NoCollision;
+    }
+
+    if (govCollision) {
+        return CollidesWithGovernor;
+    } else if (aliasCollision) {
+        return CollidesWithSensorAlias;
     } else {
-        return govCollision ? CollidesWithGovernor : CollidesWithSensorAlias;
+        return NoCollision;
     }
 }
 

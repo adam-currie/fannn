@@ -1,22 +1,20 @@
 #include "composite_sensor_reader.h"
 #include "lm_sensors_reader.h"
+#include <cmath>
 
 using namespace std;
 using namespace Fannn;
 
 CompositeSensorReader::CompositeSensorReader() {
     //todo: dynamically load sensor reader plugins
-    readers.push_back(make_unique<LmSensorsReader>());
+    readers.push_back(&LmSensorsReader::instance());
 }
 
-bool CompositeSensorReader::hasSensor(string sensor) const {
-    for (auto const & r : readers)
-        if (r->hasSensor(sensor))
-            return true;
-    return false;
+void CompositeSensorReader::rescan() {
+    //todo
 }
 
-vector<string> CompositeSensorReader::getAll() const {//todo: cache
+vector<string> const CompositeSensorReader::getAll() {
     vector<string> v;
     for (auto const & r : readers) {
         vector<string> names = r->getAll();
@@ -25,10 +23,11 @@ vector<string> CompositeSensorReader::getAll() const {//todo: cache
     return v;
 }
 
-double CompositeSensorReader::getValue(string sensorId) const {
-    for (auto const & r : readers)
-        if (r->hasSensor(sensorId))
-            return r->getValue(sensorId);
-    throwSensorNotFound(sensorId);
-    return 0;//never reached(making compiler happy)
+double CompositeSensorReader::read(string sensorId) {
+    for (auto const & r : readers) {
+        double value = r->read(sensorId);
+        if (!isnan(value))
+            return value;
+    }
+    return numeric_limits<double>::quiet_NaN();
 }
