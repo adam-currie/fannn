@@ -20,7 +20,7 @@ namespace Fannn {
                     std::string errMsg;
                     std::string token;
 
-                    Error() = default;
+                    bool operator==(Error const & other) const = default;
 
                     Error(std::string token, std::string errMsg, std::vector<std::pair<int, int>> ranges)
                         : token(token), ranges(ranges), errMsg(errMsg) {}
