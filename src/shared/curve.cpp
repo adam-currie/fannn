@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <cmath>
 #include "curve.h"
 
 using namespace std;
@@ -195,7 +196,8 @@ void Curve::setPoints(vector<Point> const & points) {
 }
 
 double Curve::getY(double x) const {
-    if(x < minX || x > maxX) throw out_of_range("x is out of range");
+    if (isnan(x)) return x;
+    x = clamp(x, minX, maxX);
 
     double prevPointX = points[0].x;//will always be atleast 1 point
     double prevPointY = points[0].y;
