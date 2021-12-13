@@ -26,7 +26,7 @@ void GovernorListModel::setProfileModel(ProfileModel* value) {
 
     if (value) {
         execAllAndPushToProfile();
-        //todo: check how old code was updating when other govs changed, dont think we did it through profile connections
+
         auto updateAllAndSignal = [this] () {
             execAllAndPushToProfile();
             emit dataChanged(index(0,0), index(rowCount()-1,0), {ErrorsRole, ErrorStrRole});
