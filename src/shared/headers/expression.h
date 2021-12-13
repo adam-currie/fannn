@@ -24,8 +24,26 @@ namespace Fannn {
 
         class INamedFuncContext {
             public:
-                virtual double lookupAndExec(const std::string& id, std::string & errMsg) const = 0;
-                virtual double lookupAndExec(const std::string& id, std::string & errMsg, double arg) const = 0;
+                /**
+                 * @brief   look up and execute a named function
+                 *
+                 * @param   id function name
+                 * @param   out result, NaN on error
+                 * @param   errMsg
+                 * @return  true on success
+                 */
+                virtual bool lookupAndExec(const std::string& id, double & out, std::string & errMsg) const = 0;
+                /**
+                 * @brief   look up and execute a named function
+                 *
+                 * @note    if arg is NaN that this is test run and is still considered successful as long as the lookup works
+                 * @param   id function name
+                 * @param   out result, NaN on error
+                 * @param   errMsg
+                 * @param   arg argument to pass to the named function
+                 * @return  true on success
+                 */
+                virtual bool lookupAndExec(const std::string& id, double & out, std::string & errMsg, double arg) const = 0;
         };
 
         typedef std::function <

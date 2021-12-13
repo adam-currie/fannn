@@ -20,8 +20,8 @@ namespace Fannn {
             ProfileGovernorExecContext(ISensorReader& sensorReader, Profile * profile) 
                 : sensorReader(sensorReader), profile(profile) {}
 
-            double lookupAndExec(const std::string& id, std::string & errMsg) const override;
-            double lookupAndExec(const std::string& id, std::string & errMsg, double arg) const override;
+            bool lookupAndExec(const std::string& id, double & out, std::string & errMsg) const override;
+            bool lookupAndExec(const std::string& id, double & out, std::string & errMsg, double arg) const override;
     };
     
 }

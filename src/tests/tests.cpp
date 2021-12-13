@@ -81,22 +81,23 @@ TEST_CASE("governor_test"){
                 return numeric_limits<double>::quiet_NaN();
             }
         }
-        double lookupAndExec(const std::string& id, std::string & errMsg) const override {
-            double value;  
+        bool lookupAndExec(const string& id, double & out, string & errMsg) const override {
+            out = numeric_limits<double>::quiet_NaN();
             try{
-                value = govMap.at(id).constExec(*this);
+                out = govMap.at(id).constExec(*this);
             }catch(out_of_range){
-                value = readSensor(id);
-                if (isnan(value))
+                out = readSensor(id);
+                if (isnan(out))
                     errMsg = "sensor/governor not found";
             }
-            return value;
+            return !isnan(out);
         }
-        double lookupAndExec(const std::string& id, std::string & errMsg, double arg) const override {
+        bool lookupAndExec(const string& id, double & out, string & errMsg, double arg) const override {
             static const Curve curve1("curve1",{{0,0},{100,50}});
-            return (id == "curve1") ?
+            out = (id == "curve1") ?
                 curve1.getY(arg) : 
                 numeric_limits<double>::quiet_NaN();
+            return !isnan(out);
         }
     } context;
 

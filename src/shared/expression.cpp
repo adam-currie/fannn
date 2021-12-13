@@ -109,8 +109,10 @@ class Parser {
                     return rightHandResult; //return the NaN value
 
                 string err = {};//todo: maybe stop recreating all the time, not sure if this is optimized by the compiler
-                double result = context.lookupAndExec(token, err, rightHandResult);
-                if (isnan(result) && errorCallback)
+
+                double result;
+                bool success = context.lookupAndExec(token, result, err, rightHandResult);
+                if (!success && errorCallback)
                     errorCallback(token, leftHandIndex, std::move(err), 1);
                 return result;
             };
@@ -118,8 +120,9 @@ class Parser {
             //named func takes zero args
             return [token, funcTokenIndex=tokenIndex++](INamedFuncContext const & context, NamedFuncErrorCallBack errorCallback, bool exhaustiveErrorChecking) {
                 string err = {};//todo: maybe stop recreating all the time, not sure if this is optimized by the compiler
-                double result = context.lookupAndExec(token, err);
-                if (isnan(result) && errorCallback)
+                double result;
+                bool success = context.lookupAndExec(token, result, err);
+                if (!success && errorCallback)
                     errorCallback(token, funcTokenIndex, std::move(err), 0);
                 return result;
             };
