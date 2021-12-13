@@ -71,6 +71,7 @@ SpacedGridDelegate {
             TextArea {
                 id: expTextArea
                 leftPadding: nameField.leftPadding
+                rightPadding: nameField.leftPadding
                 wrapMode: TextEdit.Wrap//todo: wrap on more charecters(example: sensor1+sensor2 should wrap at '+')
                 onTextChanged: governors.setExpression(index, text)
                 selectByMouse: true

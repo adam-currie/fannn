@@ -5,13 +5,21 @@ import Qt.labs.settings
 
 GridView {
     property real minCellWidth: 320
+    property real maxCellWidth: 380
     property real cellPadding: 5
     height: contentHeight + cellPadding*2
     topMargin: cellPadding
     leftMargin: cellPadding
     rightMargin: cellPadding
     bottomMargin: cellPadding
-    cellWidth: (contentItem.width)/Math.floor((contentItem.width)/minCellWidth)
+    cellWidth:
+        Math.min (
+            maxCellWidth,
+            contentItem.width / Math.min(
+                                    count,
+                                    Math.floor((contentItem.width)/minCellWidth)
+                                )
+        )
     cellHeight: 150
 }
 
