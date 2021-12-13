@@ -75,6 +75,7 @@ SpacedGridDelegate {
                 onTextChanged: governors.setExpression(index, text)
                 selectByMouse: true
                 text: expression
+                placeholderText: "e.g. curve1(governor1+sensor1)*2"
                 ErrorHighlighter {
                     id: errorHighlighter
                     document: expTextArea.textDocument
