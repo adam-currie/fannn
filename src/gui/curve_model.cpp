@@ -9,7 +9,6 @@ CurveModel::CurveModel(QObject* parent, CurveListModel* owner, Curve const & cur
     : QAbstractListModel(parent), owner(owner) {
 
     scratchCurve = curve;
-    //todo: enforce minimum distance between points and stuff
     pushedCurve = scratchCurve;
 }
 
