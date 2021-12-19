@@ -11,6 +11,13 @@ using namespace Fannn;
 
 const vector<char> DELIMINATORS = {' ', '\f', '\n', '\r', '\t', '\v'};
 
+template<typename A>
+struct FinalAction {
+    A action;
+    FinalAction(A a) : action{a} {}
+    ~FinalAction() { action(); }
+};
+
 Governor::Governor(string name, string expStr) : name(name), expStr(expStr) {
     parseErrors.clear();
     clearExecutionErrors();
@@ -70,10 +77,11 @@ double Governor::exec(Fannn::Expression::INamedFuncContext const & context, bool
     };
     
     __isExecuting = true;
-    double result = exp(context, errorCallback, exhaustiveErrorChecking);
-    __isExecuting = false;
-    
-    return result;
+    FinalAction([this]{
+        __isExecuting = false;
+    });
+
+    return exp(context, errorCallback, exhaustiveErrorChecking);
 }
 
 double Governor::constExec(Fannn::Expression::INamedFuncContext const & context) const {
@@ -87,8 +95,9 @@ double Governor::constExec(Fannn::Expression::INamedFuncContext const & context)
     }
 
     const_cast<bool&>(__isExecuting) = true;
-    double result = exp(context, {}, true);
-    const_cast<bool&>(__isExecuting) = false;
+    FinalAction([this]{
+        const_cast<bool&>(__isExecuting) = false;
+    });
 
-    return result;
+    return exp(context, {}, true);
 }
