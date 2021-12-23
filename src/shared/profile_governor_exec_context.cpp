@@ -30,15 +30,20 @@ bool ProfileGovernorExecContext::lookupAndExec(const std::string& idOrAlias, dou
 bool ProfileGovernorExecContext::lookupAndExec(const std::string& id, double & out, std::string & errMsg, double arg) const {
     for (const auto & c : profile->getCurves()) {
         if (c.name == id) {
-            bool testRun = isnan(arg);
-            out = testRun ?
-                arg :
-                c.getY(arg);
+            out = c.getY(arg);//curve failure is programmer error not user error, so don't worry about it
             return true;
         }
     }
     
     errMsg = "curve ' " + id + " ' not found";
     out = numeric_limits<double>::quiet_NaN();
+    return false;
+}
+
+bool ProfileGovernorExecContext::testLookUpOneArgFunc(const std::string& id, std::string & errMsg) const {
+    for (const auto & c : profile->getCurves())
+        if (c.name == id)
+            return true;
+    errMsg = "curve ' " + id + " ' not found";
     return false;
 }

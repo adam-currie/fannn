@@ -36,7 +36,6 @@ namespace Fannn {
                 /**
                  * @brief   look up and execute a named function
                  *
-                 * @note    if arg is NaN that this is test run and is still considered successful as long as the lookup works
                  * @param   id function name
                  * @param   out result, NaN on error
                  * @param   errMsg
@@ -44,6 +43,15 @@ namespace Fannn {
                  * @return  true on success
                  */
                 virtual bool lookupAndExec(const std::string& id, double & out, std::string & errMsg, double arg) const = 0;
+
+                /**
+                 * @brief   look up a one argument function just for error checking purposes
+                 *
+                 * @param   id function name
+                 * @param   errMsg
+                 * @return  true on success
+                 */
+                virtual bool testLookUpOneArgFunc(const std::string& id, std::string & errMsg) const = 0;
         };
 
         typedef std::function <

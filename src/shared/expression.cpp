@@ -12,6 +12,7 @@ typedef struct ArithmeticOp : public function<double(double, double)>{
         priority(priority) {}
 } ArithmeticOp;
 
+//todo: modulo
 const map<char, ArithmeticOp> ARITHMETIC = {
     {'-', ArithmeticOp(1, minus<double>())}, 
     {'+', ArithmeticOp(1, plus<double>())},
@@ -76,6 +77,7 @@ class Parser {
 
         //CONSTANTS?
         try {
+            //todo: stod has no problems with trailing crap after a number, ig it thinks its a unit, i'm pretty sure we don't want that
             const double constant = stod(token);
             tokenIndex++;
             return [constant](INamedFuncContext const & context, NamedFuncErrorCallBack errorCallback, bool exhaustiveErrorChecking) { 
@@ -105,15 +107,22 @@ class Parser {
             ExecFunc rightHandExp = parseSelfContainedExp();
             return [token, rightHandExp, leftHandIndex](INamedFuncContext const & context, NamedFuncErrorCallBack errorCallback, bool exhaustiveErrorChecking) {
                 double rightHandResult = rightHandExp(context, errorCallback, exhaustiveErrorChecking);
-                if (!exhaustiveErrorChecking && isnan(rightHandResult))
-                    return rightHandResult; //return the NaN value
+                bool rightHandExpressionFailed = isnan(rightHandResult);
 
-                string err = {};//todo: maybe stop recreating all the time, not sure if this is optimized by the compiler
+                if (rightHandExpressionFailed && !exhaustiveErrorChecking) {
+                    //don't need to call errorCallback because that's the sub-expressions job
+                    return rightHandResult; //return the NaN value
+                }
 
                 double result;
-                bool success = context.lookupAndExec(token, result, err, rightHandResult);
+                string err = {};//todo: maybe stop recreating all the time, not sure if this is optimized by the compiler
+                bool success = rightHandExpressionFailed?
+                        context.testLookUpOneArgFunc(token, err) :
+                        context.lookupAndExec(token, result, err, rightHandResult);
+
                 if (!success && errorCallback)
                     errorCallback(token, leftHandIndex, std::move(err), 1);
+
                 return result;
             };
         } else {

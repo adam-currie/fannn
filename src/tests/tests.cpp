@@ -99,6 +99,11 @@ TEST_CASE("governor_test"){
                 numeric_limits<double>::quiet_NaN();
             return !isnan(out);
         }
+       bool testLookUpOneArgFunc(const std::string& id, std::string & errMsg) const override {
+           bool found = id == "curve1";
+           if (!found) errMsg = "i don't have a curve named: " + id;
+           return found;
+       }
     } context;
 
     Governor gov1("gov1", "curve1 sensor1");

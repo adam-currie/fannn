@@ -196,7 +196,6 @@ void Curve::setPoints(vector<Point> const & points) {
 }
 
 double Curve::getY(double x) const {
-    if (isnan(x)) return x;
     x = clamp(x, minX, maxX);
 
     double prevPointX = points[0].x;//will always be atleast 1 point
