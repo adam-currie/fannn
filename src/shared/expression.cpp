@@ -29,6 +29,35 @@ const vector<char> Expression::RESERVED_SYMBOLS = []() {
     return symbols;
 }();
 
+//returns false for failure including when outOfRange is set
+bool tryParseConstant(string const & s, double & result, bool & outOfRange) {
+    errno = 0;
+
+    const char* cstr = s.c_str();
+    char* endPtr;
+    result = strtod(cstr, &endPtr);
+
+    ulong endIndex = endPtr - cstr;
+
+    if (endIndex == s.length()) {
+        return true;
+    } else if (errno == ERANGE) {
+        /*
+         * todo:
+         * i don't think gcc sets this or signals out of range in any way,
+         * it just picks the closest aproximation, if this is okay which i think it is,
+         * then we should probably just get rid of all this out of range stuff and
+         * force it into range for compilers that don't do this for us.
+         */
+        outOfRange = true;
+        return false;
+    } else {
+        outOfRange = false;
+        return false;
+    }
+
+}
+
 bool isArithmeticOp(string s) {
     return  s.size() == 1 &&
             ARITHMETIC.find(s.at(0)) != ARITHMETIC.end();
@@ -76,17 +105,17 @@ class Parser {
             throw TokenParseError::disappoint(tokenIndex, "expression", token);
 
         //CONSTANTS?
-        try {
-            //todo: stod has no problems with trailing crap after a number, ig it thinks its a unit, i'm pretty sure we don't want that
-            const double constant = stod(token);
+        bool outOfRange;
+        double constant;
+        if (tryParseConstant(token, constant, outOfRange)) {
             tokenIndex++;
-            return [constant](INamedFuncContext const & context, NamedFuncErrorCallBack errorCallback, bool exhaustiveErrorChecking) { 
-                return constant; 
+            return [constant](INamedFuncContext const & context, NamedFuncErrorCallBack errorCallback, bool exhaustiveErrorChecking) {
+                return constant;
             };
-        } catch (invalid_argument) {
-            //so its not a constant, fine by me!
-        } catch (out_of_range) {
+        } else if (outOfRange) {
             throw TokenParseError(tokenIndex, "constant value '" + token + "' is out of range");
+        } else {
+            // not a constant, keep looking
         }
 
         //BRACKETS?
