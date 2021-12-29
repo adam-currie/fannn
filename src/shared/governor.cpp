@@ -11,13 +11,6 @@ using namespace Fannn;
 
 const vector<char> DELIMINATORS = {' ', '\f', '\n', '\r', '\t', '\v'};
 
-template<typename A>
-struct FinalAction {
-    A action;
-    FinalAction(A a) : action{a} {}
-    ~FinalAction() { action(); }
-};
-
 Governor::Governor(string name, string expStr) : name(name), expStr(expStr) {
     parseErrors.clear();
     clearExecutionErrors();
@@ -50,16 +43,14 @@ void Governor::clearExecutionErrors() {
 double Governor::exec(Fannn::Expression::INamedFuncContext const & context, bool exhaustiveErrorChecking) {
     clearExecutionErrors();
 
-    if (__isExecuting) {
-        //todo: add error to execErrors
-        return numeric_limits<double>::quiet_NaN();
-    }
-
     if (!parseErrors.empty()) {
         return numeric_limits<double>::quiet_NaN();
     }
 
-    auto errorCallback = [this] (string identifier, int tokenIndex, string const errMsg, int argCount) {        
+    auto errorCallback = [this] (string identifier, int tokenIndex, string errMsg, int argCount) {
+        if (reentrancyBlocker.resetFailFlag())
+            errMsg = "infinite self reference";
+
         auto range = tokenizer->backtraceToken(tokenIndex);
 
         auto & errors = (argCount == 0) ?
@@ -75,29 +66,30 @@ double Governor::exec(Fannn::Expression::INamedFuncContext const & context, bool
         //should only be reached if we couldnt find a pre-existing error for this identifier
         errors.push_back(Error(identifier, errMsg, {range}));
     };
-    
-    __isExecuting = true;
-    FinalAction([this]{
-        __isExecuting = false;
-    });
 
-    return exp(context, errorCallback, exhaustiveErrorChecking);
+    double result;
+    if (!reentrancyBlocker.enter([&]{
+        result = exp(context, errorCallback, exhaustiveErrorChecking);
+    })){
+        //blocked us from reentering
+        result = numeric_limits<double>::quiet_NaN();
+    }
+    
+    return result;
 }
 
 double Governor::constExec(Fannn::Expression::INamedFuncContext const & context) const {
-    if (__isExecuting) {
-        //todo add error
-        return numeric_limits<double>::quiet_NaN();
-    }
-
     if (!parseErrors.empty()) {
         return numeric_limits<double>::quiet_NaN();
     }
 
-    const_cast<bool&>(__isExecuting) = true;
-    FinalAction([this]{
-        const_cast<bool&>(__isExecuting) = false;
-    });
+    double result;
+    if (!reentrancyBlocker.enter([&]{
+        result = exp(context, {}, true);
+    })){
+        //blocked us from reentering
+        result = numeric_limits<double>::quiet_NaN();
+    }
 
-    return exp(context, {}, true);
+    return result;
 }

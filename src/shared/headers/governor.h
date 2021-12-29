@@ -9,6 +9,7 @@
 #include <optional>
 #include <map>
 #include "expression.h"
+#include "reentrancy_blocker.h"
 
 namespace Fannn {
 
@@ -33,9 +34,7 @@ namespace Fannn {
             std::vector<Error> parseErrors;
             std::vector<Error> sensorAndGovErrors;
             std::vector<Error> curveErrors;
-
-            //this changes under const context!
-            bool __isExecuting = false;
+            mutable ReentrancyBlocker reentrancyBlocker;
 
         public:
             std::string name;
