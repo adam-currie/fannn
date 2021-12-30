@@ -85,13 +85,9 @@ Qt::ItemFlags CurveListModel::flags(const QModelIndex &index) const {
 }
 
 void CurveListModel::add() {
-    std::string name;
-    int i = 0;
-
-tryNextName:
-    name = "curve" + std::to_string(++i);
-    if (checkNameInUse(name))
-        goto tryNextName;
+    std::string name = "curve1";
+    for (int i=2; checkNameInUse(name); ++i)
+        name = "curve" + std::to_string(i);
 
     int preRowCount = rowCount();
     beginInsertRows(QModelIndex(), preRowCount, preRowCount);

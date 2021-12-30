@@ -1,7 +1,9 @@
 #include "profile_list_model.h"
 #include "profile_persister.h"
+#include <algorithm>
 #include <stdexcept>
 #include <string>
+#include "contains.h"
 
 using std::string;
 
@@ -66,19 +68,14 @@ int ProfileListModel::indexOf(QString profileName) {
 }
 
 void ProfileListModel::createAndSwitchTo() {
-    string newName;
-    int i = 0;
-
     //we want this to be up to date
     auto latestProfileNames = Fannn::ProfilePersister::getProfileNames();
 
-tryNextName:
-    newName = "profile" + std::to_string(++i);
-    for (const string& name : latestProfileNames)
-        if (name == newName)
-            goto tryNextName;
+    string name = "profile1";
+    for (int i=2; latestProfileNames>>contains(name); ++i)
+        name = "profile" + std::to_string(i);
 
-    Fannn::ProfilePersister pp(newName);
+    Fannn::ProfilePersister pp(name);
     pp.save(); //need to mark our territory
     setCurrentProfile(new ProfileModel(this, pp));
 }

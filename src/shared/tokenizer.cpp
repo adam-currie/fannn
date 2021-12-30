@@ -1,13 +1,9 @@
 #include "tokenizer.h"
 #include <algorithm>
+#include "contains.h"
 
 using namespace std;
 using namespace Fannn;
-
-template <typename T>
-bool contains(vector<T> v, T t){
-    return find(v.begin(), v.end(), t) != v.end();
-}
 
 Tokenizer::Tokenizer(string str, vector<char> const & excludedDelims, vector<char> const & includedDelims)
   : str(str) {
@@ -28,12 +24,12 @@ Tokenizer::Tokenizer(string str, vector<char> const & excludedDelims, vector<cha
     };
 
     for (; i<str.size(); i++) {
-        if (contains(excludedDelims, str[i])) {
+        if (excludedDelims>>contains(str[i])) {
             endCurrentToken();
-        }else if (contains(includedDelims, str[i])) {
+        } else if (includedDelims>>contains(str[i])) {
             endCurrentToken();
             addToken(i,i);
-        }else if(startOfToken == -1){
+        } else if (startOfToken == -1){
             startOfToken = i;
         }
     }
