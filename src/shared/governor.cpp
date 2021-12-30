@@ -68,14 +68,10 @@ double Governor::exec(Fannn::Expression::INamedFuncContext const & context, bool
     };
 
     double result;
-    if (!reentrancyBlocker.enter([&]{
+    bool entered = reentrancyBlocker.enter([&]{
         result = exp(context, errorCallback, exhaustiveErrorChecking);
-    })){
-        //blocked us from reentering
-        result = numeric_limits<double>::quiet_NaN();
-    }
-    
-    return result;
+    });
+    return entered? result : numeric_limits<double>::quiet_NaN();
 }
 
 double Governor::constExec(Fannn::Expression::INamedFuncContext const & context) const {
@@ -84,12 +80,8 @@ double Governor::constExec(Fannn::Expression::INamedFuncContext const & context)
     }
 
     double result;
-    if (!reentrancyBlocker.enter([&]{
+    bool entered = reentrancyBlocker.enter([&]{
         result = exp(context, {}, true);
-    })){
-        //blocked us from reentering
-        result = numeric_limits<double>::quiet_NaN();
-    }
-
-    return result;
+    });
+    return entered? result : numeric_limits<double>::quiet_NaN();
 }
