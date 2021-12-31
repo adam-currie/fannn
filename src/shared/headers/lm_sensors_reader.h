@@ -13,6 +13,8 @@ namespace Fannn {
         LmSensorsReader();
         LmSensorsReader(LmSensorsReader const&) = delete;
         void operator=(LmSensorsReader const&) = delete;
+        LmSensorsReader(LmSensorsReader const&&) = delete;
+        void operator=(LmSensorsReader const&&) = delete;
 
         public:
             
