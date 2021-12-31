@@ -17,12 +17,6 @@ class QGovernorError {
         }
 
         QGovernorError() = default;
-        QGovernorError(const QGovernorError & other) {
-            ranges = other.ranges;
-            errMsg = other.errMsg;
-        }
-        ~QGovernorError() = default;
-
 };
 
 Q_DECLARE_METATYPE(QGovernorError)
