@@ -35,7 +35,7 @@ bool tryParseConstant(string const & s, double & result, bool & outOfRange) {
 
     const char* cstr = s.c_str();
     char* endPtr;
-    result = strtod(cstr, &endPtr);
+    result = strtod(cstr, &endPtr);//todo: switch to from_chars when our compiler has compliant implementation
 
     ulong endIndex = endPtr - cstr;
 
