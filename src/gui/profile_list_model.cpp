@@ -3,9 +3,10 @@
 #include <algorithm>
 #include <stdexcept>
 #include <string>
-#include "contains.h"
+#include "containers_util.h"
 
 using std::string;
+using Fannn::Util::contains;
 
 ProfileListModel::ProfileListModel(QObject *parent) : QAbstractListModel(parent) {
     auto persister = Fannn::ProfilePersister(Fannn::ProfilePersister::getActiveProfileName());

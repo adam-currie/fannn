@@ -7,7 +7,7 @@
 #include "profile_engine.h"
 #include "profile_persister.h"
 #include "composite_device_writer.h"
-#include "composite_sensor_reader.h"
+#include "plugins_composite_sensor_reader.h"
 #include "min_interval_stepper.h"
 
 using namespace std;
@@ -28,7 +28,7 @@ void load() {
     engine.emplace(
         active.profile(), 
         CompositeDeviceWriter::instance(), 
-        CompositeSensorReader::instance()
+        PluginsCompositeSensorReader::instance()
     );
 
     stepper = MinIntervalStepper(active.profile().getUpdateInterval());

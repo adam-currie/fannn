@@ -1,6 +1,6 @@
 #include "sensor_list_model.h"
 
-using Fannn::CompositeSensorReader;
+using Fannn::PluginsCompositeSensorReader;
 
 SensorListModel::SensorListModel(QObject *parent) : QAbstractListModel(parent), readTimer(QTimer(this)) {
     connect(this, &SensorListModel::profileChanged,
@@ -11,7 +11,7 @@ SensorListModel::SensorListModel(QObject *parent) : QAbstractListModel(parent), 
 }
 
 QVariant SensorListModel::data(const QModelIndex &index, int role) const {
-    auto& reader = CompositeSensorReader::instance();
+    auto& reader = PluginsCompositeSensorReader::instance();
 
     if (!index.isValid())
         return QVariant();
@@ -78,5 +78,5 @@ Qt::ItemFlags SensorListModel::flags(const QModelIndex &index) const {
 }
 
 int SensorListModel::rowCount(const QModelIndex &parent) const {
-    return CompositeSensorReader::instance().getAll().size();//todo: SLOW, DUMB
+    return PluginsCompositeSensorReader::instance().getAll().size();//todo: SLOW, DUMB
 }

@@ -1,13 +1,13 @@
 #include "profile_model.h"
 #include "profile_persister.h"
-#include "composite_sensor_reader.h"
+#include "plugins_composite_sensor_reader.h"
 #include "composite_device_writer.h"
 #include <string>
 #include <assert.h>
 
 using namespace std;
 
-using Fannn::CompositeSensorReader;
+using Fannn::PluginsCompositeSensorReader;
 using Fannn::CompositeDeviceWriter;
 
 ProfileModel::ProfileModel(QObject *parent, Fannn::ProfilePersister persister)
@@ -43,7 +43,7 @@ void ProfileModel::save() {
 
 
 ProfileModel::SensorAliasOrGovNameCollision ProfileModel::setSensorAlias(int index, QString alias) {
-    string id = CompositeSensorReader::instance().getAll().at(index);
+    string id = PluginsCompositeSensorReader::instance().getAll().at(index);
     bool govCollision, aliasCollision;
     bool success = persister
             .profile()
@@ -89,7 +89,7 @@ bool ProfileModel::removeController(int index) {
 }
 
 string ProfileModel::removeSensorAlias(int index) {
-    string id = CompositeSensorReader::instance().getAll().at(index);
+    string id = PluginsCompositeSensorReader::instance().getAll().at(index);
     string removedAlias = persister.profile()
             .removeAliasForSensor(id);
 

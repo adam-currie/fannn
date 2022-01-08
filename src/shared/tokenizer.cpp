@@ -1,6 +1,6 @@
 #include "tokenizer.h"
 #include <algorithm>
-#include "contains.h"
+#include "containers_util.h"
 
 using namespace std;
 using namespace Fannn;
@@ -22,6 +22,8 @@ Tokenizer::Tokenizer(string str, vector<char> const & excludedDelims, vector<cha
             startOfToken = -1;
         }
     };
+
+    using Fannn::Util::contains;
 
     for (; i<str.size(); i++) {
         if (excludedDelims>>contains(str[i])) {

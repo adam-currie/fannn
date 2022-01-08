@@ -64,6 +64,11 @@ target_link_libraries(fannn-gui PRIVATE
     Qt6::Gui
     Qt6::Widgets
     fannn-shared
+    fannn-util
 )
 
 set_property(TARGET fannn-gui PROPERTY POSITION_INDEPENDENT_CODE ON)
+
+add_dependencies(fannn-gui
+    fannn-lm-sensors-reader
+)

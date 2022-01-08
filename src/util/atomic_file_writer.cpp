@@ -9,6 +9,7 @@
 
 using namespace std;
 using namespace Fannn;
+using namespace Fannn::Util;
 
 #define TEMP_FILENAME_LENGTH 16
 
@@ -47,7 +48,7 @@ static void ensureDirectoryStructure(string path){
 static void cleanupTempDir(){
     struct stat statbuf;
     timeval now;
-    gettimeofday(&now, nullptr);
+    gettimeofday(&now, nullptr);//todo: switch to clock_gettime with CLOCK_MONOTONIC_COARSE, but need to find out how to compare to time from stat
 
     filesystem::create_directory(TEMP_DIR);
     for (const auto& entry : std::filesystem::directory_iterator(TEMP_DIR)){

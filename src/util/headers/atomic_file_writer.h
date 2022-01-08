@@ -4,7 +4,7 @@
 #include <memory>
 #include <experimental/propagate_const>
 
-namespace Fannn {
+namespace Fannn::Util {
 
     class AtomicFileWriter {
         class Impl;

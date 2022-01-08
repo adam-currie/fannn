@@ -3,7 +3,7 @@
 #include <functional>
 #include <iostream>
 #include "governor.h"
-#include "lm_sensors_reader.h"
+#include "i_sensor_reader.h"
 #include "sysfs_pwm_writer.h"
 #include "curve.h"
 #include "profile.h"
@@ -59,12 +59,12 @@ TEST_CASE("curve_gety_test"){
 TEST_CASE("tokenizer_test"){
     Tokenizer tokenizer(" 1+2 -3+value - 420 ", {' '}, {'+','-'});
     REQUIRE(
-            tokenizer.getTokens() == 
+            tokenizer.getTokens() ==
             vector<string>({"1","+","2","-","3","+","value","-","420"})
     );
 }
 
-TEST_CASE("governor_test"){    
+TEST_CASE("governor_test"){
     //has fake sensor values that increment each time they are read, starting at 10
     class : public Expression::INamedFuncContext { public:
         string prefix = "sensor";
@@ -95,7 +95,7 @@ TEST_CASE("governor_test"){
         bool lookupAndExec(const string& id, double & out, string & errMsg, double arg) const override {
             static const Curve curve1("curve1",{{0,0},{100,50}});
             out = (id == "curve1") ?
-                curve1.getY(arg) : 
+                curve1.getY(arg) :
                 numeric_limits<double>::quiet_NaN();
             return !isnan(out);
         }

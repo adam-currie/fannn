@@ -6,7 +6,7 @@
 #include "sensor_list_model.h"
 #include "q_governor_error.h"
 #include "profile_governor_exec_context.h"
-#include "composite_sensor_reader.h"
+#include "plugins_composite_sensor_reader.h"
 
 class GovernorListModel : public QAbstractListModel {
     Q_OBJECT
@@ -29,7 +29,7 @@ class GovernorListModel : public QAbstractListModel {
     };
 
     std::vector<QMetaObject::Connection> profileConnections;
-    Fannn::ProfileGovernorExecContext context = Fannn::ProfileGovernorExecContext(Fannn::CompositeSensorReader::instance(), nullptr);
+    Fannn::ProfileGovernorExecContext context = Fannn::ProfileGovernorExecContext(Fannn::PluginsCompositeSensorReader::instance(), nullptr);
 
     void execAllAndPushToProfile();
 

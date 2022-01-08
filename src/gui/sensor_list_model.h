@@ -4,7 +4,7 @@
 #include <qqml.h>
 #include <QTimer>
 #include "profile_model.h"
-#include "composite_sensor_reader.h"
+#include "plugins_composite_sensor_reader.h"
 
 //todo: display sensors seperated by their individual implementations of ISensorReader,
 //      so that they can be toggled in settings(only for display purposes(still use composite reader for actual reading))

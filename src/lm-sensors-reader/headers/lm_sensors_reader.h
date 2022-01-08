@@ -31,3 +31,7 @@ namespace Fannn {
     };
 
 }
+
+extern "C" Fannn::ISensorReader* fannn_plugin_reader_get() {
+    return &Fannn::LmSensorsReader::instance();
+}
