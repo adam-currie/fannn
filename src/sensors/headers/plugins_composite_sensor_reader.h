@@ -9,7 +9,7 @@ namespace Fannn {
 
     class PluginsCompositeSensorReader : public ISensorReader {
         static constexpr char PLUGINS_DIR[] = "plugins/";
-        static constexpr char PLUGIN_GETTER_NAME[] = "fannn_plugin_reader_get";
+        static constexpr char PLUGIN_GETTER_NAME[] = "fannn_reader_plugin_get";
 
         std::vector<Plugins::DlPlugin<PLUGIN_GETTER_NAME, ISensorReader>> plugins;
 

@@ -6,7 +6,7 @@
 
 namespace Fannn {
 
-    class LmSensorsReader : public ISensorReader{
+    class LmSensorsReader : public ISensorReader {
         class Impl;
         std::experimental::propagate_const<std::unique_ptr<Impl>> pImpl;
         
@@ -32,6 +32,6 @@ namespace Fannn {
 
 }
 
-extern "C" Fannn::ISensorReader* fannn_plugin_reader_get() {
+extern "C" Fannn::ISensorReader* fannn_reader_plugin_get() {
     return &Fannn::LmSensorsReader::instance();
 }
