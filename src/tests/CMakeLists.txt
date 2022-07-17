@@ -1,7 +1,9 @@
+Include(FetchContent)
+
 FetchContent_Declare(
   catch2
   GIT_REPOSITORY https://github.com/catchorg/Catch2.git
-  GIT_TAG v3.0.0-preview3)
+  GIT_TAG 605a34765aa5d5ecbf476b4598a862ada971b0cc) # 3.0.1
 FetchContent_MakeAvailable(catch2)
 
 #needed for include(catch) since we are using fetchcontent
