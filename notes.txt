@@ -6,3 +6,21 @@ attribution?:
     qt
     lm_sensors/libsensors
     https://github.com/nlohmann/json
+
+pugins:
+    https://stackoverflow.com/questions/70660488/why-are-rtld-deepbind-and-rtld-local-not-preventing-collision-of-static-class-me
+
+    we can't dlopen and then check symbols for stb_gnu_unique
+    because it will already have screwed up our other plugins
+    and it prevents dlclose from even doing anything
+
+    instead of having a plugin dll consist of just a single getter for a plugin object,
+    we COULD just make it not an object, and just make what would have been methods into static functions,
+    which would allow for more validation, BEFORE something is even loaded as a plugin, however,
+    you would then need to pass a list of all the functions you need to check for, and they would all need to exist
+    for something to count as a plugin at all, and if one was messed up, but all others were present, do you assume it was intended as a plugin?
+    what if only 2 are present, was that intended as a plugin? how do you know whether to provide an error message or just ignore, conversly
+    if we relly on a single well named getter(like Fannn_SensorGetter) function being present, you have a single obvious point at which to check
+    the intention of whether its a plugin or not, from there if anything is messed up, its obviously an error that the user needs to hear about.
+    and if we want to have further validation of plugins, before use, it can be entirely seperate from the loader logic,
+    we don't have to necessarily wait until a function is called to check if it exists, though the loader leaves that as an option.
