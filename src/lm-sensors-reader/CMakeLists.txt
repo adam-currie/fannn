@@ -5,6 +5,8 @@ add_library(fannn-lm-sensors-reader SHARED
     id_builder.cpp
 )
 
+target_compile_options(fannn-lm-sensors-reader PRIVATE -fno-gnu-unique)
+
 set_property(TARGET fannn-lm-sensors-reader PROPERTY POSITION_INDEPENDENT_CODE ON)
 
 target_link_libraries(fannn-lm-sensors-reader PRIVATE
