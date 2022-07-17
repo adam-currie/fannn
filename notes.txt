@@ -1,6 +1,8 @@
-lm_sensors is not going to be enough, we need an abstraction layer so we can use things like XNVCtrl
+dependsencies(i forgot which of these are just build dependsencies):
+libsensors
+libegl1-mesa-dev
 
-third party:
+attribution?:
     qt
-    lm_sensors
+    lm_sensors/libsensors
     https://github.com/nlohmann/json
