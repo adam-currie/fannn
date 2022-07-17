@@ -6,7 +6,7 @@
 timespec MinIntervalStepper::getTime() {
     timespec t;
     if(clock_gettime(CLOCK_MONOTONIC, &t))
-        throw std::runtime_error("clock_gettime() failed:" + errno);
+        throw std::runtime_error("clock_gettime() failed; errno:" + std::to_string(errno));
     return t;
 }
 
