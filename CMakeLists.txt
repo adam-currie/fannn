@@ -15,6 +15,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 add_subdirectory(src/util)
+add_subdirectory(src/file-io)
 add_subdirectory(src/plugins)
 add_subdirectory(src/sensors)
 add_subdirectory(src/lm-sensors-reader)

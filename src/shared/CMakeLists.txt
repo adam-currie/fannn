@@ -19,6 +19,7 @@ target_link_libraries(fannn-shared PUBLIC
 
 target_link_libraries(fannn-shared PRIVATE
     fannn-util
+    fannn-file-io
 )
 
 target_include_directories(fannn-shared PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/headers)

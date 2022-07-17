@@ -9,7 +9,7 @@
 
 using namespace std;
 using namespace Fannn;
-using Fannn::Util::AtomicFileWriter;
+using Fannn::FileIO::AtomicFileWriter;
 using LoadError = ProfilePersister::LoadError;
 
 static void ensureDirectoryStructure(string path) {

@@ -12,7 +12,7 @@ set_property(TARGET fannn-lm-sensors-reader PROPERTY POSITION_INDEPENDENT_CODE O
 target_link_libraries(fannn-lm-sensors-reader PRIVATE
     "${LIB_SENSORS}"
     fannn-sensors
-    fannn-util
+    fannn-file-io
 )
 
 set_target_properties(fannn-lm-sensors-reader
