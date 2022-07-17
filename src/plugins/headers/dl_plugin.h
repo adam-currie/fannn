@@ -1,57 +1,54 @@
 #pragma once
 
-#include <optional>
+#include <variant>
+#include <string>
+#include "dl_plugin_helper.h"
+#include "dl_obj.h"
 
 namespace Fannn::Plugins {
 
-    namespace Private {
-        #include <dlfcn.h>
-    }
-
-    template<const char* PLUGIN_GETTER_NAME, typename TPlugin>
+    template<const char * const PLUGIN_GETTER_NAME, typename TPlugin>
     class DlPlugin {
-        void* handle;
+        Fannn::Plugins::Internal::DlObj dlo;
         TPlugin* _plugin;
 
-        DlPlugin() = default;//use load function, dont let calling code make these
+        DlPlugin(Fannn::Plugins::Internal::DlObj&& dlo, TPlugin* plugin)
+            : dlo(std::move(dlo)), _plugin(plugin) {}
 
         public:
-            static std::optional<DlPlugin> load(const char* path) {
-                DlPlugin dlPlugin;
 
-                dlPlugin.handle = Private::dlopen(path, RTLD_NOW);
-                if (!dlPlugin.handle)
-                    return std::nullopt;
+            struct LoadError {
+                bool likelyUserError;
+                std::string msg;
+            };
 
-                // don't need to check dlerror because we are checking for null, and we don't want null even if it's not an error
-                auto getter = (TPlugin*(*)()) Private::dlsym(dlPlugin.handle, PLUGIN_GETTER_NAME);
+            static std::variant<DlPlugin, DlPlugin::LoadError> load(const char * path) {
+                using Fannn::Plugins::Internal::DlObj;
 
-                if (!getter)
-                    return std::nullopt;
+                LoadError loadError;
 
-                /*
-                 * nothing is an error yet as it's okay to have things other than
-                 * plugins in this dir, but everything after here is an error in the plugin
-                 */
+                std::optional<DlObj> tempDlo = Internal::loadPluginDlo(path, PLUGIN_GETTER_NAME, loadError.likelyUserError, loadError.msg);
+                if (!tempDlo)
+                    return loadError;
 
+                auto getter = (TPlugin*(*)()) tempDlo->getSymbol(PLUGIN_GETTER_NAME);
+
+                TPlugin* tempPlugin;
                 try {
-                    dlPlugin._plugin = getter();
+                    tempPlugin = getter();
                 }  catch (...) {
                     //todo: wrap, rethrow, document, check in calling code
                     throw;
                 }
 
-                //i STILL don't trust it! let me at least check for null
-                if (dlPlugin._plugin) {
-                    return std::optional(std::move(dlPlugin));
-                } else {
-                    //todo: better exception
-                    throw;
-                }
+                return DlPlugin<PLUGIN_GETTER_NAME, TPlugin>(
+                        std::move(*tempDlo),
+                        tempPlugin
+                );
             }
 
             bool operator==(const DlPlugin &other) const {
-                return handle == other.handle;
+                return dlo == other.dlo;
             }
 
             TPlugin& plugin()           { return *_plugin; }
@@ -65,15 +62,7 @@ namespace Fannn::Plugins {
             DlPlugin(TPlugin const& other) = delete;
             TPlugin &operator=(TPlugin const& other) = delete;
 
-            ~DlPlugin() {
-                //we don't delete pPlugin because it will go out of scope on it's own when the dl is closed
-
-                /*
-                 * if multiple DlPlugins are created for the same file then closing here doesn't
-                 * actually close the handle until the last one is closed
-                 */
-                if (handle) Private::dlclose(handle);
-            }
+            ~DlPlugin() = default;
     };
 
 }

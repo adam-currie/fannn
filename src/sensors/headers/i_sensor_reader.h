@@ -2,7 +2,6 @@
 
 #include <string>
 #include <vector>
-#include <stdexcept>
 
 namespace Fannn {
 
@@ -11,7 +10,7 @@ namespace Fannn {
             /**
              * @brief   gets the available sensors
              * 
-             * @note    this function won't be called by the daemon under normal operation.
+             * @note    this function won't be called by the daemon more than once under normal operation.
              * @return  std::vector<std::string> the sensor ids
              */
             virtual std::vector<std::string> const getAll() = 0;

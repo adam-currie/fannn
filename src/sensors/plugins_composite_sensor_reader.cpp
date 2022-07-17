@@ -1,7 +1,6 @@
 #include "plugins_composite_sensor_reader.h"
 
 #include <cmath>
-#include <dlfcn.h>
 #include <filesystem>
 #include "containers_util.h"
 #include "plugin_dir_loading.h"
@@ -16,7 +15,7 @@ PluginsCompositeSensorReader::PluginsCompositeSensorReader() {
 void PluginsCompositeSensorReader::rescan() {
     for (auto& p : plugins)
         p.plugin().rescan();
-    Plugins::loadFromDir(plugins, PLUGINS_DIR);
+    Plugins::loadFromDir(plugins, PLUGINS_DIR);//debug
 }
 
 vector<string> const PluginsCompositeSensorReader::getAll() {
