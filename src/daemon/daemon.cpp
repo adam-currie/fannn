@@ -70,7 +70,7 @@ int main() {
         while(
             !terminating &&
             !needsReload &&
-            !stepper.step()
+            !stepper.step() //returns false if interputed while waiting to step, so try again
         );
     }
 
