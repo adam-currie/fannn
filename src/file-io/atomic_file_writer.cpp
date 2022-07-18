@@ -12,11 +12,36 @@ using namespace std;
 using namespace Fannn;
 using namespace Fannn::FileIO;
 
+class FpWrapper {
+    FILE* fp;
+    public:
+        FpWrapper() : fp(nullptr) {}
+        FpWrapper(const char * const path, const char * const mode)
+            : fp(fopen(path, mode)) {}
+        FpWrapper(const FpWrapper&) = delete;
+        FpWrapper(const FpWrapper&&) = delete;
+        FpWrapper& operator=(const FpWrapper&) = delete;
+        FpWrapper& operator=(FpWrapper&& other) {
+            if (fp != nullptr)
+                fclose(fp);
+            fp = other.fp;
+            other.fp = nullptr;
+            return *this;
+        }
+        ~FpWrapper() {
+            if (fp != nullptr) {
+                fclose(fp);
+                fp = nullptr;
+            }
+        }
+        operator FILE*() const { return fp; }
+};
+
 class AtomicFileWriter::Impl {
     public:
-        ProximateTempFile temp = {};//todo: check destructor is called
+        ProximateTempFile temp = {};
         string targetPath;
-        FILE *tmpFp;//todo: close?
+        FpWrapper tmpFp;
 };
 
 static void ensureDirectoryStructure(string path){
@@ -28,7 +53,7 @@ static void ensureDirectoryStructure(string path){
 AtomicFileWriter::AtomicFileWriter(string filename) : pImpl{std::make_unique<Impl>()} {
     pImpl->targetPath = filename;
 
-    pImpl->tmpFp = fopen(pImpl->temp.getPath(), "w");
+    pImpl->tmpFp = FpWrapper(pImpl->temp.getPath(), "w");
     if(pImpl->tmpFp == nullptr)//basically the user would have be trying to make this fail
         throw runtime_error("failed to create temporary file for writing");
 }
