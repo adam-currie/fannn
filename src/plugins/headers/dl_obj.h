@@ -34,8 +34,8 @@ namespace Fannn::Plugins::Internal {
             }
 
             DlObj(DlObj const& other) = delete;
-            DlObj& operator=(DlObj&& other) = delete;
-            DlObj &operator=(DlObj const& other) = delete;
+            DlObj& operator=(const DlObj&& other) = delete;
+            DlObj& operator=(const DlObj& other) = delete;
 
             ~DlObj();
     };
