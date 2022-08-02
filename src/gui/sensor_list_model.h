@@ -42,6 +42,8 @@ class SensorListModel : public QAbstractListModel {
         Q_INVOKABLE bool removeAlias(int row);
         Q_INVOKABLE ProfileModel::SensorAliasOrGovNameCollision setAlias(int row, QString alias);
 
+        Q_INVOKABLE double readSensor(std::string id);
+
     signals:
         void profileChanged(ProfileModel* value);
 };

@@ -5,7 +5,7 @@
 #include "governor.h"
 #include "expression.h"
 #include "profile.h"
-#include "i_sensor_reader.h"
+#include <functional>
 
 namespace Fannn {
 
@@ -14,10 +14,10 @@ namespace Fannn {
         double readSensorByIdOrAlias(std::string idOrAlias) const;
 
         public: 
-            ISensorReader& sensorReader;
+            std::function<double(std::string)> sensorReader;
             Profile * profile;
 
-            ProfileGovernorExecContext(ISensorReader& sensorReader, Profile * profile) 
+            ProfileGovernorExecContext(std::function<double(std::string)> sensorReader, Profile * profile)
                 : sensorReader(sensorReader), profile(profile) {}
 
             bool lookupAndExec(const std::string& id, double & out, std::string & errMsg) const override;

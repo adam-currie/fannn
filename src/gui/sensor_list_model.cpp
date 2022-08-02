@@ -38,7 +38,9 @@ bool SensorListModel::removeAlias(int row) {
     if (!_profileModel)
         return false;
 
-    std::string removedAlias = _profileModel->removeSensorAlias(row);
+    std::string id = PluginsCompositeSensorReader::instance().getAll().at(row);
+    std::string removedAlias = _profileModel->removeSensorAlias(id);
+
     bool removed = !removedAlias.empty();
     if (removed)
         emit dataChanged(index(row,0), index(row,0), {AliasRole});
@@ -46,12 +48,17 @@ bool SensorListModel::removeAlias(int row) {
 }
 
 ProfileModel::SensorAliasOrGovNameCollision SensorListModel::setAlias(int row, QString alias) {
-    auto result = _profileModel->setSensorAlias(row, alias);
+    std::string id = PluginsCompositeSensorReader::instance().getAll().at(row);
+    auto result = _profileModel->setSensorAlias(id, alias);
 
     if (result == ProfileModel::NoCollision)
         emit dataChanged(index(row,0), index(row,0), {AliasRole});
 
     return result;
+}
+
+double SensorListModel::readSensor(std::string id) {
+    return Fannn::PluginsCompositeSensorReader::instance().read(id);
 }
 
 void SensorListModel::onProfileChanged(ProfileModel *value) {

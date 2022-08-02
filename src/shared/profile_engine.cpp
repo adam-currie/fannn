@@ -33,7 +33,7 @@ inline void printExecErrors(const Governor& gov, const string& controller) {
 ProfileEngine::ProfileEngine(Profile profile, IDeviceWriter& deviceWriter, ISensorReader& sensorReader) 
     :   profile(profile), 
         deviceWriter(deviceWriter), 
-        context(sensorReader, &(this->profile))
+        context([&](std::string id) -> double {return sensorReader.read(id);}, &(this->profile))
 {
     for (auto const & c : profile.getControllers()) {
         bool foundValid = false;

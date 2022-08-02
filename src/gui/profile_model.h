@@ -61,8 +61,8 @@ class ProfileModel : public QAbstractItemModel {
         Q_ENUM(SensorAliasOrGovNameCollision)
 
         //FOR SENSORS MODEL todo: limit access somehow
-        SensorAliasOrGovNameCollision setSensorAlias(int index, QString alias);
-        std::string removeSensorAlias(int index);
+        SensorAliasOrGovNameCollision setSensorAlias(std::string id, QString alias);
+        std::string removeSensorAlias(std::string id);
 
         //FOR GOVERNORS MODEL todo: limit access somehow
         SensorAliasOrGovNameCollision updateGovernor(int index, Fannn::Governor const & gov);

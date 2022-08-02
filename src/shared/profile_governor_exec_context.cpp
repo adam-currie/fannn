@@ -7,8 +7,8 @@ using namespace std;
 inline double ProfileGovernorExecContext::readSensorByIdOrAlias(string idOrAlias) const {
     for (const auto & sa : profile->getSensorAliases())
         if (sa.alias == idOrAlias)
-            return sensorReader.read(sa.id);
-    return sensorReader.read(idOrAlias);
+            return sensorReader(sa.id);
+    return sensorReader(idOrAlias);
 }
 
 bool ProfileGovernorExecContext::lookupAndExec(const std::string& idOrAlias, double & out, std::string & errMsg) const {

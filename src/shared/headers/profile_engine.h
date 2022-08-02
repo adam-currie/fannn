@@ -3,6 +3,7 @@
 #include "i_device_writer.h"
 #include "profile.h"
 #include "profile_governor_exec_context.h"
+#include "i_sensor_reader.h"
 #include <memory>
 
 namespace Fannn {
