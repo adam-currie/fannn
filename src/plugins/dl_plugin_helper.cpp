@@ -9,7 +9,6 @@
 #include <cstring>
 #include <vector>
 #include <variant>
-#include <cxxabi.h>//for demangling names
 
 static constexpr unsigned char ELF64MAGIC[] = {ELFMAG0, 'E', 'L', 'F'};
 
