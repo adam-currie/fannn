@@ -4,7 +4,6 @@
 #include <qqml.h>
 #include <QTimer>
 #include "profile_model.h"
-#include "plugins_composite_sensor_reader.h"
 
 //todo: display sensors seperated by their individual implementations of ISensorReader,
 //      so that they can be toggled in settings(only for display purposes(still use composite reader for actual reading))
@@ -41,8 +40,10 @@ class SensorListModel : public QAbstractListModel {
 
         Q_INVOKABLE bool removeAlias(int row);
         Q_INVOKABLE ProfileModel::SensorAliasOrGovNameCollision setAlias(int row, QString alias);
-
         Q_INVOKABLE double readSensor(std::string id);
+
+    public slots:
+        void scanForSensors();
 
     signals:
         void profileChanged(ProfileModel* value);

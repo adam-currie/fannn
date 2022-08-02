@@ -35,6 +35,7 @@ qt6_add_qml_module(fannn-gui
         error_highlighter.cpp
         curve_model.cpp
         horz_extended_xy_model_wrapper.cpp
+        user_level_logging_messages.cpp
     QML_FILES
         main.qml
         Warning.qml

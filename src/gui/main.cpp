@@ -2,6 +2,7 @@
 #include <QQmlApplicationEngine>
 #include <QSettings>
 #include <QQuickStyle>
+#include "user_level_logging_messages.h"
 #include "sensor_list_model.h"
 #include "profile_list_model.h"
 #include "controller_list_model.h"
@@ -9,10 +10,13 @@
 #include "sensor_list_model.h"
 #include "curve_list_model.h"
 
+
 int main(int argc, char *argv[]){
     QApplication::setApplicationName("Fannn");
     QApplication::setOrganizationName("Fannn");
     QApplication app(argc, argv);
+
+    UserLevelMessageHandling::init();
 
     QSettings settings;
     QQuickStyle::setStyle("Material");

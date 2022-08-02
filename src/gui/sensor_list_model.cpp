@@ -1,5 +1,9 @@
 #include "sensor_list_model.h"
 
+#include <QtCore>
+#include "plugins_composite_sensor_reader.h"
+#include "user_level_logging_messages.h"
+
 using Fannn::PluginsCompositeSensorReader;
 
 SensorListModel::SensorListModel(QObject *parent) : QAbstractListModel(parent), readTimer(QTimer(this)) {
@@ -8,6 +12,7 @@ SensorListModel::SensorListModel(QObject *parent) : QAbstractListModel(parent), 
     connect(&readTimer, &QTimer::timeout, [this](){
         emit dataChanged(index(0,0), index(rowCount()-1,0), {ValueRole});
     });
+    scanForSensors();
 }
 
 QVariant SensorListModel::data(const QModelIndex &index, int role) const {
@@ -45,6 +50,34 @@ bool SensorListModel::removeAlias(int row) {
     if (removed)
         emit dataChanged(index(row,0), index(row,0), {AliasRole});
     return removed;
+}
+
+void SensorListModel::scanForSensors() {
+    auto& reader = PluginsCompositeSensorReader::instance();
+
+    reader.rescan();
+
+    std::vector<Fannn::Plugins::PluginLoadError> errs = reader.getPluginLoadErrors();
+    std::string errBody = {};
+    int userErrorCount = 0;
+    for (auto err : errs) {
+        if (err.likelyUserError) {
+            ++userErrorCount;
+            errBody += "<br>" + err.path + ": " + err.msg;
+        }
+    }
+    if (userErrorCount > 0) {
+        /*
+         * do this on the next gui loop iteration so that when this is called
+         * as part of the initialization of a window,
+         * the resulting message box ends up on top
+         */
+        QTimer::singleShot(0, [=]()-> void {
+            const char * const errHead = (userErrorCount == 1) ?
+                    "error loading plugin:" : "error loading plugins:";
+            qCWarning(UserLevelMessageHandling::PLUGINS) << errHead << errBody.c_str();
+        });
+    }
 }
 
 ProfileModel::SensorAliasOrGovNameCollision SensorListModel::setAlias(int row, QString alias) {
