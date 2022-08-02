@@ -16,9 +16,10 @@ namespace Fannn {
             virtual std::vector<std::string> const getAll() = 0;
 
             /**
-             * @brief   rescans for sensors
+             * @brief   rescans for/updates the list of sensors
              * 
              * @note    can be a no-op.
+             * @note    this function won't be called by the daemon more than once under normal operation.
              */
             virtual void rescan() = 0;
 
