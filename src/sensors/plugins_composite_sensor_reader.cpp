@@ -8,14 +8,15 @@
 using namespace std;
 using namespace Fannn;
 
-PluginsCompositeSensorReader::PluginsCompositeSensorReader() {
-    Plugins::loadFromDir(plugins, PLUGINS_DIR);
-}
-
 void PluginsCompositeSensorReader::rescan() {
     for (auto& p : plugins)
         p.plugin().rescan();
-    Plugins::loadFromDir(plugins, PLUGINS_DIR);//debug
+    loadErrors.clear();
+    Plugins::loadFromDir(
+        plugins,
+        PLUGINS_DIR,
+        [&] (Plugins::PluginLoadError err) -> void {loadErrors.push_back(err);}
+    );
 }
 
 vector<string> const PluginsCompositeSensorReader::getAll() {

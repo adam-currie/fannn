@@ -4,6 +4,7 @@
 #include <string>
 #include "dl_plugin_helper.h"
 #include "dl_obj.h"
+#include "plugin_load_error.h"
 
 namespace Fannn::Plugins {
 
@@ -16,16 +17,11 @@ namespace Fannn::Plugins {
             : dlo(std::move(dlo)), _plugin(plugin) {}
 
         public:
-
-            struct LoadError {
-                bool likelyUserError;
-                std::string msg;
-            };
-
-            static std::variant<DlPlugin, DlPlugin::LoadError> load(const char * path) {
+            static std::variant<DlPlugin, PluginLoadError> load(const char * path) {
                 using Fannn::Plugins::Internal::DlObj;
 
-                LoadError loadError;
+                PluginLoadError loadError;
+                loadError.path = path;
 
                 std::optional<DlObj> tempDlo = Internal::loadPluginDlo(path, PLUGIN_GETTER_NAME, loadError.likelyUserError, loadError.msg);
                 if (!tempDlo)
