@@ -25,7 +25,6 @@ namespace Fannn {
 
             static LmSensorsReader& instance() {
                 static auto instance = LmSensorsReader();
-                LmSensorsReader& r = instance;
                 return instance;
             }
     };
