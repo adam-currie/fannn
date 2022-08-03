@@ -114,6 +114,8 @@ cleanup:
 
 //returns fd cursor to original position on success
 bool validateDynSym(int fd, const char * const getterName, const size_t sectionHeadersOffset, const Elf64_Shdr& section, bool& looksLikeUserError, std::string& errMsg) {
+    looksLikeUserError = false;
+
     off_t originalCur = lseek(fd, 0, SEEK_CUR);
     if (originalCur == -1) {
         errMsg = strerror(errno);
