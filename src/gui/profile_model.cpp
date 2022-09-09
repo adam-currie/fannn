@@ -1,12 +1,9 @@
 #include "profile_model.h"
 #include "profile_persister.h"
-#include "composite_device_writer.h"
 #include <string>
 #include <assert.h>
 
 using namespace std;
-
-using Fannn::CompositeDeviceWriter;
 
 ProfileModel::ProfileModel(QObject *parent, Fannn::ProfilePersister persister)
     : QAbstractItemModel(parent), persister(persister) {
@@ -59,9 +56,7 @@ ProfileModel::SensorAliasOrGovNameCollision ProfileModel::setSensorAlias(string 
     }
 }
 
-bool ProfileModel::setGovernorForController(int index, string governorName) {
-    string id = CompositeDeviceWriter::instance().getAll().at(index);
-
+bool ProfileModel::setGovernorForController(string id, string governorName) {
     bool success = persister
             .profile()
             .setGovernorForController(id, governorName);
@@ -72,9 +67,7 @@ bool ProfileModel::setGovernorForController(int index, string governorName) {
     return success;
 }
 
-bool ProfileModel::removeController(int index) {
-    string id = CompositeDeviceWriter::instance().getAll().at(index);
-
+bool ProfileModel::removeController(string id) {
     bool success = persister
             .profile()
             .removeController(id);
@@ -121,12 +114,19 @@ ProfileModel::SensorAliasOrGovNameCollision ProfileModel::updateGovernor(int ind
     }
 }
 
-void ProfileModel::addGovernor(Fannn::Governor gov) {
-    bool a,b;
-    bool added = persister.profile().addGovernor(gov,a,b);
-    assert (added && !a && !b);
-    emit governorsChanged();
-    setUnsavedChanges(persister.unsavedChanges());
+ProfileModel::SensorAliasOrGovNameCollision ProfileModel::addGovernor(Fannn::Governor gov) {
+    bool govCollision, aliasCollision;
+    persister.profile().addGovernor(gov, govCollision, aliasCollision);
+
+    if (govCollision) {
+        return CollidesWithGovernor;
+    } else if (aliasCollision) {
+        return CollidesWithSensorAlias;
+    } else {
+        emit governorsChanged();
+        setUnsavedChanges(persister.unsavedChanges());
+        return NoCollision;
+    }
 }
 
 void ProfileModel::removeGovernor(int index) {
@@ -150,17 +150,17 @@ void ProfileModel::removeCurve(int index) {
 
 bool ProfileModel::updateCurve(int index, Fannn::Curve curve) {
     bool nameCollision;//todo
-    bool success = persister
+    bool changed = persister
             .profile()
             .updateCurve(
                 index,
                 curve,
                 nameCollision);
 
-    if (success) {
+    if (changed) {
         emit curvesChanged();
         setUnsavedChanges(persister.unsavedChanges());
     }
 
-    return success;
+    return changed;
 }

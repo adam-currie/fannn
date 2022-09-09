@@ -4,7 +4,6 @@
 #include <iostream>
 #include "governor.h"
 #include "i_sensor_reader.h"
-#include "sysfs_pwm_writer.h"
 #include "curve.h"
 #include "profile.h"
 #include "profile_engine.h"

@@ -1,10 +1,8 @@
 add_library(fannn-shared SHARED
     governor.cpp
-    sysfs_pwm_writer.cpp
     tokenizer.cpp
     profile_engine.cpp
     profile_persister.cpp
-    composite_device_writer.cpp
     profile.cpp
     curve.cpp
     profile_governor_exec_context.cpp
@@ -17,6 +15,7 @@ target_include_directories(fannn-shared PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/heade
 
 target_link_libraries(fannn-shared PUBLIC
     fannn-sensors
+    fannn-device-writers
 )
 
 target_link_libraries(fannn-shared PRIVATE

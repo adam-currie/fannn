@@ -44,6 +44,9 @@ class ControllerListModel : public QAbstractListModel {
          */
         Q_INVOKABLE int indexOfGovernor(QString governorName);
 
+    public slots:
+        void scanForControllers();
+
     signals:
         void profileChanged(ProfileModel* value);
 };

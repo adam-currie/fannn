@@ -1,6 +1,6 @@
 #include "profile_engine.h"
 #include <iostream>
-#include "composite_device_writer.h"
+#include "plugins_composite_device_writer.h"
 #include "cmath"
 
 using namespace std;

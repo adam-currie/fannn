@@ -18,6 +18,22 @@ namespace Fannn::Util {
             }
     };
 
+    template<typename Predicate>
+    class any {
+        Predicate predicate;
+
+        public:
+            any(Predicate predicate) : predicate(predicate) {}
+
+            template<typename C>
+            friend const bool operator>>(const C& container, const any& args) {
+                for (const auto& i : container)
+                    if (args.predicate(i))
+                        return true;
+                return false;
+            }
+    };
+
     template<typename T>
     class addAll {
         const T& item;

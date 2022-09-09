@@ -85,7 +85,7 @@ bool Profile::setSensorAlias(std::string sensorId, std::string alias, bool& govC
     return true;
 }
 
-bool Profile::addGovernor(Governor gov, bool& govCollision, bool& sensorAliasCollision) {
+void Profile::addGovernor(Governor gov, bool& govCollision, bool& sensorAliasCollision) {
     sensorAliasCollision = govCollision = false;
 
     if (gov.name == "")//todo: check for illegal chars
@@ -94,19 +94,18 @@ bool Profile::addGovernor(Governor gov, bool& govCollision, bool& sensorAliasCol
     for (const Governor & g : governors) {
         if (g.name == gov.name) {
             govCollision = true;
-            return false;
+            return;
         }
     }
 
-    for (auto const & sa : sensorAliases) {
+    for (const Alias & sa : sensorAliases) {
         if (gov.name == sa.alias) {
             sensorAliasCollision = true;
-            return false;
+            return;
         }
     }
 
     governors.push_back(gov);
-    return true;
 }
 
 bool Profile::updateGovernor(int index, Governor newGov, bool& govCollision, bool& sensorAliasCollision) {

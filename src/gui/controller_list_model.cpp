@@ -1,7 +1,7 @@
 #include "controller_list_model.h"
-#include "composite_device_writer.h"
+#include "plugins_composite_device_writer.h"
 
-using Fannn::CompositeDeviceWriter;
+using Fannn::PluginsCompositeDeviceWriter;
 using std::string;
 using std::vector;
 
@@ -14,7 +14,7 @@ QVariant ControllerListModel::data(const QModelIndex &index, int role) const {
 
     switch (role) {
         case NameRole: {
-            string id = CompositeDeviceWriter::instance().getAll()[index.row()];
+            string id = PluginsCompositeDeviceWriter::instance().getAll()[index.row()];
             return QString::fromStdString(id);
         }
         case GovernorChoices: {
@@ -30,7 +30,7 @@ QVariant ControllerListModel::data(const QModelIndex &index, int role) const {
             if (!_profileModel)
                 return 0;
 
-            string id = CompositeDeviceWriter::instance().getAll()[index.row()];
+            string id = PluginsCompositeDeviceWriter::instance().getAll()[index.row()];
             string govName = "";
             for (const auto & c : _profileModel->profile().getControllers())
                 if (c.id == id)
@@ -81,18 +81,20 @@ Qt::ItemFlags ControllerListModel::flags(const QModelIndex &index) const {
 }
 
 int ControllerListModel::rowCount(const QModelIndex &parent) const {
-    return Fannn::CompositeDeviceWriter::instance().getAll().size();
+    return Fannn::PluginsCompositeDeviceWriter::instance().getAll().size();
 }
 
 void ControllerListModel::setGovernor(int row, int governorIndex){
     if (!_profileModel)
         return;
 
+    string id = PluginsCompositeDeviceWriter::instance().getAll().at(row);
+
     if (governorIndex == 0) {
-        _profileModel->removeController(row);
+        _profileModel->removeController(id);
     } else {
         string govName = _profileModel->profile().getGovernors()[governorIndex-1].name;
-        _profileModel->setGovernorForController(row, govName);
+        _profileModel->setGovernorForController(id, govName);
     }
 
     emit dataChanged(index(row,0), index(row,0), {SelectedGovernorIndex});
@@ -110,4 +112,8 @@ int ControllerListModel::indexOfGovernor(QString governorName) {
         }
     }
     return -1;
+}
+
+void ControllerListModel::scanForControllers() {
+    //todo
 }

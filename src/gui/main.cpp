@@ -11,6 +11,7 @@
 #include "curve_list_model.h"
 
 
+
 int main(int argc, char *argv[]){
     QApplication::setApplicationName("Fannn");
     QApplication::setOrganizationName("Fannn");

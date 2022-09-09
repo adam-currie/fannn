@@ -5,16 +5,18 @@
 
 namespace Fannn {
 
-    class SysfsPwmWriter : public IDeviceWriter{
+    class SysfsPwmWriter : public IDeviceWriter {
         std::vector<std::string> ids;
 
         SysfsPwmWriter();
         SysfsPwmWriter(SysfsPwmWriter const&) = delete;
         void operator=(SysfsPwmWriter const&) = delete;
+        SysfsPwmWriter(SysfsPwmWriter const&&) = delete;
+        void operator=(SysfsPwmWriter const&&) = delete;
 
         public:
             
-            std::vector<std::string> const & getAll() override {
+            std::vector<std::string> const getAll() override {
                 return ids;
             }
 
@@ -30,4 +32,8 @@ namespace Fannn {
             }
     };
     
+}
+
+extern "C" Fannn::IDeviceWriter* fannn_writer_plugin_get() {
+    return &Fannn::SysfsPwmWriter::instance();
 }

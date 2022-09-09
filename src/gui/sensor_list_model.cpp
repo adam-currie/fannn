@@ -60,7 +60,7 @@ void SensorListModel::scanForSensors() {
     std::vector<Fannn::Plugins::PluginLoadError> errs = reader.getPluginLoadErrors();
     std::string errBody = {};
     int userErrorCount = 0;
-    for (auto err : errs) {
+    for (auto const & err : errs) {
         if (err.likelyUserError) {
             ++userErrorCount;
             errBody += "<br>" + err.path + ": " + err.msg;

@@ -66,7 +66,7 @@ class ProfileModel : public QAbstractItemModel {
 
         //FOR GOVERNORS MODEL todo: limit access somehow
         SensorAliasOrGovNameCollision updateGovernor(int index, Fannn::Governor const & gov);
-        void addGovernor(Fannn::Governor gov);
+        SensorAliasOrGovNameCollision addGovernor(Fannn::Governor gov);
         void removeGovernor(int index);
 
         //FOR CURVES MODEL limit access somehow
@@ -79,8 +79,8 @@ class ProfileModel : public QAbstractItemModel {
         bool updateCurve(int index, Fannn::Curve curve);
 
         //FOR CONTROLLERS MODEL todo: limit access somehow
-        bool setGovernorForController(int index, std::string governorName);
-        bool removeController(int index);
+        bool setGovernorForController(std::string id, std::string governorName);
+        bool removeController(std::string id);
 
 
     signals:

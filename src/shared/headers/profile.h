@@ -69,13 +69,13 @@ namespace Fannn {
                 return setSensorAlias(sensorId, alias, a,b);
             }
 
-            bool addGovernor(Governor gov, bool& govCollision, bool& sensorAliasCollision);
+            void addGovernor(Governor gov, bool& govCollision, bool& sensorAliasCollision);
 
             /**
              * @brief   updates the governor if it is different, and it's name doesn't collide
              *
              * @note    governors with different errors count as different governors in this context
-             * @return  true if the governor was actually changed, false if not
+             * @return  true if governor was updated, false if issues prevent the change or if no changes to be made
              */
             bool updateGovernor(int index, Governor gov, bool& govCollision, bool& sensorAliasCollision);
             void removeGovernor(int index);
@@ -87,7 +87,7 @@ namespace Fannn {
              * @brief updates a curve
              * @param nameCollision
              *      true if the curve can't be updated because it's new name collides with another curves name
-             * @return true only if changes occur
+             * @return true if curve was updated, false if issues prevent the change or if no changes to be made
              */
             bool updateCurve(int index, Curve curve, bool& nameCollision);
 

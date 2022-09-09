@@ -1,5 +1,7 @@
 #include "governor_list_model.h"
+
 #include <QPair>
+#include "containers_util.h"
 #include "q_governor_error.h"
 
 GovernorListModel::GovernorListModel(QObject *parent) : QAbstractListModel(parent) {}
@@ -101,17 +103,15 @@ int GovernorListModel::rowCount(const QModelIndex &parent) const {
 }
 
 void GovernorListModel::add() {
-    std::string name;
-    int i = 0;
+    using Fannn::Util::any;
 
-tryNextName:
-    name = "governor" + std::to_string(++i);
-    for (auto const & g : _profileModel->profile().getGovernors())
-        if (g.name == name)
-            goto tryNextName;
-    for (auto const & sa : _profileModel->profile().getSensorAliases())
-        if (sa.alias == name)
-            goto tryNextName;
+    std::string name;
+    { int i=0; do {
+        name = "governor" + std::to_string(++i);
+    } while (
+         _profileModel->profile().getGovernors()>>any([name](const auto& g) -> bool{return g.name == name;}) ||
+         _profileModel->profile().getSensorAliases()>>any([name](const auto& a) -> bool{return a.alias == name;})
+    ); }
 
     int preRowCount = rowCount();
     beginInsertRows(QModelIndex(), preRowCount, preRowCount);
@@ -145,9 +145,6 @@ ProfileModel::SensorAliasOrGovNameCollision GovernorListModel::rename(int row, Q
         emit dataChanged(index(0,0), index(rowCount()-1,0), {ErrorsRole, ErrorStrRole});
         emit dataChanged(index(row,0), index(row,0), {NameRole});
     }
-
-    //todo: rn this isnt needed because but it's better to be safe, remove in some future build for perf?
-    emit dataChanged(index(row,0), index(row,0), {NameRole});
 
     return result;
 }

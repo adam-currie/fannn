@@ -2,7 +2,6 @@
 
 #include <string>
 #include <vector>
-#include <stdexcept>
 
 namespace Fannn {
         
@@ -14,7 +13,7 @@ namespace Fannn {
              * @note    this function won't be called by the daemon under normal operation.
              * @return  std::vector<std::string> the device ids
              */
-            virtual std::vector<std::string> const & getAll() = 0;
+            virtual std::vector<std::string> const getAll() = 0;
 
             /**
              * @brief   rescans for device outputs

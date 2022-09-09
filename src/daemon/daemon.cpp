@@ -6,7 +6,7 @@
 #include "governor.h"
 #include "profile_engine.h"
 #include "profile_persister.h"
-#include "composite_device_writer.h"
+#include "plugins_composite_device_writer.h"
 #include "plugins_composite_sensor_reader.h"
 #include "min_interval_stepper.h"
 
@@ -27,7 +27,7 @@ void load() {
 
     engine.emplace(
         active.profile(), 
-        CompositeDeviceWriter::instance(), 
+        PluginsCompositeDeviceWriter::instance(),
         PluginsCompositeSensorReader::instance()
     );
 
