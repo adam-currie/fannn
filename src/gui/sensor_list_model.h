@@ -5,7 +5,7 @@
 #include <QTimer>
 #include "profile_model.h"
 
-//todo: display sensors seperated by their individual implementations of ISensorReader,
+//todo: display sensors separated by their individual implementations of ISensorReader,
 //      so that they can be toggled in settings(only for display purposes(still use composite reader for actual reading))
 class SensorListModel : public QAbstractListModel {
     Q_OBJECT
