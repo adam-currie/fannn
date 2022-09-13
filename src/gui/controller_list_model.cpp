@@ -1,12 +1,16 @@
 #include "controller_list_model.h"
+
+#include <QtCore>
 #include "plugins_composite_device_writer.h"
+#include "user_level_logging_messages.h"
 
 using Fannn::PluginsCompositeDeviceWriter;
 using std::string;
 using std::vector;
 
-ControllerListModel::ControllerListModel(QObject *parent)
-    : QAbstractListModel(parent) {}
+ControllerListModel::ControllerListModel(QObject *parent) : QAbstractListModel(parent) {
+    scanForControllers();
+}
 
 QVariant ControllerListModel::data(const QModelIndex &index, int role) const {
     if (!index.isValid())
@@ -115,5 +119,31 @@ int ControllerListModel::indexOfGovernor(QString governorName) {
 }
 
 void ControllerListModel::scanForControllers() {
-    //todo
+    auto& writer = PluginsCompositeDeviceWriter::instance();
+
+    //todo: reuse logic also for sensors?
+
+    writer.rescan();
+
+    std::vector<Fannn::Plugins::PluginLoadError> errs = writer.getPluginLoadErrors();
+    std::string errBody = {};
+    int userErrorCount = 0;
+    for (auto const & err : errs) {
+        if (err.likelyUserError) {
+            ++userErrorCount;
+            errBody += "<br>" + err.path + ": " + err.msg;
+        }
+    }
+    if (userErrorCount > 0) {
+        /*
+         * do this on the next gui loop iteration so that when this is called
+         * as part of the initialization of a window,
+         * the resulting message box ends up on top
+         */
+        QTimer::singleShot(0, [=]()-> void {
+            const char * const errHead = (userErrorCount == 1) ?
+                    "error loading plugin:" : "error loading plugins:";
+            qCWarning(UserLevelMessageHandling::PLUGINS) << errHead << errBody.c_str();
+        });
+    }
 }
