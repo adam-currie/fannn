@@ -22,16 +22,16 @@ optional<ProfileEngine> engine;
 
 void load() {
     //todo: log exception and retry? maybe the system will do this for me?
-    ProfilePersister active(ProfilePersister::getActiveProfileName());
-    active.load();
+    ProfilePersister persister(ProfilePersister::getActiveProfileName());
+    persister.load();
 
     engine.emplace(
-        active.profile(), 
+        persister.profile(),
         PluginsCompositeDeviceWriter::instance(),
         PluginsCompositeSensorReader::instance()
     );
 
-    stepper = MinIntervalStepper(active.profile().getUpdateInterval());
+    stepper = MinIntervalStepper(persister.profile().getUpdateInterval());
 }
 
 void initSignalHandlers() {
