@@ -316,7 +316,7 @@ std::optional<DlObj> Fannn::Plugins::Internal::loadPluginDlo(const char * const 
     const char * cerr;
 
     /*
-     * copy so that our validation and our dynamic linking get the same data incase the
+     * copy so that our validation and our dynamic linking get the same data in case the
      * user swaps the file or it gets rolled back by a backup system, etc.
      * todo: we should probably be trying to hardlink before jumping directly to copying.
      */
