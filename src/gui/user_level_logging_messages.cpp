@@ -22,7 +22,7 @@ namespace UserLevelMessageHandling {
          * asking if the user wants to see it again, but that only applies for exactly the same error string,
          * sometimes you have more than one string but that all are the same basic error,
          * so we should replace this with a checkbox that is based on something else,
-         * maybe put in a pull request that makes all this relly on a hash of the string by default(probably what already happens),
+         * maybe put in a pull request that makes all this rely on a hash of the string by default(probably what already happens),
          * but have an optional hash parameter to override this.
          */
         for (auto c : CUSTOM_CATEGORIES)
