@@ -25,6 +25,9 @@ void load() {
     ProfilePersister persister(ProfilePersister::getActiveProfileName());
     persister.load();
 
+    PluginsCompositeDeviceWriter::instance().scan();
+    PluginsCompositeSensorReader::instance().scan();
+
     engine.emplace(
         persister.profile(),
         PluginsCompositeDeviceWriter::instance(),
