@@ -8,9 +8,9 @@
 using namespace std;
 using namespace Fannn;
 
-void PluginsCompositeDeviceWriter::rescan() {
+void PluginsCompositeDeviceWriter::scan() {
     for (auto& p : plugins)
-        p.plugin().rescan();
+        p.plugin().scan();
     loadErrors.clear();
     Plugins::loadFromDir(
         plugins,

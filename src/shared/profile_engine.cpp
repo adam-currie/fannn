@@ -66,7 +66,7 @@ void ProfileEngine::runOnce(){
     */
 
     /*
-     * todo:    do a rescan here at the start of the loop if
+     * todo:    do a scan here at the start of the loop if
      *          a sensor stops being valid, but not every time if it stays invalid,
      *          maybe only once every few minutes or something
      *          (variable set by calling code based on number of iterations)

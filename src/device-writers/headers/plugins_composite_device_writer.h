@@ -22,7 +22,7 @@ namespace Fannn {
 
         public:
             std::vector<std::string> const getAll() override;
-            void rescan() override;
+            void scan() override;
             bool write(std::string id, double value) override;
 
             std::vector<Plugins::PluginLoadError> getPluginLoadErrors() const {

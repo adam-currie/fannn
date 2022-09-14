@@ -81,7 +81,7 @@ vector<string> const LmSensorsReader::getAll() {
     return keys;
 }
 
-void LmSensorsReader::rescan() {
+void LmSensorsReader::scan() {
     //todo
 }
 

@@ -22,7 +22,7 @@ namespace Fannn {
 
             bool write(std::string deviceId, double value) override;
 
-            void rescan() override {
+            void scan() override {
                 //todo
             }
 

@@ -55,7 +55,7 @@ bool SensorListModel::removeAlias(int row) {
 void SensorListModel::scanForSensors() {
     auto& reader = PluginsCompositeSensorReader::instance();
 
-    reader.rescan();
+    reader.scan();
 
     std::vector<Fannn::Plugins::PluginLoadError> errs = reader.getPluginLoadErrors();
     std::string errBody = {};

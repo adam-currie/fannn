@@ -19,7 +19,7 @@ namespace Fannn {
         public:
             
             std::vector<std::string> const getAll() override;
-            void rescan() override;
+            void scan() override;
             double read(std::string sensorId) override;
             ~LmSensorsReader();
 

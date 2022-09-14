@@ -123,7 +123,7 @@ void ControllerListModel::scanForControllers() {
 
     //todo: reuse logic also for sensors?
 
-    writer.rescan();
+    writer.scan();
 
     std::vector<Fannn::Plugins::PluginLoadError> errs = writer.getPluginLoadErrors();
     std::string errBody = {};

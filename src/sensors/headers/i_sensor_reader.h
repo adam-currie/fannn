@@ -21,7 +21,7 @@ namespace Fannn {
              * @note    can be a no-op.
              * @note    this function won't be called by the daemon more than once under normal operation.
              */
-            virtual void rescan() = 0;
+            virtual void scan() = 0;
 
             /**
              * @brief   reads the value of a sensor

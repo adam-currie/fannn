@@ -20,7 +20,7 @@ namespace Fannn {
              * 
              * @note    can be a no-op.
              */
-            virtual void rescan() = 0;
+            virtual void scan() = 0;
 
             /**
              * @brief   sets the value of a device
