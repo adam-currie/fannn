@@ -20,14 +20,13 @@ namespace Fannn::Plugins {
             static std::variant<DlPlugin, PluginLoadError> load(const char * path) {
                 using Fannn::Plugins::Internal::DlObj;
 
-                PluginLoadError loadError;
-                loadError.path = path;
+                std::variant<DlObj, PluginLoadError> tempDloOrErr = Internal::loadPluginDlo(path, PLUGIN_GETTER_NAME);
+                if (std::holds_alternative<PluginLoadError>(tempDloOrErr))
+                    return std::get<PluginLoadError>(tempDloOrErr);
 
-                std::optional<DlObj> tempDlo = Internal::loadPluginDlo(path, PLUGIN_GETTER_NAME, loadError.likelyUserError, loadError.msg);
-                if (!tempDlo)
-                    return loadError;
+                DlObj tempDlo = std::move(std::get<DlObj>(tempDloOrErr));
 
-                auto getter = (TPlugin*(*)()) tempDlo->getSymbol(PLUGIN_GETTER_NAME);
+                auto getter = (TPlugin*(*)()) tempDlo.getSymbol(PLUGIN_GETTER_NAME);
 
                 TPlugin* tempPlugin;
                 try {
@@ -38,7 +37,7 @@ namespace Fannn::Plugins {
                 }
 
                 return DlPlugin<PLUGIN_GETTER_NAME, TPlugin>(
-                        std::move(*tempDlo),
+                        std::move(tempDlo),
                         tempPlugin
                 );
             }

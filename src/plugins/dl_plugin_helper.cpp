@@ -8,11 +8,10 @@
 #include <fcntl.h>
 #include <cstring>
 #include <vector>
-#include <variant>
 
 static constexpr unsigned char ELF64MAGIC[] = {ELFMAG0, 'E', 'L', 'F'};
 
-using namespace Fannn::Plugins::Internal;
+using namespace Fannn::Plugins;
 
 class FdWrapper {
     int fd;
@@ -300,18 +299,12 @@ bool symlinkOrHardCopy(int destFd, const char * const srcPath, const char * err)
     return true;
 }
 
-std::optional<DlObj> Fannn::Plugins::Internal::loadPluginDlo(const char * const path, const char * const getterName, bool& looksLikeUserError, std::string& errMsg) {
+std::variant<Internal::DlObj, PluginLoadError> Internal::loadPluginDlo(const char * const path, const char * const getterName) {
     Fannn::FileIO::ProximateTempFile tempFile;
-
-    auto failNonUsrErr = [&] (const std::string e) {
-        looksLikeUserError = false;
-        errMsg = e;
-        return std::nullopt;
-    };
 
     FdWrapper tempFd(tempFile.getPath(), O_RDWR);
     if (tempFd == -1)
-        return failNonUsrErr("io error: " + std::string(strerror(errno)));
+        return PluginLoadError(path, false, "io error: " + std::string(strerror(errno)));
 
     const char * cerr;
 
@@ -321,13 +314,16 @@ std::optional<DlObj> Fannn::Plugins::Internal::loadPluginDlo(const char * const 
      * todo: we should probably be trying to hardlink before jumping directly to copying.
      */
     if (!symlinkOrHardCopy(tempFd, path, cerr))
-        return failNonUsrErr("io error: " + std::string(cerr));
+        return PluginLoadError(path, false, "io error: " + std::string(cerr));
 
-    if (!validateElfForPlugin(tempFd, getterName, looksLikeUserError, errMsg))
-        return std::nullopt;
+    {
+        PluginLoadError e(path);
+        if (!validateElfForPlugin(tempFd, getterName, e.likelyUserError, e.msg))
+            return e;
+    }
 
-    auto dlo = Internal::DlObj::open(tempFile.getPath(), cerr);
-    return dlo ?
-        std::move(dlo) :
-        failNonUsrErr(std::string(cerr));
+    if (auto dlo = Internal::DlObj::open(tempFile.getPath(), cerr))
+        return std::move(*dlo);
+    else
+        return PluginLoadError(path, false, std::string(cerr));
 }
