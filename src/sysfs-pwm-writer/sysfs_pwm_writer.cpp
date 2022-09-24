@@ -35,11 +35,11 @@ bool SysfsPwmWriter::write(string deviceId, double value){
         todo: might need to enable pwm here and then reset to the original value in a destructor, see:
         https://github.com/lm-sensors/lm-sensors/blob/master/prog/pwm/fancontrol
     */
-   ofstream out(deviceId, std::ofstream::trunc);
-   if (out) {
-       out << value;
-       return true;
-   } else {
-       return false;
-   }
+    ofstream out(deviceId, std::ofstream::trunc);
+    if (out) {
+        out << value;
+        return true;
+    } else {
+        return false;
+    }
 }
