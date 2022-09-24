@@ -23,7 +23,7 @@ namespace Fannn::Plugins::Internal {
     DlObj::~DlObj() {
         if (handle) {
             /*
-             * if multiple DlPlugins are created for the same file then closing here doesn't
+             * if multiple dlobjs are created for the same file then closing here doesn't
              * actually close the handle until the last one is closed
              */
             dlclose(const_cast<void*>(handle));
