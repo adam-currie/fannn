@@ -56,6 +56,7 @@ const vector<string> ProfilePersister::getProfileNames() {
 }
 
 string ProfilePersister::getActiveProfileName() {
+    //todo:  replace with symlink directly to target profile file, makes it easier for user to edit the current profile manually
     string indexPath(ACTIVE_PROFILE_NAME_PATH);
     ensureDirectoryStructure(indexPath);
     fstream(indexPath, fstream::app).close();//create if doesn't exist
