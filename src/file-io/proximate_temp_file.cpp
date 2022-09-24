@@ -17,7 +17,7 @@ static void getRandAlphaNum(char *out, const int len) {
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
         "abcdefghijklmnopqrstuvwxyz"
         "-_";
-    srand((unsigned) time(NULL));
+    srand(rand()^time(NULL));
     for (int i = 0; i < len; ++i) 
         out[i] = alphanum[rand() % (sizeof(alphanum) - 1)];
     out[len] = '\0';
