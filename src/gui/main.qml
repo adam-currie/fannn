@@ -16,7 +16,31 @@ ApplicationWindow {
     title: qsTr("Fannn Profile Editor")
 
     property bool _closing: false
-    required property var profilesModel
+
+    ProfileListModel {
+        id: profileListModel
+    }
+
+    SensorListModel {
+        id: sensorsModel
+        profile: profileListModel.currentProfile
+    }
+
+    GovernorListModel {
+        id: governorsModel
+        profile: profileListModel.currentProfile
+        sensors: sensorsModel
+    }
+
+    CurveListModel {
+        id: curvesModel
+        profile: profileListModel.currentProfile
+    }
+
+    ControllerListModel {
+        id: controllersModel
+        profile: profileListModel.currentProfile
+    }
 
     Material.theme: Material.Dark
     Material.primary: Material.BlueGrey
@@ -25,7 +49,7 @@ ApplicationWindow {
     UnsavedChangesDialog {
         id: closingWindowSaveDlg
         parent: mainPage
-        profileModel: profilesModel.currentProfile
+        profileModel: profileListModel.currentProfile
         onSaved: function (close) {
             window._closing = true
             window.close()
@@ -41,27 +65,6 @@ ApplicationWindow {
             var openedDlg = closingWindowSaveDlg.openIfUnsaved()
             close.accepted = !openedDlg
         }
-    }
-
-    SensorListModel {
-        id: sensorsModel
-        profile: profilesModel.currentProfile
-    }
-
-    GovernorListModel {
-        id: governorsModel
-        profile: profilesModel.currentProfile
-        sensors: sensorsModel
-    }
-
-    CurveListModel {
-        id: curvesModel
-        profile: profilesModel.currentProfile
-    }
-
-    ControllerListModel {
-        id: controllersModel
-        profile: profilesModel.currentProfile
     }
 
     Settings {
@@ -117,14 +120,14 @@ ApplicationWindow {
                 id: addButton
 
                 function addProfile(){
-                    profilesModel.createAndSwitchTo()
+                    profileListModel.createAndSwitchTo()
                     //todo: focus ComboBox textfield for editing new name
                 }
 
                 UnsavedChangesDialog {
                     id: confirmationDialog
                     parent: mainPage
-                    profileModel: profilesModel.currentProfile
+                    profileModel: profileListModel.currentProfile
                     onSaved: addButton.addProfile()
                     onDiscarded: addButton.addProfile()
                 }
@@ -142,14 +145,14 @@ ApplicationWindow {
 
             RoundButton {
                 id: favButton
-                icon.name: (profilesModel?.activeProfileName && profilesModel.activeProfileName === profilesModel?.currentProfile?.name) ?
+                icon.name: (profileListModel?.activeProfileName && profileListModel.activeProfileName === profileListModel?.currentProfile?.name) ?
                                "starred-symbolic" :
                                "non-starred-symbolic"
                 anchors.left: addButton.right
                 anchors.leftMargin: -5
                 radius: 0
                 flat: true
-                onClicked: profilesModel.activeProfileName = profilesModel.currentProfile.name
+                onClicked: profileListModel.activeProfileName = profileListModel.currentProfile.name
             }
 
             ToolButton {
@@ -209,8 +212,8 @@ ApplicationWindow {
 
                         property bool _isBlank: false
 
-                        text: _isBlank || !profilesModel.currentProfile ?
-                                  "" : profilesModel.currentProfile.updateIntervalMs
+                        text: _isBlank || !profileListModel.currentProfile ?
+                                  "" : profileListModel.currentProfile.updateIntervalMs
 
                         onEditingFinished: {
                             _isBlank = false
@@ -219,8 +222,8 @@ ApplicationWindow {
                         onTextChanged: {
                             var nextIsBlank = !text
                             if (!nextIsBlank) {
-                                if (profilesModel.currentProfile)
-                                    profilesModel.currentProfile.updateIntervalMs = text
+                                if (profileListModel.currentProfile)
+                                    profileListModel.currentProfile.updateIntervalMs = text
                                 }
                             _isBlank = nextIsBlank
                         }
@@ -312,18 +315,18 @@ ApplicationWindow {
             SaveAnywayDialog {
                 id: saveAnywayDlg
                 parent: mainPage
-                profileModel: profilesModel.currentProfile
+                profileModel: profileListModel.currentProfile
             }
             Button {
                 text: "save profile"
                 flat: true
                 anchors.right: parent.right
                 anchors.margins: 5
-                enabled: profilesModel.currentProfile ?
-                    profilesModel.currentProfile.unsavedChanges : false
-                onClicked: profilesModel.currentProfile.hasIssues ?
+                enabled: profileListModel.currentProfile ?
+                    profileListModel.currentProfile.unsavedChanges : false
+                onClicked: profileListModel.currentProfile.hasIssues ?
                                saveAnywayDlg.open() :
-                               profilesModel.currentProfile.save()
+                               profileListModel.currentProfile.save()
             }
         }
     }
